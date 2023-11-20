@@ -72,7 +72,7 @@ class COA extends Model
      *******************************/
     public function scopeGrid($query)
     {
-        return $query->latest();
+        return $query->orderBy('id');
     }
 
     public function scopeFilters($query)
@@ -95,11 +95,6 @@ class COA extends Model
             $this->save();
             $this->saveLogNotify();
 
-            // if ($request->is_submit) {
-            //     return $this->commitSaved(['redirectToModal' => route($request->routes.'.submit', $this->id)]);
-            // }
-
-
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -117,6 +112,26 @@ class COA extends Model
             return $this->commitDeleted();
         } catch (\Exception $e) {
             return $this->rollbackDeleted($e);
+        }
+    }
+
+    public function saveLogNotify()
+    {
+        $data = $this->name;
+        $routes = request()->get('routes');
+        switch (request()->route()->getName()) {
+            case $routes . '.store':
+                $this->addLog('Membuat Data ' . $data);
+                break;
+            case $routes . '.update':
+                $this->addLog('Mengubah Data ' . $data);
+                break;
+            case $routes . '.destroy':
+                $this->addLog('Menghapus Data ' . $data);
+                break;
+            case $routes . '.importSave':
+                auth()->user()->addLog('Import Data Master Struktur Organisasi');
+                break;
         }
     }
 }

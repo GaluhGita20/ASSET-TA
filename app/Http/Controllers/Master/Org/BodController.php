@@ -59,7 +59,7 @@ class BodController extends Controller
                 return request()->start;
             })
             ->addColumn('code', function ($record) {
-                return  $record->code_manual ?? null;
+                return  $record->code ?? null;
             })
             ->addColumn('name', function ($record) {
                 return $record->name ?? null;

@@ -7,17 +7,9 @@
     <div class="row">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                    <label class="col-sm-12 col-md-3 col-form-label">{{ __('ID Vendor') }}</label>
-                    <div class=" col-sm-12 col-md-9 parent-group">
-                        <input name="id_vendor" class="form-control" placeholder="{{ __('ID Vendor') }}">
-                    </div>
-            </div>
-        </div>
-        <div class="col-sm-12 col-sm-12">
-            <div class="form-group row">
                     <label class="col-sm-12 col-md-3 col-form-label">{{ __('Vendor') }}</label>
                     <div class=" col-sm-12 col-md-9 parent-group">
-                        <input name="name" class="form-control" placeholder="{{ __('Vendor') }}">
+                        <input name="name" type="text" class="form-control" placeholder="{{ __('Vendor') }}">
                     </div>
             </div>
         </div>
@@ -25,7 +17,7 @@
                         <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Alamat') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <textarea name="address" class="form-control" placeholder="{{ __('Alamat') }}"></textarea>
+                    <textarea name="address" type="text" class="form-control" placeholder="{{ __('Alamat') }}"></textarea>
                 </div>
             </div>
         </div>

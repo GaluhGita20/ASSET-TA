@@ -107,4 +107,24 @@ class TypeVendor extends Model
             return $this->rollbackDeleted($e);
         }
     }
+
+    public function saveLogNotify()
+    {
+        $data = $this->name;
+        $routes = request()->get('routes');
+        switch (request()->route()->getName()) {
+            case $routes . '.store':
+                $this->addLog('Membuat Data ' . $data);
+                break;
+            case $routes . '.update':
+                $this->addLog('Mengubah Data ' . $data);
+                break;
+            case $routes . '.destroy':
+                $this->addLog('Menghapus Data ' . $data);
+                break;
+            case $routes . '.importSave':
+                auth()->user()->addLog('Import Data Master Struktur Organisasi');
+                break;
+        }
+    }
 }

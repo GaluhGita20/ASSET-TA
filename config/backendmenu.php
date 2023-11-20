@@ -76,9 +76,41 @@ return [
                 ]
             ],
             [
-                'name' => 'master.coa',
+                'name' => 'master.Coa',
                 'title' => 'Chart of Accounts',
-                'url' => '/master/coa',
+                'url' => '',
+                'submenu' => [
+                    [
+                        'name' => 'master_coa_tanah',
+                        'title' => 'Coa Tanah',
+                        'url' => '/master/coa/tanah'
+                    ],
+                    [
+                        'name' => 'master_coa_peralatan',
+                        'title' => 'Coa Peralatan Mesin',
+                        'url' => '/master/coa/peralatan-mesin'
+                    ],
+                    [
+                        'name' => 'master_coa_bangunan',
+                        'title' => 'Coa Gedung Bangunan',
+                        'url' => '/master/coa/gedung-bangunan'
+                    ],
+                    [
+                        'name' => 'master_coa_aset_lainya',
+                        'title' => 'Coa Aset Tetap Lainya',
+                        'url' => '/master/coa/aset-tetap-lainya'
+                    ],
+                    [
+                        'name' => 'master_coa_jalan_irigasi',
+                        'title' => 'Coa Jalan Irigasi Jaringan ',
+                        'url' => '/master/coa/jalan-irigasi-jaringan'
+                    ],
+                    [
+                        'name' => 'master_coa_kontruksi_pembangunan',
+                        'title' => 'Coa Kontruksi Pembangunan',
+                        'url' => '/master/coa/kontruksi-pembangunan'
+                    ],
+                ]
             ],
             [
                 'name' => 'Vendor',

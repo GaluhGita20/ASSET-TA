@@ -25,8 +25,8 @@ class CoaRequest extends FormRequest
     {
         $id = $this->record->id ?? 0;
         $rules = [
-            'kode_akun' => 'required|unique:chart_of_accounts,kode_akun,'.$id,
-            'nama_akun' => 'required|string|max:255|unique:chart_of_accounts,nama_akun,'.$id,
+            'kode_akun' => 'required|unique:ref_coa,kode_akun,'.$id,
+            'nama_akun' => 'required|string|max:255|unique:ref_coa,nama_akun,'.$id,
             'tipe_akun' => 'required',
         ];
 

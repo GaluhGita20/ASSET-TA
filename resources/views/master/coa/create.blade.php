@@ -18,15 +18,14 @@
     <div class="form-group row">
         <label class="col-sm-12 col-md-4 col-form-label">{{ __('Tipe Akun Utama') }}</label>
         <div class="col-sm-12 col-md-8 parent-group">
-        <select class="form-control base-plugin--select2-ajax" name="tipe_akun" data-placeholder="Tipe Akun Utama">
-            <option disabed value="">Tipe Akun Utama</option>
-            <option value="laba rugi">Laba Rugi</option>
-            <option value="pendapatan">Pendapatan</option>
-            <option value="biaya">Biaya</option>
-            <option value="neraca">Neraca</option>
-            <option value="aset">Aset</option>
-            <option value="kewajiban">Kewajiban</option>
-            <option value="ekuitas">Ekuitas</option>
+        <select class="form-control base-plugin--select2-ajax" name="tipe_akun" data-placeholder="Tipe Akun Utama" disabled>
+            {{-- <option disabed value="">Tipe Akun Utama</option> --}}
+            <option value="KIB A" {{ $tipe_akun == "KIB A" ? 'selected' : '' }}>KIB A</option>
+            <option value="KIB B" {{ $tipe_akun == "KIB B" ? 'selected' : '' }}>KIB B</option>
+            <option value="KIB C" {{ $tipe_akun == "KIB C" ? 'selected' : '' }}>KIB C</option>
+            <option value="KIB D" {{ $tipe_akun == "KIB D" ? 'selected' : '' }}>KIB D</option>
+            <option value="KIB E" {{ $tipe_akun == "KIB E" ? 'selected' : '' }}>KIB E</option>
+            <option value="KIB F" {{ $tipe_akun == "KIB F" ? 'selected' : '' }}>KIB F</option>
         </select>
         </div>
     </div>

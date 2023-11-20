@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
             );
         }
     );
+
     Route::namespace('Dashboard')
         ->group(
             function () {
@@ -176,8 +177,6 @@ Route::middleware('auth')->group(function () {
                             Route::delete('user/{id}/sertifikasiDetailDestroy', 'UserController@sertifikasiDetailDestroy')->name('user.sertifikasi.detailDestroy');
                             Route::post('user/{record}/sertifikasiGrid', 'UserController@sertifikasiGrid')->name('user.sertifikasi.grid');
 
-
-
                             Route::get('profile', 'ProfileController@index')->name('profile.index');
                             Route::post('profile', 'ProfileController@updateProfile')->name('profile.updateProfile');
                             Route::get('profile/notification', 'ProfileController@notification')->name('profile.notification');
@@ -196,11 +195,6 @@ Route::middleware('auth')->group(function () {
                             Route::grid('activity', 'ActivityController');
                         }
                     );
-
-                // Route::namespace('Reset')->group(function () {
-                //     Route::get('reset-data', 'ResetController@index')->name('reset');
-                //     Route::post('reset-data', 'ResetController@reset')->name('reset');
-                // });
             }
         );
 
@@ -247,10 +241,19 @@ Route::middleware('auth')->group(function () {
                             Route::grid('district', 'DistrictController');
                         }
                     );
+
                 Route::namespace('Coa')
+                    ->prefix('coa')
+                    ->name('coa.')
                     ->group(
                         function () {
-                            Route::grid('coa', 'CoaController');
+                            Route::grid('tanah', 'CoaTanahController');
+                            Route::grid('peralatan-mesin', 'CoaPeralatanController');
+                            Route::grid('gedung-bangunan', 'CoaBangunanController');
+                            Route::grid('aset-tetap-lainya', 'CoaAsetTetapController');
+                            Route::grid('jalan-irigasi-jaringan', 'CoaJalanIrigasiController');
+                            Route::grid('kontruksi-pembangunan', 'CoaKontruksiBangunanController');
+
                             Route::get('getDetailCOA', 'CoaController@getDetailCOA')->name('getDetailCOA');
                         }
                     );

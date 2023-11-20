@@ -11,10 +11,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
-class CoaController extends Controller
+class CoaTanahController extends Controller
 {
-    protected $module = 'master.coa';
-    protected $routes = 'master.coa';
+    //
+    protected $module = 'master_coa_tanah';
+    protected $routes = 'master.coa.tanah';
     protected $views  = 'master.coa';
     protected $perms = 'master';
     private $datas;
@@ -28,20 +29,20 @@ class CoaController extends Controller
                 'views' => $this->views,
                 'perms' => $this->perms,
                 'permission' => $this->perms . '.view',
-                'title' => 'Chart of Accounts (COA)',
+                'title' => 'Chart of Accounts Tanah',
                 'breadcrumb' => [
-                    'Konsol Admin' => route($this->routes . '.index'),
-                    'Parameter' => route($this->routes . '.index'),
-                    'COA' => route($this->routes . '.index'),
+                    'Data Master' => rut($this->routes . '.index'),
+                    'Chart Of Accouts' => rut($this->routes . '.index'),
+                    'COA Tanah' => rut($this->routes . '.index'),
                 ]
             ]
         );
     }
-
+    
     public function grid()
     {
         $user = auth()->user();
-        $records = Coa::grid()->filters()->dtGet();
+        $records = Coa::grid()->where('tipe_akun','=','KIB A')->filters()->dtGet();
 
         return DataTables::of($records)
             ->addColumn(
@@ -80,12 +81,6 @@ class CoaController extends Controller
                     return $record->createdByRaw();
                 }
             )
-            // ->addColumn(
-            //     'status',
-            //     function ($record) {
-            //         return $record->status;
-            //     }
-            // )
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [];
                 if ($record->checkAction('show', $this->perms)) {
@@ -141,45 +136,44 @@ class CoaController extends Controller
 
     public function create(){
         $page_action = "create";
+        $tipe_akun = "KIB A";
         $baseContentReplace = "base-modal--render";
-        return $this->render($this->views . '.create');
+        return $this->render($this->views . '.create',compact("tipe_akun"));
     }
 
     public function show(COA $record){
-        $this->prepare(
-            [
-                'breadcrumb' => [
-                    'Konsol Admin' => route($this->routes . '.index'),
-                    'Parameter' => route($this->routes . '.index'),
-                    'Jurnal' => route($this->routes . '.index'),
-                    'COA' => route($this->routes . '.index'),
-                    'Lihat' => route($this->routes . '.show', $record->id),
-                ]
-            ]
-        );
         $page_action = "show";
-        return $this->render($this->views . '.detail', compact("page_action", "record"));
+        $tipe_akun = "KIB A";
+        return $this->render($this->views . '.detail', compact("page_action", "record","tipe_akun"));
     }
     public function store(CoaRequest $request){
         $record = new COA;
         return $record->handleStoreOrUpdate($request);
     }
 
-    public function edit(COA $record){
-        $this->prepare(
-            [
-                'breadcrumb' => [
-                    'Konsol Admin' => route($this->routes . '.index'),
-                    'Parameter' => route($this->routes . '.index'),
-                    'Jurnal' => route($this->routes . '.index'),
-                    'COA' => route($this->routes . '.index'),
-                    'Detil' => route($this->routes . '.edit', $record->id),
-                ]
-            ]
-        );
+    public function edit(COA $record)
+    {
         $page_action = "edit";
-        return $this->render($this->views . '.detail', compact("page_action", "record"));
+        $tipe_akun = "KIB A";
+        return $this->render($this->views.'.detail', compact("page_action","record","tipe_akun"));
     }
+
+
+    // public function edit(COA $record){
+    //     $this->prepare(
+    //         [
+    //             'breadcrumb' => [
+    //                 'Konsol Admin' => route($this->routes . '.index'),
+    //                 'Parameter' => route($this->routes . '.index'),
+    //                 'Jurnal' => route($this->routes . '.index'),
+    //                 'COA' => route($this->routes . '.index'),
+    //                 'Detil' => route($this->routes . '.edit', $record->id),
+    //             ]
+    //         ]
+    //     );
+    //     $page_action = "edit";
+    //     return $this->render($this->views . '.detail', compact("page_action", "record"));
+    // }
 
     public function update(COA $record, CoaRequest $request){
         return $record->handleStoreOrUpdate($request);
@@ -197,4 +191,5 @@ class CoaController extends Controller
             'tipe_akun' => $coa->tipe_akun,
         ]);
     }
+
 }

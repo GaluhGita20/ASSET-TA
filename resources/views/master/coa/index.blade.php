@@ -4,19 +4,19 @@
         <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <input type="text" class="form-control filter-control" data-post="nama_akun" placeholder="{{ __('Nama Akun') }}">
         </div>
+
         <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <select class="form-control filter-control base-plugin--select2" name="tipe_akun"
                 data-post="tipe_akun"
                 data-placeholder="{{ __('Tipe Akun Utama') }}"
             >
             <option value="">Pilih Salah Satu</option>
-            <option value="laba rugi">Laba Rugi</option>
-            <option value="pendapatan">Pendapatan</option>
-            <option value="biaya">Biaya</option>
-            <option value="neraca">Neraca</option>
-            <option value="aset">Aset</option>
-            <option value="kewajiban">Kewajiban</option>
-            <option value="ekuitas">Ekuitas</option>
+            <option value="KIB A">KIB A</option>
+            <option value="KIB B">KIB B</option>
+            <option value="KIB C">KIB C</option>
+            <option value="KIB D">KIB D</option>
+            <option value="KIB E">KIB E</option>
+            <option value="KIB F">KIB F</option>
             </select>
         </div>
     </div>

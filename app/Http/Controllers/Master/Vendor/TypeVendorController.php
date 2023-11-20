@@ -28,11 +28,11 @@ class TypeVendorController extends Controller
                 'views' => $this->views,
                 'perms' => $this->perms,
                 'permission' => $this->perms . '.view',
-                'title' => 'Mata Anggaran',
+                'title' => 'Jenis Usaha Vendor',
                 'breadcrumb' => [
-                    'Konsol Admin' => route($this->routes . '.index'),
-                    'Parameter' => route($this->routes . '.index'),
-                    'Mata Anggaran' => route($this->routes . '.index'),
+                    'Data Master' => route($this->routes . '.index'),
+                    'Vendor' => route($this->routes . '.index'),
+                    'Jenis Usaha Vendor' => route($this->routes . '.index'),
                 ]
             ]
         );
@@ -51,27 +51,15 @@ class TypeVendorController extends Controller
                 }
             )
             ->addColumn(
-                'mata_anggaran',
+                'name',
                 function ($record) {
-                    return Base::makeLabel($record->mata_anggaran, 'danger');
+                    return $record->name;
                 }
             )
             ->addColumn(
-                'nama',
+                'description',
                 function ($record) {
-                    return Base::makeLabel($record->name, 'primary');
-                }
-            )
-            ->addColumn(
-                'deskripsi',
-                function ($record) {
-                    return '<div style="margin-right: 0; width:250px"><p class="text-left" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">' . ($record->description) . '</p></div>';
-                }
-            )
-            ->addColumn(
-                'status',
-                function ($record) {
-                    return $record->status;
+                    return $record->description;
                 }
             )
             ->addColumn(
@@ -99,10 +87,8 @@ class TypeVendorController extends Controller
             })
             ->rawColumns(
                 [
-                    'mata_anggaran',
-                    'nama',
-                    'deskripsi',
-                    'status',
+                    'name',
+                    'descrption',
                     'updated_by',
                     'action',
                 ]
@@ -116,9 +102,8 @@ class TypeVendorController extends Controller
             'tableStruct' => [
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
-                    $this->makeColumn('name:mata_anggaran|label:Kode|className:text-center'),
-                    $this->makeColumn('name:nama|label:Nama|className:text-left'),
-                    $this->makeColumn('name:deskripsi|label:Deskripsi|className:text-left'),
+                    $this->makeColumn('name:name|label:Nama Jenis Usaha|className:text-center'),
+                    $this->makeColumn('name:description|label:Deskripsi|className:text-left'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -131,14 +116,14 @@ class TypeVendorController extends Controller
     public function create()
     {
         $page_action = "create";
-        return $this->render($this->views . '.detail', compact("page_action"));
+        return $this->render($this->views . '.create', compact("page_action"));
     }
 
     public function show(TypeVendor $record)
     {
         $baseContentReplace = false;
         $page_action = "show";
-        return $this->render($this->views . '.detail', compact("page_action", "record", "baseContentReplace"));
+        return $this->render($this->views . '.edit', compact("page_action", "record", "baseContentReplace"));
     }
     public function store(TypeVendorRequest $request)
     {
@@ -149,7 +134,7 @@ class TypeVendorController extends Controller
     public function edit(TypeVendor $record)
     {
         $page_action = "edit";
-        return $this->render($this->views . '.detail', compact("page_action", "record"));
+        return $this->render($this->views . '.edit', compact("page_action", "record"));
     }
 
     public function update(TypeVendor $record, TypeVendorRequest $request)
@@ -164,10 +149,10 @@ class TypeVendorController extends Controller
 
     public function getDetailTypeVendor(Request $request)
     {
-        $id_mata_anggaran = $request->id_mata_anggaran;
-        $mata_anggaran = TypeVendor::where('id', $id_mata_anggaran)->first()->mata_anggaran;
+        $id = $request->id;
+        $type_vendor = TypeVendor::where('id', $id)->first()->name;
         return response()->json([
-            'mata_anggaran' => $mata_anggaran,
+            'Jenis Usaha' => $type_vendor,
         ]);
     }
 }

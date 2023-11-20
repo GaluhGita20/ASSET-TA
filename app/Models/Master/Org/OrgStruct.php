@@ -18,12 +18,11 @@ class OrgStruct extends Model
     protected $fillable = [
         'parent_id',
         'level', //root, bod, department, branch
-        'type', //1:presdir, 2:direktur, 3:ia department, 4:it department, 5:Bagian Perencanaan & Evaluasi Audit
+         //1:presdir, 2:direktur, 3:ia department, 4:it department, 5:Bagian Perencanaan & Evaluasi Audit
         'name',
         'email',
         'website',
         'code',
-        'code_manual',
         'phone',
         'address',
         'province_id',
@@ -44,8 +43,8 @@ class OrgStruct extends Model
                 return __('Sub Departemen');
             case 'subsection':
                 return __('Sub Unit Departemen');
-            case 'group':
-                return __('Grup Lainnya');
+            // case 'group':
+            //     return __('Grup Lainnya');
             default:
                 return ucfirst($this->level);
         }
@@ -72,10 +71,10 @@ class OrgStruct extends Model
         return $this->hasMany(OrgStruct::class, 'parent_id')->orderBy('level')->with('child');
     }
 
-    public function childOfGroup()
-    {
-        return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'group_id', 'struct_id');
-    }
+    // public function childOfGroup()
+    // {
+    //     return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'group_id', 'struct_id');
+    // }
 
     public function structGroup()
     {
@@ -122,15 +121,15 @@ class OrgStruct extends Model
         return $query->where('level', 'bod')->orderByRaw("CASE WHEN updated_at > created_at THEN updated_at ELSE created_at END DESC");
     }
 
-    public function scopePresdir($query)
-    {
-        return $query->bod()->where('type', 1);
-    }
+    // public function scopePresdir($query)
+    // {
+    //     return $query->bod()->where('type', 1);
+    // }
 
-    public function scopeDirector($query)
-    {
-        return $query->bod()->where('type', '!=', 1);
-    }
+    // public function scopeDirector($query)
+    // {
+    //     return $query->bod()->where('type', '!=', 1);
+    // }
 
     public function scopeDepartment($query)
     {
@@ -177,12 +176,13 @@ class OrgStruct extends Model
             $this->fill($request->all());
             $this->updated_at = now();
             $this->level = $level;
-            $this->code = $this->code ?: $this->getNewCode($level);
+            $this->code = $this->code ? : $this->getNewCode($level);
             $this->save();
 
-            if ($level == 'group') {
-                $this->childOfGroup()->sync($request->department);
-            }
+            // if ($level == 'group') {
+            //     $this->childOfGroup()->sync($request->department);
+            // }
+
             $this->saveLogNotify();
 
             return $this->commitSaved();
@@ -250,9 +250,9 @@ class OrgStruct extends Model
     /** OTHER FUNCTIONS **/
     public function canDeleted()
     {
-        if (in_array($this->type, [1, 2, 3, 4, 5])) return false;
-        if (in_array($this->level, ['root', 'boc'])) return false;
-        if ($this->child()->exists()) return false;
+        // if (in_array($this->type, [1, 2, 3, 4, 5])) return false;
+        if (in_array($this->level, ['root', 'bod'])) return false;
+        // if ($this->child()->exists()) return false;
         if ($this->structGroup()->exists()) return false;
         if ($this->positions()->exists()) return false;
 
@@ -265,7 +265,7 @@ class OrgStruct extends Model
             case 'root':
                 $max = static::root()->max('code');
                 return $max ? $max + 1 : 1001;
-            case 'boc':
+            case 'bod':
                 $max = static::bod()->max('code');
                 return $max ? $max + 1 : 1101;
             case 'department':

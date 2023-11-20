@@ -15,12 +15,16 @@ class BodRequest extends FormRequest
                 // 'different:id',
                 'exists:ref_org_structs,id'
             ],
-            'code_manual'  => 'required|unique:ref_org_structs,code_manual,'.$id.',id',
+           // 'code_manual'  => 'required|unique:ref_org_structs,code_manual,'.$id.',id',
             'name'      => [
                 'required',
                 'max:255',
                 'unique:ref_org_structs,name,'.$id.',id,level,bod'
             ],
+            // 'code' =>[
+            //     'required',
+            //     'unique:ref_org_structs,code,'.$id.',id,level,bod'
+            // ]
         ];
 
         return $rules;
