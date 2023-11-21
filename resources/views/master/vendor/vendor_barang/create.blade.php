@@ -145,7 +145,8 @@
 					var urlOrigin = objectId.data('url-origin');
 					var urlParam = $.param({province_id: me.val()});
 					objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
-					objectId.val(null).prop('disabled', false);
+					console.log(decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+                    objectId.val(null).prop('disabled', false);
 				}
 				BasePlugin.initSelect2();
 			});

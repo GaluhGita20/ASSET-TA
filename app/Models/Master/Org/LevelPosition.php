@@ -26,10 +26,10 @@ class LevelPosition extends Model
     /*******************************
      ** RELATION
      *******************************/
-    public function positions()
-    {
-        return $this->hasMany(Position::class, 'level_id');
-    }
+    // public function positions()
+    // {
+    //     return $this->hasMany(Position::class, 'level_id');
+    // }
 
     /*******************************
      ** SCOPE

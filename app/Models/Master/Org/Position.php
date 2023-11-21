@@ -14,7 +14,8 @@ class Position extends Model
 
     protected $fillable = [
         'location_id',
-        'level_id',
+        // 'level_id',
+        'level',
         'name',
         'code',
     ];
@@ -32,22 +33,22 @@ class Position extends Model
      *******************************/
     public function location()
     {
-        return $this->belongsTo(OrgStruct::class, 'location_id');
+        return $this->belongsTo(OrgStruct::class,'location_id');
     }
 
-    public function level()
-    {
-        return $this->belongsTo(LevelPosition::class, 'level_id');
-    }
+    // public function level()
+    // {
+    //     return $this->belongsTo(LevelPosition::class, 'level_id');
+    // }
 
-    public function struct()
-    {
-        return $this->belongsTo(OrgStruct::class, 'location_id');
-    }
+    // public function struct()
+    // {
+    //     return $this->belongsTo(OrgStruct::class, 'location_id');
+    // }
     
     public function users()
     {
-        return $this->hasMany(User::class, 'position_id');
+        return $this->hasMany(User::class,'position_id');
     }
     /*******************************
      ** SCOPE
@@ -167,6 +168,7 @@ class Position extends Model
                 $qq->seksiEvaluasi();
             });
         })->get();
+
         $lists = [];
         foreach($temp as $dd){
             $lists = array_merge($lists, $dd->getIdsWithChild());
@@ -174,13 +176,13 @@ class Position extends Model
         return in_array($this->location_id , $lists);
     }
 
-    public function imLevelManajerSPI()
-    {
-        $temp = Position::whereHas('level', function ($q) {
-            $q->where('name', 'LIKE', '%' . 'Manajer SPI');
-        })->pluck('id')->toArray();
-        return in_array($this->id, $temp);
-    }
+    // public function imLevelManajerSPI()
+    // {
+    //     $temp = Position::whereHas('level', function ($q) {
+    //         $q->where('name', 'LIKE', '%' . 'Manajer SPI');
+    //     })->pluck('id')->toArray();
+    //     return in_array($this->id, $temp);
+    // }
 
     public function isAuditor($request)
     {

@@ -80,7 +80,8 @@ Route::middleware('auth')->group(function () {
                 // Ajax Modules
                 
                 Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
-
+                Route::post('{search}/selectLevelJabatan', 'AjaxController@selectLevelJabatan')->name('selectLevelJabatan');
+                
 
                 Route::get('city-options', 'AjaxController@cityOptions')->name('cityOptions');
                 Route::post('penilaian-category', 'AjaxController@penilaianCategoryOptions')->name('penilaianCategoryOptions');

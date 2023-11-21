@@ -178,7 +178,6 @@ class AjaxController extends Controller
                 break;
             case 'find':
                 return $items->find($request->id);
-
             default:
                 $items = $items->whereNull('id');
                 break;
@@ -243,6 +242,22 @@ class AjaxController extends Controller
         return response()->json(compact('results', 'more'));
     }
 
+
+    public function selectLevelJabatan($search, Request $request){
+        $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
+        switch ($search) {
+            case 'by_level':
+                $items = $items->where('level', $request->level_id);
+                break;
+            default:
+                $items = $items->whereNull('id');
+                break;
+        }
+
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+
+    }
     public function selectStruct($search, Request $request)
     {
         $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
@@ -262,11 +277,11 @@ class AjaxController extends Controller
             case 'parent_subsection':
                 $items = $items->whereIn('level', ['subdepartment']);
                 break;
-
             default:
                 $items = $items->whereNull('id');
                 break;
         }
+
         $items = $items->when(
             $not = $request->not,
             function ($q) use ($not) {

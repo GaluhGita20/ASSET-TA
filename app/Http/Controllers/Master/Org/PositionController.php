@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\Org\PositionRequest;
 use App\Models\Master\Org\Position;
 use Illuminate\Http\Request;
+// use App\Support\Base;
 
 class PositionController extends Controller
 {
@@ -40,7 +41,7 @@ class PositionController extends Controller
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
                     $this->makeColumn('name:location|label:Struktur|className:text-center'),
-                    $this->makeColumn('name:level|label:Level|className:text-center'),
+                    // $this->makeColumn('name:level|label:Level|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -52,7 +53,7 @@ class PositionController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Position::with('level')->grid()->filters()->dtGet();
+        $records = Position::grid()->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn('num', function ($record) {
@@ -64,15 +65,12 @@ class PositionController extends Controller
             ->addColumn('location', function ($record) {
                 return $record->location->name ?? '';
             })
-            ->addColumn('level', function ($record) {
-                if($record->level){
-                    return $record->level->name ?? null;
-                }
-                return '-';
-            })
             ->addColumn('updated_by', function ($record) {
                 return $record->createdByRaw();
             })
+            // ->addColumn('updated_by', function ($record) {
+            //     return $record->createdByRaw();
+            // })
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show|id:' . $record->id,
@@ -87,7 +85,7 @@ class PositionController extends Controller
                 }
                 return $this->makeButtonDropdown($actions);
             })
-            ->rawColumns(['action', 'updated_by', 'location', 'name', 'level'])
+            ->rawColumns(['action', 'updated_by', 'location', 'name'])
             ->make(true);
     }
 
@@ -161,3 +159,10 @@ class PositionController extends Controller
         return $record->handleImport($request);
     }
 }
+
+            // ->addColumn('level', function ($record) {
+            //     if($record->level){
+            //         return $record->level->name ?? null;
+            //     }
+            //     return '-';
+            // })
