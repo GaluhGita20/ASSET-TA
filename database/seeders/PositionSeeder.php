@@ -136,7 +136,6 @@ class PositionSeeder extends Seeder
                 "code" => 1021,
                 "level" => "subdepartement",
             ],
-            
 
             [
                 "location_id" => 7,
