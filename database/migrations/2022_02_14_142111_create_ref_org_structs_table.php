@@ -32,6 +32,7 @@ class CreateRefOrgStructsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('location_id')->nullable();
             $table->string('name');
+            $table->string('level');
             $table->unsignedInteger('code');
             $table->commonFields();
 

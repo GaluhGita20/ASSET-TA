@@ -14,13 +14,13 @@ class PositionSeeder extends Seeder
                 "location_id" => 2,
                 "name" => "Kepala Direktur",
                 "code" => 1001,
-                "level_id" => "bod",
+                "level" => "bod",
             ],
             [
                 "location_id" => 2,
                 "name" => "Wakil Kepala Direktur",
                 "code" => 1002,
-                "level_id" => "bod",
+                "level" => "bod",
             ],
             [
                 "location_id" => 3,
