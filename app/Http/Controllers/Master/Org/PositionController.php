@@ -41,7 +41,7 @@ class PositionController extends Controller
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
                     $this->makeColumn('name:location|label:Struktur|className:text-center'),
-                    // $this->makeColumn('name:level|label:Level|className:text-center'),
+                    $this->makeColumn('name:level|label:Level|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -68,9 +68,9 @@ class PositionController extends Controller
             ->addColumn('updated_by', function ($record) {
                 return $record->createdByRaw();
             })
-            // ->addColumn('updated_by', function ($record) {
-            //     return $record->createdByRaw();
-            // })
+            ->addColumn('level', function ($record) {
+                return $record->level ?? '';
+            })
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show|id:' . $record->id,

@@ -147,6 +147,27 @@ class OrgStructSeeder extends Seeder
                 'code_manual'   => '060107',
                 'type'          => 0,
             ],
+
+            // [
+            //     'level'         => 'subdepartment',
+            //     'name'          => 'IGD',
+            //     'phone'         => config('base.company.phone'),
+            //     'address'       => config('base.company.address'),
+            //     'parent_code'   => 2003,
+            //     'code'          => 3006,
+            //     'code_manual'   => '060106',
+            //     'type'          => 0,
+            // ],
+            // [
+            //     'level'         => 'subdepartment',
+            //     'name'          => 'IPSRS',
+            //     'phone'         => config('base.company.phone'),
+            //     'address'       => config('base.company.address'),
+            //     'parent_code'   => 2003,
+            //     'code'          => 3007,
+            //     'code_manual'   => '060107',
+            //     'type'          => 0,
+            // ],
         ];
 
         $this->generate($structs);
