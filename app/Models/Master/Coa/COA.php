@@ -39,6 +39,17 @@ class COA extends Model
     /*******************************
      ** ACCESSOR
      *******************************/
+    public function getShowTipeAkunAttribute()
+    {
+        switch ($this->tipe_akun) {
+            case 'KIB A':
+                return __('Tanah');
+            case 'KIB B':
+                return __('Mesin');
+            default:
+                return ucfirst($this->tipe_akun);
+        }
+    }
 
     public function checkAction($action, $perms)
     {

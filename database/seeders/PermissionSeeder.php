@@ -28,6 +28,20 @@ class PermissionSeeder extends Seeder
                 'name'          => 'monitoring',
                 'action'        => ['view'],
             ],
+
+            /** PENGAJUAN**/
+            [
+                'name'          => 'pengajuan.pembelian-aset',
+                'action'        => ['view', 'create', 'edit', 'delete', 'approve'],
+            ],
+            [
+                'name'          => 'pengajuan.berita-acara',
+                'action'        => ['view', 'create', 'edit', 'approve'],
+            ],
+            [
+                'name'          => 'pengajuan.registrasi-aset',
+                'action'        => ['view', 'create', 'edit', 'approve'],
+            ],
             
             /** REPORT **/
             [
@@ -53,6 +67,9 @@ class PermissionSeeder extends Seeder
                 'name'  => 'Administrator',
                 'PERMISSIONS'   => [
                     'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],
@@ -83,14 +100,6 @@ class PermissionSeeder extends Seeder
                 'name' => 'Administrator',
             ]
         );
-
-        $komisaris = Role::firstOrNew(['id' => 2]);
-        $komisaris->name = 'Dewan Komisaris';
-        $komisaris->save();
-
-        $komite = Role::firstOrNew(['id' => 3]);
-        $komite->name = 'Komite Audit';
-        $komite->save();
 
         $perms_ids = [];
         foreach ($permissions as $row) {

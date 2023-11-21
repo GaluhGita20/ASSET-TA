@@ -209,7 +209,6 @@ class PositionSeeder extends Seeder
         foreach ($position as $val) {
             $position              = Position::firstOrNew(['code' => $val['code']]);
             $position->location_id = $val['location_id'] ?? NULL;
-            // $position->nonpkpt_id = $val['nonpkpt_id'] ?? NULL;
             $position->name        = $val['name'];
             $position->code        = $val['code'];
             $position->level        = $val['level'] ?? NULL;
