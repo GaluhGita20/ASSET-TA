@@ -165,15 +165,15 @@ class LoginController extends Controller
             [
                 $this->username()   => 'required',
                 'password'          => 'required',
-                'captcha'           => 'required|simple_captcha',
+                //'captcha'           => 'required|simple_captcha',
             ],
-            [
-                'captcha' => 'Captcha',
-            ],
-            [
-                $this->username() => 'Username / Email',
-                'captcha' => 'Captcha',
-            ]
+            // [
+            //     'captcha' => 'Captcha',
+            // ],
+            // [
+            //     $this->username() => 'Username / Email',
+            //     'captcha' => 'Captcha',
+            // ]
         );
     }
 }

@@ -78,6 +78,10 @@ Route::middleware('auth')->group(function () {
                 Route::post('userNotification', 'AjaxController@userNotification')->name('userNotification');
                 Route::get('userNotification/{notification}/read', 'AjaxController@userNotificationRead')->name('userNotificationRead');
                 // Ajax Modules
+                
+                Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
+
+
                 Route::get('city-options', 'AjaxController@cityOptions')->name('cityOptions');
                 Route::post('penilaian-category', 'AjaxController@penilaianCategoryOptions')->name('penilaianCategoryOptions');
                 Route::post('city-options-root', 'AjaxController@cityOptionsRoot')->name('cityOptionsRoot');

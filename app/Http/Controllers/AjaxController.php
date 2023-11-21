@@ -42,6 +42,7 @@ use App\Models\Rkia\Rkia;
 use App\Models\Rkia\Summary;
 use App\Models\Survey\SurveyReg;
 use App\Models\Survey\SurveyRegUser;
+use App\Models\Master\Vendor\TypeVendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -49,6 +50,22 @@ use Illuminate\Support\Str;
 
 class AjaxController extends Controller
 {
+    public function selectJenisUsaha($search, Request $request)
+    {
+        $items = TypeVendor::keywordBy('name')->orderBy('name');
+        switch ($search) {
+            case 'all':
+                $items = $items;
+                break;
+
+            default:
+                $items = $items->whereNull('id');
+                break;
+        }
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
     public function saveTempFiles(Request $request)
     {
         $this->beginTransaction();
@@ -133,6 +150,7 @@ class AjaxController extends Controller
             case 'all':
                 $items = $items;
                 break;
+
             case 'approver':
                 $perms = str_replace('_', '.', $request->perms) . '.approve';
                 $items = $items->whereHas(

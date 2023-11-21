@@ -35,42 +35,42 @@
                     </span>
                 @enderror
             </div>
-            <div class="form-group">
-                <label class="font-weight-bolder">Captcha</label>
+            {{-- <div class="form-group">
+                <label class="font-weight-bolder">Captcha</label> --}}
                 {{-- {!! captcha_img() !!} --}}
-                {!! getCaptchaBox('captcha') !!}
+                {{-- {!! getCaptchaBox('captcha') !!} --}}
                 {{-- {{ $errors }} --}}
                 {{-- {{ $errors->captcha }} --}}
                 {{-- {{ $errors->get('captcha')[0]??'' }} --}}
                 {{-- <input id="captcha" name="captcha" class="form-control @error('captcha') is-invalid @enderror"
                     placeholder="Captcha" autocomplete="off"> --}}
-                @if ($errors->get('captcha')[0] ?? null)
+                {{-- @if ($errors->get('captcha')[0] ?? null) --}}
                     {{-- @error('captcha') --}}
-                    <span style="color: #F64E60; font-weight: 400; font-size: 10.8px">
+                    {{-- <span style="color: #F64E60; font-weight: 400; font-size: 10.8px">
                         <strong>{{ $errors->get('captcha')[0] ?? '' }}</strong>
-                    </span>
+                    </span> --}}
                     {{-- @enderror --}}
-                @endif
-            </div>
+                {{-- @endif
+            </div> --}}
 
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label class="checkbox">
                     <input type="checkbox" name="remember"
                         {{ session('remember_username') != '' || old('remember') ? 'checked' : '' }}>
                     <span class="mr-2"></span>{{ \Base::trans('Remember Me') }}
                 </label>
-            </div>
+            </div> --}}
 
             <div class="form-group d-flex flex-wrap justify-content-between align-items-center">
-                <button type="submit" class="btn btn-info btn-block font-weight-bold my-3 py-3">
-                    {{ \Base::trans('Masuk') }}
+                <button type="submit" class="btn btn-info btn-block my-3 py-3">
+                 Masuk
                 </button>
-                @if (Route::has('password.request'))
+                {{-- @if (Route::has('password.request'))
                     <a href="{{ rut('password.request') }}"
                         class="w-100 text-center text-dark-50 text-hover-danger my-3 mr-2">
                         {{ \Base::trans('Lupa Password?') }}
                     </a>
-                @endif
+                @endif --}}
             </div>
         </form>
     </div>

@@ -45,11 +45,11 @@
 							<img src="{{ '/'.(config('base.logo.auth')) }}" alt="Image" style="max-width: 500px; max-height: 90px">
 						</div>
 						<div class="text-center">
-							<h1 class="font-size-h1 font-weight-boldest"  style="color:#6f55d0;"><b>E-AUDIT SPI</b></h1>
-							<h1 class="font-size-h3 font-weight-boldest"  style="color:#6f55d0;">
+							{{-- <h1 class="font-size-h1 font-weight-boldest"  style="color:#0d0c12;"><b>E-ASET RSUD</b></h1> --}}
+							<h1 class="font-size-h3 font-weight-boldest"  style="color:#0c0b10;">
 								<b>
-									APLIKASI SISTEM INFORMASI MANAJEMEN AUDIT<br>
-									SATUAN PENGAWAS INTERN - PERUMDA TIRTA PATRIOT
+									APLIKASI SISTEM MANAJAMEN ASET<br>
+									RSUD - KABUPATEN LOMBOK UTARA
 								</b>
 							</h1>
 						</div>
@@ -66,14 +66,14 @@
 		                </div>
 		            </div>
 
-		            <div class="d-flex flex-column align-items-center p-5">
-		                <div class="order-2 order-sm-1 my-2" style="color:#6f55d0;font-weight:600;">
+		            {{-- <div class="d-flex flex-column align-items-center p-5">
+		                <div class="order-2 order-sm-1 my-2" style="color:#040404;font-weight:600;">
 							© SPI {{ config('base.app.name') }} 2023
 		                </div>
-		                <div class="d-flex order-1 order-sm-2 my-2" style="color:#6f55d0;font-weight:600;">
+		                <div class="d-flex order-1 order-sm-2 my-2" style="color:#000000;font-weight:600;">
 		                    {{ config('base.app.copyright') }}
 		                </div>
-		            </div>
+		            </div> --}}
 
 		        </div>
 		    </div>

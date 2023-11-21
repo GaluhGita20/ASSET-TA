@@ -4,8 +4,9 @@ namespace App\Models\Master\Vendor;
 
 use App\Imports\Master\ExampleImport;
 use App\Models\Globals\TempFiles;
-use App\Models\Master\Geo\City;
-use App\Models\Master\Geo\Province;
+use App\Models\Master\Geografis\City;
+use App\Models\Master\Geografis\Province;
+use App\Models\Master\Vendor\TypeVendor;
 use App\Models\Model;
 use App\Models\Traits\RaidModel;
 use App\Models\Traits\ResponseTrait;
@@ -20,21 +21,40 @@ class Vendor extends Model
     public $table = 'ref_vendor';
 
     protected $fillable = [
-        "name", "address", "ref_province_id", "ref_city_id", "id_vendor",
-        "telp", "email", "contact_person", "status",
+        "nomor_instansi",
+        "name",
+        "type_vendor_id",
+        "kode_rekening",
+        "pimpinan", 
+        "telp",
+        "email",
+        "contact_person",
+        "address",
+        "ref_province_id",
+        "ref_city_id",
+        "ref_distric_id",
     ];
 
     public function provinsi() {
         return $this->belongsTo(Province::class, 'ref_province_id');
     }
 
+    public function jenisUsaha() {
+        return $this->belongsTo(TypeVendor::class, 'type_vendor_id');
+    }
+
     public function kota() {
-        return $this->belongsTo(City::class, "ref_city_id");
+        return $this->belongsTo(City::class, 'ref_city_id');
     }
 
     public function getProvinceName() {
         return $this->provinsi->name;
     }
+
+    public function getJenisUsahaName() {
+        return $this->jenisUsaha->name;
+    }
+    
 
     public function getCityName() {
         return $this->kota->name;
@@ -68,7 +88,7 @@ class Vendor extends Model
     public function scopeFilters($query)
     {
         return $query->filterBy(['name'])
-        ->filterBy(['status']);
+        ->filterBy(['type_vendor_id']);
     }
 
     /*******************************
@@ -81,6 +101,7 @@ class Vendor extends Model
             $this->fill($request->all());
             $this->save();
             $this->saveLogNotify();
+            // $this->dd($request->all());
 
             return $this->commitSaved();
         } catch (\Exception $e) {
@@ -141,13 +162,32 @@ class Vendor extends Model
         return false;
     }
 
+    public function saveLogNotify()
+    {
+        $data = $this->name;
+        $routes = request()->get('routes');
+        switch (request()->route()->getName()) {
+            case $routes . '.store':
+                $this->addLog('Membuat Data ' . $data);
+                break;
+            case $routes . '.update':
+                $this->addLog('Mengubah Data ' . $data);
+                break;
+            case $routes . '.destroy':
+                $this->addLog('Menghapus Data ' . $data);
+                break;
+            case $routes . '.importSave':
+                auth()->user()->addLog('Import Data Master Struktur Organisasi');
+                break;
+        }
+    }
+
     /*******************************
      ** OTHER FUNCTIONS
      *******************************/
     public function canDeleted()
     {
         // if($this->barang->count() || $this->pembelian->count()) return false;
-
         return true;
     }
 }

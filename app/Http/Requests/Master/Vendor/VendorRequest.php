@@ -25,25 +25,32 @@ class VendorRequest extends FormRequest
     {
         $id = $this->record->id ?? 0;
 
-        return [
-            'id_vendor' => 'required|string|max:255|unique:ref_vendor,name,'.$id,
-            'name' => 'required|string',
+        $rules= [
+            //'id_vendor' => 'required|string|max:255|unique:ref_vendor,name,'.$id,
+            'name' => 'required|string|unique:ref_vendor,name,'.$id,
             'address' => 'required',
             'telp' => 'required',
+            'type_vendor_id' => 'required',
             'email' => 'required',
+            'kode_rekening' => 'required',
+            'nomor_instansi' => 'required',
+            'ref_province_id' => 'required',
+            'ref_city_id' => 'required',
             'contact_person' => 'required',
 
             // 'status' => 'required',
         ];
+        return $rules;
+
     }
 
-    public function attributes()
-    {
-        return [
-            'name' => 'Vendor',
-            'address' => 'Alamat',
-            'status' => 'Status',
+    // public function attributes()
+    // {
+    //     return [
+    //         'name' => 'Vendor',
+    //         'address' => 'Alamat',
+    //         'status' => 'Status',
 
-        ];
-    }
+    //     ];
+    // }
 }

@@ -6,8 +6,9 @@ use App\Exports\GenerateExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\Vendor\VendorRequest;
 use App\Models\Master\Vendor\Vendor;
-use App\Models\Master\Geo\City;
-use App\Models\Master\Geo\Province;
+use App\Models\Master\Vendor\TypeVendor;
+use App\Models\Master\Geografis\City;
+use App\Models\Master\Geografis\Province;
 use App\Support\Base;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -31,9 +32,9 @@ class VendorController extends Controller
                 'permission' => $this->perms . '.view',
                 'title' => 'Vendor',
                 'breadcrumb' => [
-                    'Konsol Admin' => route($this->routes . '.index'),
-                    'Parameter' => route($this->routes . '.index'),
+                    'Master' => route($this->routes . '.index'),
                     'Vendor' => route($this->routes . '.index'),
+                    'Vendor Barang' => route($this->routes . '.index'),
                 ]
             ]
         );
@@ -46,7 +47,9 @@ class VendorController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:name|label:Vendor|className:text-left'),
-                    // $this->makeColumn('name:address|label:Alamat|className:text-left'),
+                    $this->makeColumn('name:address|label:Alamat|className:text-left'),
+                    $this->makeColumn('name:email|label:Email|className:text-left'),
+                    $this->makeColumn('name:telp|label:Nomor Telpon Instansi|className:text-left'),
                     // $this->makeColumn('name:province|label:Provinsi|className:text-left'),
                     // $this->makeColumn('name:city|label:Kota|className:text-left'),
                     // $this->makeColumn('name:telp|label:Telepon|className:text-left'),
@@ -75,19 +78,19 @@ class VendorController extends Controller
             ->addColumn(
                 'name',
                 function ($record) {
-                    return Base::makeLabel($record->name, 'danger');
+                    return $record->name;
                 }
             )
             ->addColumn(
                 'contact_person',
                 function ($record) {
-                    return  Base::makeLabel($record->contact_person, 'primary');
+                    return  $record->contact_person;
                 }
             )
             ->addColumn(
                 'telp',
                 function ($record) {
-                    return Base::makeLabel($record->telp, 'success');
+                    return $record->telp;
                 }
             )
             ->addColumn(
@@ -129,26 +132,25 @@ class VendorController extends Controller
                     return $this->makeButtonDropdown($actions);
                 }
             )
-            ->addColumn(
-
-                'status',
-                function ($record) {
-                    return $record->status;
-                }
-            )
-            ->rawColumns(['contact_person', 'status', 'email', 'telp', 'address', 'name', 'action', 'updated_by'])
+        
+            ->rawColumns(['contact_person','email', 'telp', 'address', 'name', 'action', 'updated_by'])
             ->make(true);
     }
 
     public function create()
     {
-        $data = $this->datas;
+    //     // $data = $this->datas;
+    //     // $page_action = "create";
+    //     $provinces = Province::select("id", "name")->get();
+    //     //$record = new Vendor();
+    //     //$this->pushBreadcrumb(['Tambah' => route($this->routes . '.create', $record)]);
+    //     return $this->render($this->views.'.create',compact('provinces'));
         $page_action = "create";
-        $provinces = Province::select("id", "name")->get();
-        $record = new Vendor();
-        $this->pushBreadcrumb(['Tambah' => route($this->routes . '.create', $record)]);
-        return $this->render($this->views . '.create', compact('page_action', 'data', 'provinces'));
+        $record= new Vendor;
+        return $this->render($this->views . '.create', compact('record'));
+        //return $this->render($this->views . '.create', compact("page_action"));
     }
+
 
     public function store(VendorRequest $request)
     {
@@ -164,12 +166,12 @@ class VendorController extends Controller
 
     public function edit(Vendor $record)
     {
-
-        $this->pushBreadcrumb(['Detil' => route($this->routes . '.edit', $record)]);
-        $province = Province::where('id', $record->ref_province_id)->first();
-        $city = City::where('id', $record->ref_city_id)->first();
-        $page_action = "edit";
-        return $this->render($this->views . '.edit', compact('record', 'province', 'city', 'page_action'));
+        //$this->pushBreadcrumb(['Detil' => route($this->routes . '.edit', $record)]);
+        //$province = Province::where('id', $record->ref_province_id)->first();
+        //$city = City::where('id', $record->ref_city_id)->first();
+        //$page_action = "edit";
+       // $record= Vendor::findOrFail($id);
+        return $this->render($this->views . '.edit', compact('record'));
     }
 
     public function update(VendorRequest $request, Vendor $record)

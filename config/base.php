@@ -18,11 +18,11 @@ return [
     ],
 
     'logo' => [
-        'favicon' => 'assets/media/logos/patriot-favicon.ico',
-        'auth' => 'assets/media/logos/logo-patriot-auth.jpg',
-        'aside' => 'assets/media/logos/logo-patriot.jpg',
-        'print' => 'assets/media/logos/logo-patriot.jpg',
-        'barcode' => 'assets/media/logos/logo-patriot.png',
+        'favicon' => 'assets/media/logos/logo-rsud-klu.ico',
+        'auth' => 'assets/media/logos/logo-rsud-klu.jpg',
+        'aside' => 'assets/media/logos/logo-rsud-klu.jpg',
+        'print' => 'assets/media/logos/logo-rsud-klu.jpg',
+        'barcode' => 'assets/media/logos/logo-rsud-klu.png',
 
         'spi-print' => 'assets/media/logos/logo spi.png',
         'bumn-print' => 'assets/media/logos/bumn.jpg',

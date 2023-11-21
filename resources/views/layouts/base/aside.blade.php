@@ -7,6 +7,7 @@
                     style="max-width: 170px; max-height: 40px;" />
             </a>
         </div>
+        {{-- <h6>tes</h6> --}}
 
         <button class="brand-toggle btn btn-sm px-0" id="kt_aside_toggle">
             {!! \Base::getSVG('assets/media/svg/icons/Navigation/Angle-double-left.svg', 'svg-icon-xl') !!}
