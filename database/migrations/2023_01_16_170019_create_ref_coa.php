@@ -20,7 +20,8 @@ class CreateRefCoa extends Migration
                 $table->string('kode_akun')->unique();
                 $table->string('nama_akun')->nullable();
                 $table->enum('tipe_akun', ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F'])->nullable();
-                $table->string('deskripsi')->nullable();
+                $table->text('deskripsi')->nullable();
+                $table->string('status')->nullable();
                 $table->commonFields();
             }
         );

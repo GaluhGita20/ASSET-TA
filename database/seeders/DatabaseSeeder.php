@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionSeeder::class);
         $this->call(MasterSeeder::class);
         $this->call(PositionSeeder::class);
+
+        // JSON
         $this->call(CoaTanahSeeder::class);
+
     }
 }
