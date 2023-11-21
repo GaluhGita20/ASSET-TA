@@ -17,7 +17,7 @@ class AlterTableSysUsersAddNppNullable extends Migration
         Schema::table(
             'sys_users',
             function (Blueprint $table) {
-                $table->string('npp')->after('name')->nullable();
+                $table->string('nip')->after('name')->nullable();
 
             }
         );

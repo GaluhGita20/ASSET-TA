@@ -13,6 +13,7 @@ class OrgStructSeeder extends Seeder
             // type => 1:presdir, 2:direktur, 3:ia department, 4:it department
             // Level Root
             [
+                'id' =>1,
                 'level'         => 'root',
                 'name'          => config('base.company.name'),
                 'phone'         => config('base.company.phone'),
@@ -26,6 +27,7 @@ class OrgStructSeeder extends Seeder
             ],
             // Level BOD
             [
+                'id' =>2,
                 'level'         => 'bod',
                 'name'          => 'Direksi',
                 'phone'         => config('base.company.phone'),
@@ -37,6 +39,7 @@ class OrgStructSeeder extends Seeder
             ],
             // Level Departemen
             [
+                'id' =>3,
                 'level'         => 'department',
                 'name'          => 'Bidang Penunjang Medik dan Non Medik',
                 'phone'         => config('base.company.phone'),
@@ -47,6 +50,7 @@ class OrgStructSeeder extends Seeder
                 'type'          => 3,
             ],
             [
+                'id' =>4,
                 'level'         => 'department',
                 'name'          => 'Bidang Pelayanan Medik dan Keparawatan',
                 'phone'         => config('base.company.phone'),
@@ -56,7 +60,7 @@ class OrgStructSeeder extends Seeder
                 'code_manual'   => '0602',
                 'type'          => 0,
             ],
-            [
+            [ 'id' =>5,
                 'level'         => 'department',
                 'name'          => 'Bagian Tata Usaha',
                 'phone'         => config('base.company.phone'),
@@ -66,7 +70,7 @@ class OrgStructSeeder extends Seeder
                 'code_manual'   => '0603',
                 'type'          => 0,
             ],
-            [
+            [  'id' =>6,
                 'level'         => 'department',
                 'name'          => 'Bidang Pengembangan Sumber Daya Manusia dan Kemuhamasan',
                 'phone'         => config('base.company.phone'),
@@ -77,7 +81,7 @@ class OrgStructSeeder extends Seeder
                 'type'          => 3,
             ],
             // subdepartment
-            [
+            [ 'id' =>7,
                 'level'         => 'subdepartment',
                 'name'          => 'Seksi Penunjang Medik dan Non Medik',
                 'phone'         => config('base.company.phone'),
@@ -87,7 +91,7 @@ class OrgStructSeeder extends Seeder
                 'code_manual'   => '060101',
                 'type'          => 0,
             ],
-            [
+            [ 'id' =>8,
                 'level'         => 'subdepartment',
                 'name'          => 'Seksi Sarana dan Prasarana Logistik',
                 'phone'         => config('base.company.phone'),
@@ -97,53 +101,95 @@ class OrgStructSeeder extends Seeder
                 'code_manual'   => '060102',
                 'type'          => 0,
             ],
-            [
+
+            [ 'id' =>9,
+                'level'         => 'subdepartment',
+                'name'          => 'Seksi PSDM dan Diklat',
+                'phone'         => config('base.company.phone'),
+                'address'       => config('base.company.address'),
+                'parent_code'   => 2004,
+                'code'          => 3003,
+                'code_manual'   => '060101',
+                'type'          => 0,
+            ],
+            [  'id' =>10,
+                'level'         => 'subdepartment',
+                'name'          => 'Seksi Humas',
+                'phone'         => config('base.company.phone'),
+                'address'       => config('base.company.address'),
+                'parent_code'   => 2004,
+                'code'          => 3004,
+                'code_manual'   => '060102',
+                'type'          => 0,
+            ],
+
+            [ 'id' =>11,
                 'level'         => 'subdepartment',
                 'name'          => 'Seksi Pelayanan Medik',
                 'phone'         => config('base.company.phone'),
                 'address'       => config('base.company.address'),
                 'parent_code'   => 2002,
-                'code'          => 3003,
+                'code'          => 3005,
                 'code_manual'   => '060103',
                 'type'          => 0,
             ],
-            [
+            [  'id' =>12,
                 'level'         => 'subdepartment',
                 'name'          => 'Seksi Pelayanan Keperawatan',
                 'phone'         => config('base.company.phone'),
                 'address'       => config('base.company.address'),
                 'parent_code'   => 2002,
-                'code'          => 3004,
+                'code'          => 3006,
                 'code_manual'   => '060104',
                 'type'          => 0,
             ],
-            [
+            [ 'id' =>13,
                 'level'         => 'subdepartment',
                 'name'          => 'Sub Bagian Program Perencanaan dan Pelaporan',
                 'phone'         => config('base.company.phone'),
                 'address'       => config('base.company.address'),
                 'parent_code'   => 2003,
-                'code'          => 3005,
+                'code'          => 3007,
                 'code_manual'   => '060105',
                 'type'          => 0,
             ],
-            [
+            [ 'id' =>14,
                 'level'         => 'subdepartment',
                 'name'          => 'Sub Bagian Keuangan',
                 'phone'         => config('base.company.phone'),
                 'address'       => config('base.company.address'),
                 'parent_code'   => 2003,
-                'code'          => 3006,
+                'code'          => 3008,
                 'code_manual'   => '060106',
                 'type'          => 0,
             ],
-            [
+            [ 'id' =>15,
                 'level'         => 'subdepartment',
                 'name'          => 'Sub Bagian Umum dan Kepegawaian',
                 'phone'         => config('base.company.phone'),
                 'address'       => config('base.company.address'),
                 'parent_code'   => 2003,
-                'code'          => 3007,
+                'code'          => 3009,
+                'code_manual'   => '060107',
+                'type'          => 0,
+            ],
+            [ 'id' =>16,
+                'level'         => 'subdepartment',
+                'name'          => 'IGD',
+                'phone'         => config('base.company.phone'),
+                'address'       => config('base.company.address'),
+                'parent_code'   => 2002,
+                'code'          => 3010,
+                'code_manual'   => '060106',
+                'type'          => 0,
+            ],
+            [ 'id' =>17,
+                'level'         => 'subdepartment',
+                'name'          => 'IPSRS',
+                'phone'         => config('base.company.phone'),
+                'address'       => config('base.company.address'),
+                'parent_code'   => 2001,
+                'code'          => 3011,
                 'code_manual'   => '060107',
                 'type'          => 0,
             ],
@@ -179,15 +225,16 @@ class OrgStructSeeder extends Seeder
 
         foreach ($structs as $val) {
             $struct = OrgStruct::firstOrNew(['code' => $val['code']]);
+            $struct->id  = $val['id'];
             $struct->level   = $val['level'];
             $struct->name    = $val['name'];
-            $struct->type    = $val['type'] ?? 0;
+            // $struct->type    = $val['type'] ?? 0;
             $struct->phone   = $val['phone'] ?? null;
             $struct->address = $val['address'] ?? null;
             $struct->email   = $val['email'] ?? null;
             $struct->website = $val['website'] ?? null;
             $struct->city_id = $val['city_id'] ?? null;
-            $struct->code_manual = $val['code_manual'] ?? null;
+            // $struct->code_manual = $val['code_manual'] ?? null;
             if (!empty($val['parent_code'])) {
                 if ($parent = OrgStruct::where('code', $val['parent_code'])->first()) {
                     $struct->parent_id = $parent->id;
