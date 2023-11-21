@@ -14,6 +14,32 @@ return [
         'icon' => 'fa fa-th-large',
         'url' => '/home',
     ],
+    // PENGAJUAN
+    [
+        'name' => 'pengajuan',
+        'title' => 'Pengajuan',
+        'icon' => 'fa fa-road',
+        'submenu' => [
+            [
+                'name' => 'pengajuan_pembelian-aset',
+                'perms' => 'pengajuan.pembelian-aset',
+                'title' => 'Pembelian',
+                'url' => '/pengajuan/pembelian-aset',
+            ],
+            [
+                'name' => 'pengajuan_berita-acara',
+                'perms' => 'pengajuan.berita-acara',
+                'title' => 'Berita Acara',
+                'url' => '/pengajuan/berita-acara',
+            ],
+            [
+                'name' => 'pengajuan_registrasi-aset',
+                'perms' => 'pengajuan.registrasi-aset',
+                'title' => 'Registrasi Aset',
+                'url' => '/pengajuan/registrasi-aset',
+            ],
+        ]
+    ],
     [
         'name' => 'master',
         'perms' => 'master',

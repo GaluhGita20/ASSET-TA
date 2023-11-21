@@ -78,10 +78,6 @@ Route::middleware('auth')->group(function () {
                 Route::post('userNotification', 'AjaxController@userNotification')->name('userNotification');
                 Route::get('userNotification/{notification}/read', 'AjaxController@userNotificationRead')->name('userNotificationRead');
                 // Ajax Modules
-                
-                Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
-                Route::post('{search}/selectLevelJabatan', 'AjaxController@selectLevelJabatan')->name('selectLevelJabatan');
-                
 
                 Route::get('city-options', 'AjaxController@cityOptions')->name('cityOptions');
                 Route::post('penilaian-category', 'AjaxController@penilaianCategoryOptions')->name('penilaianCategoryOptions');
@@ -97,35 +93,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectUser', 'AjaxController@selectUser')->name('selectUser');
                 Route::post('{search}/selectCity', 'AjaxController@selectCity')->name('selectCity');
                 Route::post('{search}/selectProvince', 'AjaxController@selectProvince')->name('selectProvince');
-                Route::post('selectProcedure', 'AjaxController@selectProcedure')->name('selectProcedure');
-                Route::post('selectProcedureLangkahKerja', 'AjaxController@selectProcedureLangkahKerja')->name('selectProcedureLangkahKerja');
-                Route::post('{search}/selectIctType', 'AjaxController@selectIctType')->name('selectIctType');
-                Route::post('{search}/selectTypeInspection', 'AjaxController@selectTypeInspection')->name('selectTypeInspection');
-                Route::post('getAuditRating', 'AjaxController@getAuditRating')->name('getAuditRating');
-                Route::get('get-survey-statement', 'AjaxController@getSurveyStatement')->name('getSurveyStatement');
-                Route::post('{search}/selectDokumen', 'AjaxController@selectDokumen')->name('selectDokumen');
-                Route::post('{search}/selectIctObject', 'AjaxController@selectIctObject')->name('selectIctObject');
-                Route::post('{search}/selectAspect', 'AjaxController@selectAspect')->name('selectAspect');
-                Route::post('{search}/selectDocItem', 'AjaxController@selectDocItem')->name('selectDocItem');
-                Route::post('{search}/selectCostComponent', 'AjaxController@selectCostComponent')->name('selectCostComponent');
-                Route::post('{search}/selectLevelPosition', 'AjaxController@selectLevelPosition')->name('selectLevelPosition');
-                Route::post('{search}/selectBankAccount', 'AjaxController@selectBankAccount')->name('selectBankAccount');
-                Route::post('{search}/select-auditee-non-pkpt', 'AjaxController@selectAuditeeNonPkpt')->name('select-auditee-non-pkpt');
-                Route::post('{search}/selectRiskRating', 'AjaxController@selectRiskRating')->name('selectRiskRating');
-                Route::post('{search}/selectLevelDampak', 'AjaxController@selectLevelDampak')->name('selectLevelDampak');
-                Route::post('{search}/selectLevelKemungkinan', 'AjaxController@selectLevelKemungkinan')->name('selectLevelKemungkinan');
-                Route::post('{search}/selectKodeResiko', 'AjaxController@selectKodeResiko')->name('selectKodeResiko');
-                Route::post('{search}/selectJenisResiko', 'AjaxController@selectJenisResiko')->name('selectJenisResiko');
-                Route::post('{search}/selectStatusResiko', 'AjaxController@selectStatusResiko')->name('selectStatusResiko');
-                Route::post('{search}/selectDetailApm', 'AjaxController@selectDetailApm')->name('selectDetailApm');
-                Route::post('all/selectDetailApmByAspect', 'AjaxController@selectDetailApm2')->name('selectDetailApm2');
-                Route::post('{search}/selectTrainingInstitute', 'AjaxController@selectTrainingInstitute')->name('selectTrainingInstitute');
-                Route::post('{search}/selectTrainingType', 'AjaxController@selectTrainingType')->name('selectTrainingType');
-                Route::post('{search}/selectExternInstance', 'AjaxController@selectExternInstance')->name('selectExternInstance');
-                Route::post('{search}/selectServiceProvider', 'AjaxController@selectServiceProvider')->name('selectServiceProvider');
-                Route::post('{search}/selectIacmLevelType', 'AjaxController@selectIacmLevelType')->name('selectIacmLevelType');
-                Route::post('{search}/selectIacmParameterType', 'AjaxController@selectIacmParameterType')->name('selectIacmParameterType');
-                Route::post('{search}/selectKategoriLangkahKerja', 'AjaxController@selectKategoriLangkahKerja')->name('selectKategoriLangkahKerja');
+                Route::post('{search}/selectCoa', 'AjaxController@selectCoa')->name('selectCoa');
             }
         );
 
