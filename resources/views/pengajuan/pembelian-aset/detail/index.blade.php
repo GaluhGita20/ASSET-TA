@@ -20,8 +20,8 @@
                 </div>
             </td>
             <td class="text-right td-btn-create width-200px">
-                @if (request()->route()->getName() !=
-                    $routes . '.show')
+                @if (request()->route()->getName() ==
+                    $routes . '.detail')
                     @if ($record->checkAction('edit', $perms))
                         @include('layouts.forms.btnAddModal', [
                             'urlAdd' => route($routes.'.detailCreate', $record->id),

@@ -22,10 +22,16 @@ class Pembelian extends Model
     protected $fillable = [
         'code',
         'date',
+        'user_kepada',
         'struct_id',
         'regarding',
         'sentence_start',
         'sentence_end',
+        'note_disposisi',
+    
+        'verification_status',
+        'verification_user_id',
+        'verification_at',
 
         'status',
         'version',
@@ -67,6 +73,11 @@ class Pembelian extends Model
         return $this->belongsToMany(User::class, 'trans_pengajuan_pembelian_cc', 'pembelian_id', 'user_id');
     }
 
+    public function to_user()
+    {
+        return $this->belongsTo(User::class, 'user_kepada');
+    }
+
     /*******************************
      ** SCOPE
      *******************************/
@@ -98,6 +109,8 @@ class Pembelian extends Model
             $this->save();
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
             $this->saveLogNotify();
+            $this->cc()->sync($request->cc ?? []);
+
 
             if ($request->is_submit) {
                 $this->handleSubmitSave($request);
@@ -134,6 +147,35 @@ class Pembelian extends Model
             return $this->commitDeleted();
         } catch (\Exception $e) {
             return $this->rollbackDeleted($e);
+        }
+    }
+
+    public function handleSubmitSave($request)
+    {
+        $this->beginTransaction();
+        try {
+            $this->update(['status' => 'waiting.verification']);
+            $this->saveLogNotify();
+
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
+    public function handleVerify($request)
+    {
+        $this->beginTransaction();
+        try {
+            $this->update(['status' => 'waiting.approval']);
+            $this->generateApproval($request->module);
+            $this->saveLogNotify();
+
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
         }
     }
 
@@ -186,7 +228,7 @@ class Pembelian extends Model
                     $this->addNotify([
                         'message' => 'Waiting Verification ' . $data,
                         'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
                     ]);
                 }
                 break;
@@ -197,15 +239,14 @@ class Pembelian extends Model
                     $this->addNotify([
                         'message' => 'Waiting Verification ' . $data,
                         'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
                     ]);
                 }
                 break;
             case $routes . '.destroy':
                 $this->addLog('Menghapus ' . $data);
                 break;
-            case $routes . '.submitSave':
-                $this->addLog('Submit ' . $data);
+            case $routes . '.verify':
                 $this->addNotify([
                     'message' => 'Waiting Approval ' . $data,
                     'url' => route($routes . '.approval', $this->id),
@@ -275,6 +316,12 @@ class Pembelian extends Model
             case 'show':
             case 'history':
                 return true;
+            case 'verification':
+                if ($this->status === 'waiting.verification') {
+                    return $user->isVerificationKepalaDepartement($this->struct);
+                }
+                return false;
+                break;
             case 'approval':
                 if ($this->status === 'waiting.approval.revisi') {
                     if ($this->checkApproval(request()->get('module') . '_upgrade')) {
@@ -288,12 +335,12 @@ class Pembelian extends Model
                 break;
             case 'revisi':
                 if ($user->checkPerms($perms . '.edit')) {
-                    if (isset($this->pembatalan->status) && in_array($this->pembatalan->status, ['waiting.approval', 'waiting.approval.revisi', 'completed'])) {
-                        return false;
-                    }
-                    if (isset($this->pembayaran->status) &&  in_array($this->pembayaran->status, ['waiting.approval', 'waiting.approval.revisi', 'completed'])) {
-                        return false;
-                    }
+                    // if (isset($this->pembatalan->status) && in_array($this->pembatalan->status, ['waiting.approval', 'waiting.approval.revisi', 'completed'])) {
+                    //     return false;
+                    // }
+                    // if (isset($this->pembayaran->status) &&  in_array($this->pembayaran->status, ['waiting.approval', 'waiting.approval.revisi', 'completed'])) {
+                    //     return false;
+                    // }
                     return $this->status === 'completed';
                 }
                 break;

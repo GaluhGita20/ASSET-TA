@@ -9,12 +9,8 @@ use App\Models\Globals\Activity;
 use App\Models\Globals\Approval;
 use App\Models\Globals\Notification;
 use App\Models\Globals\TempFiles;
-use App\Models\Master\Fee\BankAccount;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
-use App\Models\Rkia\Rkia;
-use App\Models\Rkia\Summary;
-use App\Models\Survey\SurveyRegUser;
 use App\Models\Traits\RaidModel;
 use App\Models\Traits\ResponseTrait;
 use App\Models\Traits\Utilities;
@@ -141,22 +137,9 @@ class User extends Authenticatable
             ->when(
                 $location_id = request()->post('location_id'),
                 function ($q) use ($location_id) {
-                    $cleanedLocationId = str_replace(['struct--', 'nonpkpt--'], '', $location_id);
-                    if (Str::startsWith($location_id, 'struct--')) {
-                        $q->whereHas(
-                            'position',
-                            function ($qq) use ($cleanedLocationId) {
-                                $qq->where('location_id', $cleanedLocationId);
-                            }
-                        );
-                    } elseif (Str::startsWith($location_id, 'nonpkpt--')) {
-                        $q->whereHas(
-                            'position',
-                            function ($qq) use ($cleanedLocationId) {
-                                $qq->where('nonpkpt_id', $cleanedLocationId);
-                            }
-                        );
-                    }
+                    $q->whereHas('position', function ($qq) use ($location_id) {
+                        $qq->where('location_id', $location_id);
+                    });
                 }
             )
             ->when(
@@ -411,45 +394,7 @@ class User extends Authenticatable
     {
         if (in_array($this->id, [1])) return false;
         if ($this->id == auth()->id()) return false;
-        if (BankAccount::where('user_id', $this->id)->exists()) return false;
         if (Approval::where('user_id', $this->id)->exists()) return false;
-        if (SurveyRegUser::where('user_id', $this->id)->exists()) return false;
-
-        $check = Summary::where('pic_id', $this->id)
-            ->orWhere('leader_id', $this->id)
-            ->orWhereHas(
-                'members',
-                function ($q) {
-                    $q->where('user_id', $this->id);
-                }
-            )
-            ->orWhereHas(
-                'rkia',
-                function ($r) {
-                    $r->orWhereHas(
-                        'cc',
-                        function ($q) {
-                            $q->where('user_id', $this->id);
-                        }
-                    );
-                }
-            )
-            ->orWhereHas(
-                'assignment',
-                function ($a) {
-                    $a->where('pic_id', $this->id)
-                        ->orWhere('leader_id', $this->id)
-                        ->orWhereHas(
-                            'members',
-                            function ($q) {
-                                $q->where('user_id', $this->id);
-                            }
-                        );
-                }
-            )
-            ->exists();
-        if ($check) return false;
-
         return true;
     }
 
@@ -531,5 +476,40 @@ class User extends Authenticatable
     public function getRoleIds()
     {
         return $this->roles()->pluck('id')->toArray();
+    }
+
+    public function imVerificationKepalaDepartement($location)
+    {
+        $kepala_department = [];
+        if($location->level == 'department'){
+            $kepala_department = User::whereHas('position', function ($q) use ($location) {
+                $q->where([['location_id', $location->id], ['level', 'kepala']]);
+            })->pluck('id')->toArray();
+        }else{
+            $kepala_department = User::whereHas('position', function ($q) use ($location) {
+                $q->where([['location_id', $location->parent_id], ['level', 'kepala']]);
+            })->pluck('id')->toArray();
+        }
+        return $kepala_department;
+    }
+
+    public function isVerificationKepalaDepartement($location)
+    {
+        if($location->level == 'department'){
+            $kepala_department = User::whereHas('position', function ($q) use ($location) {
+                $q->where([['location_id', $location->id], ['level', 'kepala']]);
+            })->pluck('id')->toArray();
+            if(in_array($this->id, $kepala_department)){
+                return true;
+            }
+        }else{
+            $kepala_department = User::whereHas('position', function ($q) use ($location) {
+                $q->where([['location_id', $location->parent_id], ['level', 'kepala']]);
+            })->pluck('id')->toArray();
+            if(in_array($this->id, $kepala_department)){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -7,7 +7,7 @@
 		</div>
         <div class="col-12 col-sm-6 col-xl-3 px-1">
 			<select class="form-control filter-control base-plugin--select2-ajax"
-				data-url="{{ route('ajax.selectStruct', ['search' => 'position_with_req']) }}"
+				data-url="{{ route('ajax.selectStruct', ['search' => 'all']) }}"
 				data-post="location_id"
 				data-placeholder="{{ __('Struktur Organisasi') }}">
 			</select>

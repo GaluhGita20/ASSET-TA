@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pengajuan;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pengajuan\PembelianRequest;
 use App\Http\Requests\Pengajuan\PembelianDetailRequest;
+use App\Http\Requests\Pengajuan\PembelianDisposisiRequest;
 use App\Models\Pengajuan\Pembelian;
 use App\Models\Pengajuan\PembelianDetail;
 use App\Support\Base;
@@ -43,8 +44,8 @@ class PembelianAsetController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:#|className:text-right'),
                     $this->makeColumn('name:pengajuan|label:Pengajuan Pembelian|className:text-center'),
-                    $this->makeColumn('name:struct|label:Unit Kerja|className:text-center'),
-                    $this->makeColumn('name:perihal|label:Perihal|className:text-center|width:200px'),
+                    $this->makeColumn('name:struct|label:Unit Kerja|className:text-center|width:250px'),
+                    $this->makeColumn('name:perihal|label:Perihal|className:text-center|width:300px'),
                     $this->makeColumn('name:version|label:Revisi|className:text-center'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),
@@ -135,6 +136,15 @@ class PembelianAsetController extends Controller
                 }
                 if ($record->checkAction('approval', $this->perms)) {
                     $actions[] = 'type:approval|page:true|label:Approval';
+                }
+                if ($record->checkAction('verification', $this->perms)) {
+                    $actions[] = [
+                        'type' => 'approval',
+                        'page' => true,
+                        'label' => 'Verifikasi',
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.approval', $record->id),
+                    ];
                 }
                 if ($record->checkAction('tracking', $this->perms)) {
                     $actions[] = 'type:tracking';
@@ -301,7 +311,7 @@ class PembelianAsetController extends Controller
         return $record->handleDetailDestroy($detail);
     }
 
-    public function update(PembelianRequest $request, Pembelian $record)
+    public function update(PembelianDisposisiRequest $request, Pembelian $record)
     {
         return $record->handleStoreOrUpdate($request);
     }
@@ -329,8 +339,33 @@ class PembelianAsetController extends Controller
 
     public function approval(Pembelian $record)
     {
-        return $this->render($this->views . '.approval', compact('record'));
+        if($record->status == 'waiting.approval'){
+            $this->pushBreadcrumb(['Approval' => route($this->routes . '.approval', $record)]);
+        }else{
+            $this->pushBreadcrumb(['Verification' => route($this->routes . '.approval', $record)]);
+        }
+        $this->prepare([
+            'tableStruct' => [
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:coa|label:Nama Akun|className:text-left|width:500px'),
+                    $this->makeColumn('name:requirement_standard|label:Standar Kebutuhan|className:text-center'),
+                    $this->makeColumn('name:existing_amount|label:Jumlah yang Ada|className:text-center'),
+                    $this->makeColumn('name:qty_req|label:Jumlah Pengajuan|className:text-center'),
+                    $this->makeColumn('name:updated_by'),
+                    $this->makeColumn('name:action_show|label:Aksi'),
+                ],
+                'url' => route($this->routes . '.detailGrid', $record->id),
+            ],
+        ]);
+        return $this->render($this->views . '.show', compact('record'));
     }
+
+    public function verify(Pembelian $record, Request $request)
+    {
+        return $record->handleVerify($request);
+    }
+
 
     public function approve(Pembelian $record, Request $request)
     {
@@ -355,6 +390,21 @@ class PembelianAsetController extends Controller
 
     public function show(Pembelian $record)
     {
+        $this->pushBreadcrumb(['Lihat' => route($this->routes . '.show', $record)]);
+        $this->prepare([
+            'tableStruct' => [
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:coa|label:Nama Akun|className:text-left|width:500px'),
+                    $this->makeColumn('name:requirement_standard|label:Standar Kebutuhan|className:text-center'),
+                    $this->makeColumn('name:existing_amount|label:Jumlah yang Ada|className:text-center'),
+                    $this->makeColumn('name:qty_req|label:Jumlah Pengajuan|className:text-center'),
+                    $this->makeColumn('name:updated_by'),
+                    $this->makeColumn('name:action_show|label:Aksi'),
+                ],
+                'url' => route($this->routes . '.detailGrid', $record->id),
+            ],
+        ]);
         return $this->render($this->views . '.show', compact('record'));
     }
 

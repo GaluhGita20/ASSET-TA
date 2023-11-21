@@ -41,6 +41,10 @@ return [
         ]
     ],
     [
+        'section' => 'ADMIN KONSOL',
+        'name' => 'console_admin',
+    ],
+    [
         'name' => 'master',
         'perms' => 'master',
         'title' => 'Data Master',
