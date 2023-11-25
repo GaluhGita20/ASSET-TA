@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(MasterSeeder::class);
+        $this->call(MenuFlowSeeder::class);
        
         // COA
         $this->call(CoaTanahSeeder::class);

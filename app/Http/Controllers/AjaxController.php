@@ -249,7 +249,7 @@ class AjaxController extends Controller
                 break;
             case 'auditor':
                 $items = $items->whereHas(
-                    'struct',
+                    'location',
                     function ($qq) {
                         $qq->inAudit();
                     }
@@ -286,7 +286,7 @@ class AjaxController extends Controller
                     'position',
                     function ($q) {
                         $q->whereHas(
-                            'struct',
+                            'location',
                             function ($qq) {
                                 $qq->where('level', 'bod');
                             }
@@ -299,7 +299,7 @@ class AjaxController extends Controller
                     'position',
                     function ($q) {
                         $q->whereHas(
-                            'struct',
+                            'location',
                             function ($qq) {
                                 $qq->where('level', 'department');
                             }

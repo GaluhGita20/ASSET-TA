@@ -19,22 +19,64 @@
                 <div class="card-body">
                     @include('globals.notes')
                     @csrf
-                    @include('pengajuan.pembelian-aset.header')
+                    @include('pengajuan.pembelian-aset.includes.header')
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">{{ __('Diteruskan Kepada Yth') }}</label>
+                                <div class="col-md-10 parent-group">
+                                    <select name="cc[]" class="form-control base-plugin--select2-ajax"
+                                        data-url="{{ route('ajax.selectUser', ['search' => 'level_department']) }}" multiple
+                                        placeholder="{{ __('Pilih Beberapa') }}">
+                                        <option value="">{{ __('Pilih Beberapa') }}</option>
+                                        @foreach ($record->cc as $user)
+                                            <option value="{{ $user->id }}" selected>
+                                                {{ $user->name . ' (' . $user->position->name ?? '' . ')' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-2 pr-0">
+                                    <label class="col-form-label">{{ __('Catatan Disposisi') }}</label>
+                                </div>
+                                <div class="col-10 parent-group">
+                                    <textarea name="note_disposisi" class="base-plugin--summernote" placeholder="{{ __('Catatan Disposisi') }}" data-height="200">{!! $record->note_disposisi  !!}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- end of header -->
 
-    <!-- card -->
+    <!-- card 2 -->
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
                 <div class="card-header">
-                    <h3 class="card-title">Detail Aktiva</h3>
+                    <h3 class="card-title">Lampiran Daftar Kebutuhan</h3>
                 </div>
                 <div class="card-body p-8">
                     @include('pengajuan.pembelian-aset.detail.index')
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- card 3 -->
+    <div class="row mb-3">
+        <div class="col-sm-12">
+            <div class="card card-custom">
+                <div class="card-header">
+                    <h3 class="card-title">Surat Pengajuan Pembelian</h3>
+                </div>
+                <div class="card-body p-8">
+                    @include('pengajuan.pembelian-aset.includes.letter')
                 </div>
                 @if (request()->route()->getName() == $routes.'.approval')
                 <div class="card-footer">
@@ -50,6 +92,7 @@
             </div>
         </div>
     </div>
+
     @php
         $colors = [
             1 => 'primary',

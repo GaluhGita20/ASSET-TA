@@ -64,20 +64,5 @@
                 @endforeach
             </div>
         </div>
-        <div class="form-group row">
-            <label class="col-md-2 col-form-label">{{ __('Tembusan') }}</label>
-            <div class="col-md-10 parent-group">
-                <select name="cc[]" class="form-control base-plugin--select2-ajax"
-                    data-url="{{ route('ajax.selectUser', ['search' => 'level_department']) }}" multiple
-                    placeholder="{{ __('Pilih Beberapa') }}">
-                    <option value="">{{ __('Pilih Beberapa') }}</option>
-                    @foreach ($record->cc as $user)
-                        <option value="{{ $user->id }}" selected>
-                            {{ $user->name . ' (' . $user->position->name ?? '' . ')' }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
     </div>
 </div>

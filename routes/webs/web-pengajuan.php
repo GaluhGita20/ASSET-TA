@@ -8,6 +8,7 @@ Route::namespace('Pengajuan')->prefix('pengajuan')->name('pengajuan.')->group(fu
         'with' => ['submit','approval','tracking','print','history'],
     ]);
     Route::post('pembelian-aset/{record}/updateSummary', 'PembelianAsetController@updateSummary')->name('pembelian-aset.updateSummary');
+    Route::post('pembelian-aset/{record}/verify', 'PembelianAsetController@verify')->name('pembelian-aset.verify');
     // detail
     Route::get('pembelian-aset/{record}/detail', 'PembelianAsetController@detail')->name('pembelian-aset.detail');
     Route::post('pembelian-aset/{record}/detailGrid', 'PembelianAsetController@detailGrid')->name('pembelian-aset.detailGrid');

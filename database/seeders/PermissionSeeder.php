@@ -74,6 +74,72 @@ class PermissionSeeder extends Seeder
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],
             ],
+            [
+                'name'  => 'Direksi',
+                'PERMISSIONS'   => [
+                    'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                ],
+            ],
+            [
+                'name'  => 'Sub Bagian Program Perencanaan',
+                'PERMISSIONS'   => [
+                    'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                ],
+            ],
+            [
+                'name'  => 'Keuangan',
+                'PERMISSIONS'   => [
+                    'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                ],
+            ],
+            [
+                'name'  => 'Umum',
+                'PERMISSIONS'   => [
+                    'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                ],
+            ],
+            [
+                'name'  => 'Sarpras',
+                'PERMISSIONS'   => [
+                    'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                ],
+            ],
+            [
+                'name'  => 'BPKAD',
+                'PERMISSIONS'   => [
+                    'dashboard'                 => ['view'],
+                    'pengajuan.pembelian-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
+                    'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                ],
+            ],
         ];
         foreach ($ROLES as $role) {
             $record = Role::firstOrNew(['name' => $role['name']]);
