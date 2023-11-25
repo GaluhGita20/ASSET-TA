@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\cityOptionsontrollers\Auth\LoginController;
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
 use App\Models\Followup\FollowupMonitor;
@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('city-options', 'AjaxController@cityOptions')->name('cityOptions');
                 Route::post('penilaian-category', 'AjaxController@penilaianCategoryOptions')->name('penilaianCategoryOptions');
-                Route::post('city-options-root', 'AjaxController@cityOptionsRoot')->name('cityOptionsRoot');
+                //Route::post('{search}/cityOptionsRoot', 'AjaxController@cityOptionsRoot')->name('cityOptionsRoot');
                 Route::get('jabatan-options', 'AjaxController@jabatanOptions')->name('jabatan-options');
                 Route::get('jabatan-options-with-nonpkpt', 'AjaxController@jabatanWithNonPKPTOptions')->name('jabatan-options-with-nonpkpt');
                 Route::post('{search}/provinceOptions', 'AjaxController@provinceOptionsBySearch')->name('provinceOptionsBySearch');
@@ -94,6 +94,10 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectCity', 'AjaxController@selectCity')->name('selectCity');
                 Route::post('{search}/selectProvince', 'AjaxController@selectProvince')->name('selectProvince');
                 Route::post('{search}/selectCoa', 'AjaxController@selectCoa')->name('selectCoa');
+
+                Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
+                //select level struct org
+                // Route::post('{search}/selectStruct', 'AjaxController@selectStruct')->name('selectStruct');
             }
         );
 
@@ -238,6 +242,13 @@ Route::middleware('auth')->group(function () {
                             Route::grid('type-vendor', 'TypeVendorController');
                         }
                     );
+
+                Route::namespace('Location')
+                ->group(
+                    function () {
+                        Route::grid('location', 'LocationController');
+                    }
+                );
             }
         );
 

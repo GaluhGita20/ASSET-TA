@@ -10,7 +10,7 @@
     @if ($page_action == "edit")
         @method('PUT')
     @endif
-@section('modal-body')
+
     <div class="form-group row">
 		<label class="col-3 col-form-label">{{ __('Nama') }}</label>
 		<div class="col-9 parent-group">
@@ -28,7 +28,7 @@
 	</div>
 @endsection
 
-@if (!in_array($page_action, ["edit", "show"]))
+@if (!in_array($page_action, ["edit"]))
 	@section('buttons')
 	@endsection
 @endif

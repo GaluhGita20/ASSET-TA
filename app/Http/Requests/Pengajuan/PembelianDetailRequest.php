@@ -27,6 +27,7 @@ class PembelianDetailRequest extends FormRequest
 
         $rules= [
             'coa_id' => 'required',
+            //'pembelian_id' =>'required',
             'existing_amount' => 'required',
             'requirement_standard' => 'required',
             'qty_req' => 'required',

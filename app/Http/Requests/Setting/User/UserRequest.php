@@ -12,15 +12,18 @@ class UserRequest extends FormRequest
         $id = $this->record->id ?? 0;
         $rules = [
             'name'        => 'required|string|max:255',
-            'npp'        => 'required|numeric|unique:sys_users,npp,' . $id,
+            'nip'        => 'required|numeric|unique:sys_users,nip,' . $id,
+            'username'    => 'required|unique:sys_users,username,' . $id,
             'email'       => 'required|string|max:60|email|unique:sys_users,email,' . $id,
+            'location_id' => 'required',
             'position_id' => 'required|exists:ref_positions,id',
             'status'      => 'required',
         ];
         if ($id == 1) {
             unset($rules['position_id']);
-            unset($rules['npp']);
+            unset($rules['nip']);
         }
+        
         if (!$id) {
             $password_rules = [
                 function ($attribute, $value, $fail) {

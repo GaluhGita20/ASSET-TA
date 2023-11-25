@@ -41,10 +41,10 @@ class Position extends Model
     //     return $this->belongsTo(LevelPosition::class, 'level_id');
     // }
 
-    // public function struct()
-    // {
-    //     return $this->belongsTo(OrgStruct::class, 'location_id');
-    // }
+    public function struct()
+    {
+        return $this->belongsTo(OrgStruct::class, 'location_id');
+    }
     
     public function users()
     {

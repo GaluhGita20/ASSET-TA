@@ -27,6 +27,7 @@ class UpdateRefOrgStructsTable extends Migration
     {
         Schema::table('ref_org_structs', function (Blueprint $table) {
             $table->string('phone', 20)->nullable()->change();
+            $table->string('type');
         });
     }
 }

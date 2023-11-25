@@ -71,11 +71,11 @@ return [
                         'title' => 'Sub Departemen',
                         'url' => '/master/org/subdepartment',
                     ],
-                    [
-                        'name' => 'master_org_subsection',
-                        'title' => 'Sub Unit Departemen',
-                        'url' => '/master/org/subsection',
-                    ],
+                    // [
+                    //     'name' => 'master_org_subsection',
+                    //     'title' => 'Sub Unit Departemen',
+                    //     'url' => '/master/org/subsection',
+                    // ],
                     [
                         'name' => 'master_org_position',
                         'title' => 'Jabatan',
@@ -83,6 +83,18 @@ return [
                     ],
 
                 ]
+            ],
+            [
+                'name' => 'Ruang',
+                'title' => 'Ruang',
+                'url' => '',
+                'submenu' => [
+                    [
+                        'name' => 'master_location',
+                        'title' => 'Master Ruang',
+                        'url' => '/master/location'
+                    ],
+                ],
             ],
             [
                 'name' => 'Geografis',
@@ -168,11 +180,11 @@ return [
                 'title' => 'Hak Akses',
                 'url' => '/setting/role',
             ],
-            [
-                'name' => 'setting_flow',
-                'title' => 'Flow Approval',
-                'url' => '/setting/flow',
-            ],
+            // [
+            //     'name' => 'setting_flow',
+            //     'title' => 'Flow Approval',
+            //     'url' => '/setting/flow',
+            // ],
             [
                 'name' => 'setting_user',
                 'title' => 'Manajemen User',
@@ -180,7 +192,7 @@ return [
             ],
             [
                 'name' => 'setting_activity',
-                'title' => 'Audit Trail',
+                'title' => 'Log Activity',
                 'url' => '/setting/activity',
             ],
         ]

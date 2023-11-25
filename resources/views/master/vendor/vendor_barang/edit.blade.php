@@ -17,23 +17,35 @@
     <div class="form-group row">  
         <label class="col-md-3 col-form-label">{{ __('Jenis Usaha') }}</label>
         <div class="col-md-9 parent-group">
-            <select name="type_vendor_id" class="form-control base-plugin--select2-ajax type_vendor_id"
-                data-url="{{ rut('ajax.selectJenisUsaha', [
+            <select name="jenisUsaha[]" class="form-control base-plugin--select2-ajax"
+                data-url="{{ route('ajax.selectJenisUsaha', [
                     'search'=>'all'
-                ]) }}"
-                data-url-origin="{{ rut('ajax.selectJenisUsaha', [
-                    'search'=>'all'
-                ]) }}"
-
+                ]) }}" multiple
                 placeholder="{{ __('Pilih Salah Satu') }}" required>
                 <option value="">{{ __('Pilih Salah Satu') }}</option>
-
-                @if (!empty($record->type_vendor_id))
-                    <option value="{{ $record->jenisUsaha->id }}" selected>{{ $record->jenisUsaha->name }}</option>
-                @endif
+                {{-- @if (!empty($record->jenisUsaha)) --}}
+                    @foreach($record->jenisUsaha as $jj)
+                    {{-- <option value="{{ $jj->id }}" selected>
+                        {{ $jj->name . ' (' . $jj->jenisUsaha->name ?? '' . ')' }}
+                    </option> --}}
+                        <option value="{{ $jj->id }}" {{ in_array($jj->id, $record->jenisUsaha->pluck('id')->toArray()) ? 'selected' : '' }}>{{ $jj->name }}</option>
+                    @endforeach        
+                {{-- @endif --}}
             </select>
+            {{-- <select name="type_id[]" class="form-control base-plugin--select2-ajax"
+                    data-url="{{ route('ajax.selectUser', ['search' => 'level_department']) }}" multiple
+                    placeholder="{{ __('Pilih Beberapa') }}">
+                    <option value="">{{ __('Pilih Beberapa') }}</option>
+                    @foreach ($record->cc as $user)
+                        <option value="{{ $user->id }}" selected>
+                            {{ $user->name . ' (' . $user->position->name ?? '' . ')' }}
+                        </option>
+                    @endforeach
+                </select> --}}
+
         </div>
     </div>
+
     <div class="row">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
@@ -53,7 +65,7 @@
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="nomor_instansi" type="text" value="{{ $record->nomor_instansi }}" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
+                    <input name="kode_instansi" type="text" value="{{ $record->kode_instansi }}" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
                 </div>
             </div>
         </div>
@@ -100,7 +112,7 @@
         <div class="form-group row">
             <label class="col-md-3 col-form-label">{{ __('Provinsi') }}</label>
             <div class="col-md-9 parent-group">
-                <select name="ref_province_id" class="form-control base-plugin--select2-ajax province_id"
+                <select name="province_id" class="form-control base-plugin--select2-ajax province_id"
                     data-url="{{ rut('ajax.selectProvince', [
                         'search'=>'all'
                     ]) }}"
@@ -109,8 +121,8 @@
                     ]) }}"
                     placeholder="{{ __('Pilih Salah Satu') }}" required>
                     <option value="">{{ __('Pilih Salah Satu') }}</option>
-                    @if (!empty($record->ref_province_id))
-					    <option value="{{ $record->ref_province_id }}" selected>{{ $record->getProvinceName() }}</option>
+                    @if (!empty($record->province_id))
+					    <option value="{{ $record->province_id }}" selected>{{ $record->getProvinceName() }}</option>
 				    @endif
                 </select>
             </div>
@@ -119,13 +131,13 @@
         <div class="form-group row">
             <label class="col-md-3 col-form-label">{{ __('Kota') }}</label>
             <div class="col-md-9 parent-group">
-                <select name="ref_city_id" class="form-control base-plugin--select2-ajax city_id"
-                    data-url="{{ rut('ajax.cityOptions', ['province_id' => '']) }}"
-                    data-url-origin="{{ rut('ajax.cityOptionsRoot') }}"
-                    placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
+                <select name="city_id" class="form-control base-plugin--select2-ajax city_id"
+                    data-url="{{ rut('ajax.selectCity', ['province_id']) }}"
+                    data-url-origin="{{ rut('ajax.selectCity',['province_id']) }}"
+                    placeholder="{{ __('Pilih Salah Satu') }}" required>
                     <option value="">{{ __('Pilih Salah Satu') }}</option>
-                    @if (!empty($record->ref_city_id))
-					    <option value="{{ $record->ref_city_id }}" selected>{{ $record->getCityName() }}</option>
+                    @if (!empty($record->city_id))
+					    <option value="{{ $record->city_id }}" selected>{{ $record->getCityName() }}</option>
 				    @endif
                 </select>
             </div>

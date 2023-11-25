@@ -5,6 +5,7 @@
         <div class="col-12 col-sm-6 col-xl-2 px-1 pl-3">
 			<input class="form-control filter-control" data-post="name" placeholder="{{ __('Name / Email') }}">
 		</div>
+
         <div class="col-12 col-sm-6 col-xl-3 px-1">
 			<select class="form-control filter-control base-plugin--select2-ajax"
 				data-url="{{ route('ajax.selectStruct', ['search' => 'position_with_req']) }}"
@@ -12,6 +13,7 @@
 				data-placeholder="{{ __('Struktur Organisasi') }}">
 			</select>
 		</div>
+		
 		<div class="col-12 col-sm-6 col-xl-3 px-1">
 			<select class="form-control base-plugin--select2-ajax filter-control"
 				data-post="role_id"

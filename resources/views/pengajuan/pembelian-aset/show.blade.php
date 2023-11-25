@@ -1,10 +1,10 @@
 @extends('layouts.modal')
 
-@section('action', route($routes . '.updateSummary', $record->id))
+{{-- @section('action', route($routes . '.updateSummary', $record->id)) --}}
 
 @section('modal-body')
-    @method('POST')
-    <input type="hidden" name="is_submit" value="0">
+
+    {{-- <input type="hidden" name="is_submit" value="0"> --}}
     <div class="row">
         <div class="col-sm-6">
             <div class="form-group row">
@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-8 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"
-                        placeholder="{{ __('Tgl Surat') }}" data-date-end-date="{{ now() }}" value="{{ $record->date->format('d/m/Y') }}">
+                        placeholder="{{ __('Tgl Surat') }}" data-date-end-date="{{ now() }}" value="{{ $record->date->format('d/m/Y') }}" readonly>
                 </div>
             </div>
         </div>
@@ -34,10 +34,7 @@
                     <label class="col-form-label">{{ __('Unit Kerja') }}</label>
                 </div>
                 <div class="col-10 parent-group">
-                    <select name="struct_id" class="form-control base-plugin--select2-ajax"
-                        data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
-                        data-placeholder="{{ __('Unit Kerja') }}">
-                        <option value="">{{ __('Unit Kerja') }}</option>
+                    <select name="struct_id" class="form-control base-plugin--select2-ajax" disabled>
                         @if ($record->struct)
                             <option value="{{ $record->struct->id }}" selected>
                                 {{ $record->struct->name }}
@@ -52,7 +49,7 @@
                     <label class="col-form-label">{{ __('Perihal') }}</label>
                 </div>
                 <div class="col-10 parent-group">
-                    <input class="form-control" name="regarding" placeholder="{{ __('Perihal') }}" value="{{ $record->regarding }}">
+                    <input class="form-control" name="regarding" placeholder="{{ __('Perihal') }}" value="{{ $record->regarding }}" readonly>
                 </div>
             </div>
 
@@ -63,15 +60,15 @@
                         <input type="hidden"
                             name="uploads[uploaded]"
                             class="uploaded"
-                            value="0">
+                            value="0" readonly>
                         <input type="file" multiple
                             class="custom-file-input base-form--save-temp-files"
                             data-name="uploads"
                             data-container="parent-group"
                             data-max-size="30024"
                             data-max-file="100"
-                            accept="*">
-                        <label class="custom-file-label" for="file">Choose File</label>
+                            accept="*" disabled>
+                        <label class="custom-file-label" for="file" readonly>Choose File</label>
                     </div>
 
                     <div class="form-text text-muted">*Maksimal 20MB</div>
@@ -82,7 +79,7 @@
                                 <i class="{{ $file->file_icon }}"></i>
                             </div>
                             <div class="alert-text text-left">
-                                <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
+                                <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}" readonly>
                                 <div>Uploaded File:</div>
                                 <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
                                     {{ $file->file_name }}
@@ -104,6 +101,8 @@
             </div>
         </div>
     </div>
+@endsection
+@section('buttons')
 @endsection
 
 @push('scripts')

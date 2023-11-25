@@ -5,7 +5,7 @@
 @section('modal-body')
     @method('POST')
     <input type="hidden" name="is_submit" value="0">
-    <input type="hidden" name="code" value="{{ $record->id }}">
+    <input type="hidden" name="pembelian_id" value="{{ $record->id }}">
     <div class="row">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
@@ -20,6 +20,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">

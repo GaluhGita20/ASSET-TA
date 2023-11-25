@@ -56,9 +56,9 @@
 		<label class="col-md-3 col-form-label">{{ __('Kota') }}</label>
 		<div class="col-md-9 parent-group">
 			<select name="city_id" class="form-control base-plugin--select2-ajax city_id"
-				data-url="{{ rut('ajax.cityOptions', ['province_id' => '']) }}"
-				data-url-origin="{{ rut('ajax.cityOptionsRoot') }}"
-				placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
+				data-url="{{ rut('ajax.selectCity', ['province_id']) }}"
+				data-url-origin="{{ rut('ajax.selectCity', ['province_id']) }}"
+				placeholder="{{ __('Pilih Salah Satu') }}" required>
 				<option value="">{{ __('Pilih Salah Satu') }}</option>
 				@if (!empty($record->city_id))
 					<option value="{{ $record->city_id }}" selected>{{ $record->city->name }}</option>
@@ -77,6 +77,7 @@
 					var objectId = $('select.city_id');
 					var urlOrigin = objectId.data('url-origin');
 					var urlParam = $.param({province_id: me.val()});
+					console.log(objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam))));
 					objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
 					objectId.val(null).prop('disabled', false);
 				}

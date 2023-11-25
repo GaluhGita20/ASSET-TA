@@ -3,18 +3,18 @@
 namespace App\Models\Auth;
 
 use App\Imports\Setting\UserImport;
-use App\Models\Auth\Pendidikan;
-use App\Models\Auth\Sertifikasi;
+// use App\Models\Auth\Pendidikan;
+// use App\Models\Auth\Sertifikasi;
 use App\Models\Globals\Activity;
 use App\Models\Globals\Approval;
 use App\Models\Globals\Notification;
 use App\Models\Globals\TempFiles;
-use App\Models\Master\Fee\BankAccount;
+// use App\Models\Master\Fee\BankAccount;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
-use App\Models\Rkia\Rkia;
-use App\Models\Rkia\Summary;
-use App\Models\Survey\SurveyRegUser;
+// use App\Models\Rkia\Rkia;
+// use App\Models\Rkia\Summary;
+// use App\Models\Survey\SurveyRegUser;
 use App\Models\Traits\RaidModel;
 use App\Models\Traits\ResponseTrait;
 use App\Models\Traits\Utilities;
@@ -24,7 +24,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
-
 
 class User extends Authenticatable
 {
@@ -41,11 +40,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'nip',
         'username',
         'email',
         'password',
         'nik',
-        'npp',
+        // 'npp',
         'image',
         'phone',
         'position_id',
@@ -106,15 +106,15 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class, 'user_id');
     }
 
-    public function pendidikans()
-    {
-        return $this->hasMany(Pendidikan::class, 'user_id');
-    }
+    // public function pendidikans()
+    // {
+    //     return $this->hasMany(Pendidikan::class, 'user_id');
+    // }
 
-    public function sertifikasis()
-    {
-        return $this->hasMany(Sertifikasi::class, 'user_id');
-    }
+    // public function sertifikasis()
+    // {
+    //     return $this->hasMany(Sertifikasi::class, 'user_id');
+    // }
 
     public function position()
     {
@@ -233,33 +233,33 @@ class User extends Authenticatable
         }
     }
 
-    public function handleDestroyPendidikan($id)
-    {
-        $this->beginTransaction();
-        try {
-            $temp = Pendidikan::find($id);
-            $temp->delete();
-            $this->save();
+    // public function handleDestroyPendidikan($id)
+    // {
+    //     $this->beginTransaction();
+    //     try {
+    //         $temp = Pendidikan::find($id);
+    //         $temp->delete();
+    //         $this->save();
 
-            return $this->commitDeleted();
-        } catch (\Exception $e) {
-            return $this->rollbackDeleted($e);
-        }
-    }
+    //         return $this->commitDeleted();
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackDeleted($e);
+    //     }
+    // }
 
-    public function handleDestroySertifikasi($id)
-    {
-        $this->beginTransaction();
-        try {
-            $temp = Sertifikasi::find($id);
-            $temp->delete();
-            $this->save();
+    // public function handleDestroySertifikasi($id)
+    // {
+    //     $this->beginTransaction();
+    //     try {
+    //         $temp = Sertifikasi::find($id);
+    //         $temp->delete();
+    //         $this->save();
 
-            return $this->commitDeleted();
-        } catch (\Exception $e) {
-            return $this->rollbackDeleted($e);
-        }
-    }
+    //         return $this->commitDeleted();
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackDeleted($e);
+    //     }
+    // }
 
     public function handleResetPassword()
     {
@@ -275,51 +275,51 @@ class User extends Authenticatable
         }
     }
 
-    public function handleStoreOrUpdatePendidikan($request)
-    {
-        $this->beginTransaction();
-        try {
-            $pendidikan = $this->pendidikans()
-                ->firstOrNew(
-                    [
-                        'jenjang_pendidikan' => $request->jenjang_pendidikan
-                    ]
-                );
-            $pendidikan->fill($request->all());
-            $this->pendidikans()->save($pendidikan);
-            $pendidikan->saveFilesByTemp($request->attachments, $request->module, 'lampiran_pendidikan');
+    // public function handleStoreOrUpdatePendidikan($request)
+    // {
+    //     $this->beginTransaction();
+    //     try {
+    //         $pendidikan = $this->pendidikans()
+    //             ->firstOrNew(
+    //                 [
+    //                     'jenjang_pendidikan' => $request->jenjang_pendidikan
+    //                 ]
+    //             );
+    //         $pendidikan->fill($request->all());
+    //         $this->pendidikans()->save($pendidikan);
+    //         $pendidikan->saveFilesByTemp($request->attachments, $request->module, 'lampiran_pendidikan');
 
-            $this->save();
-            $this->saveLogNotify();
+    //         $this->save();
+    //         $this->saveLogNotify();
 
-            return $this->commitSaved();
-        } catch (\Exception $e) {
-            return $this->rollbackSaved($e);
-        }
-    }
+    //         return $this->commitSaved();
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackSaved($e);
+    //     }
+    // }
 
-    public function handleStoreOrUpdateSertifikasi($request)
-    {
-        $this->beginTransaction();
-        try {
-            $sertifikasi = $this->sertifikasis()
-                ->firstOrNew(
-                    [
-                        'nama_sertif' => $request->nama_sertif
-                    ]
-                );
-            $sertifikasi->fill($request->all());
-            $this->sertifikasis()->save($sertifikasi);
-            $sertifikasi->saveFilesByTemp($request->attachments, $request->module, 'lampiran_sertifikasi');
+    // public function handleStoreOrUpdateSertifikasi($request)
+    // {
+    //     $this->beginTransaction();
+    //     try {
+    //         $sertifikasi = $this->sertifikasis()
+    //             ->firstOrNew(
+    //                 [
+    //                     'nama_sertif' => $request->nama_sertif
+    //                 ]
+    //             );
+    //         $sertifikasi->fill($request->all());
+    //         $this->sertifikasis()->save($sertifikasi);
+    //         $sertifikasi->saveFilesByTemp($request->attachments, $request->module, 'lampiran_sertifikasi');
 
-            $this->save();
-            $this->saveLogNotify();
+    //         $this->save();
+    //         $this->saveLogNotify();
 
-            return $this->commitSaved();
-        } catch (\Exception $e) {
-            return $this->rollbackSaved($e);
-        }
-    }
+    //         return $this->commitSaved();
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackSaved($e);
+    //     }
+    // }
 
     public function handleUpdateProfile($request)
     {
@@ -411,46 +411,46 @@ class User extends Authenticatable
     {
         if (in_array($this->id, [1])) return false;
         if ($this->id == auth()->id()) return false;
-        if (BankAccount::where('user_id', $this->id)->exists()) return false;
+        // if (BankAccount::where('user_id', $this->id)->exists()) return false;
         if (Approval::where('user_id', $this->id)->exists()) return false;
-        if (SurveyRegUser::where('user_id', $this->id)->exists()) return false;
+        // if (SurveyRegUser::where('user_id', $this->id)->exists()) return false;
 
-        $check = Summary::where('pic_id', $this->id)
-            ->orWhere('leader_id', $this->id)
-            ->orWhereHas(
-                'members',
-                function ($q) {
-                    $q->where('user_id', $this->id);
-                }
-            )
-            ->orWhereHas(
-                'rkia',
-                function ($r) {
-                    $r->orWhereHas(
-                        'cc',
-                        function ($q) {
-                            $q->where('user_id', $this->id);
-                        }
-                    );
-                }
-            )
-            ->orWhereHas(
-                'assignment',
-                function ($a) {
-                    $a->where('pic_id', $this->id)
-                        ->orWhere('leader_id', $this->id)
-                        ->orWhereHas(
-                            'members',
-                            function ($q) {
-                                $q->where('user_id', $this->id);
-                            }
-                        );
-                }
-            )
-            ->exists();
-        if ($check) return false;
+        // $check = Summary::where('pic_id', $this->id)
+        //     ->orWhere('leader_id', $this->id)
+        //     ->orWhereHas(
+        //         'members',
+        //         function ($q) {
+        //             $q->where('user_id', $this->id);
+        //         }
+        //     )
+            // ->orWhereHas(
+            //     'rkia',
+            //     function ($r) {
+            //         $r->orWhereHas(
+            //             'cc',
+            //             function ($q) {
+            //                 $q->where('user_id', $this->id);
+            //             }
+            //         );
+            //     }
+            // )
+            // ->orWhereHas(
+            //     'assignment',
+            //     function ($a) {
+            //         $a->where('pic_id', $this->id)
+            //             ->orWhere('leader_id', $this->id)
+            //             ->orWhereHas(
+            //                 'members',
+            //                 function ($q) {
+            //                     $q->where('user_id', $this->id);
+            //                 }
+            //             );
+            //     }
+            // )
+            // ->exists();
+        // if ($check) return false;
 
-        return true;
+        // return true;
     }
 
     public function checkPerms($permission)

@@ -146,8 +146,9 @@ class VendorController extends Controller
     //     //$this->pushBreadcrumb(['Tambah' => route($this->routes . '.create', $record)]);
     //     return $this->render($this->views.'.create',compact('provinces'));
         $page_action = "create";
+        $type ="create";
         $record= new Vendor;
-        return $this->render($this->views . '.create', compact('record'));
+        return $this->render($this->views . '.create', compact('record','type'));
         //return $this->render($this->views . '.create', compact("page_action"));
     }
 

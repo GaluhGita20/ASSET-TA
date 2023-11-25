@@ -11,9 +11,11 @@
 	</div>
 	@section('buttons')
 		<div class="modal-footer">
-			@section('modal-footer')
-				@include('layouts.forms.btnSubmitModal')
-			@show
+			{{-- @if($type == 'edit' || $type=='create') --}}
+				@section('modal-footer')
+					@include('layouts.forms.btnSubmitModal')
+				@show
+			{{-- @endif --}}
 		</div>
 	@show
 </form>

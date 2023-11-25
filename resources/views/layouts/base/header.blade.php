@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="dropdown">
+            {{-- <div class="dropdown">
                 <div class="topbar-item" data-toggle="dropdown" data-offset="10px,0px" aria-expanded="false">
                     <div class="btn btn-icon btn-clean btn-dropdown btn-lg mr-1">
                         @php
@@ -76,7 +76,7 @@
                         </li>
                     </ul>
                 </div>
-            </div>
+            </div> --}}
 
             @if (auth()->check())
                 <div class="dropdown">

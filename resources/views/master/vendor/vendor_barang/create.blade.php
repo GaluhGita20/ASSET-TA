@@ -17,23 +17,51 @@
     <div class="form-group row">  
         <label class="col-md-3 col-form-label">{{ __('Jenis Usaha') }}</label>
         <div class="col-md-9 parent-group">
-            <select name="type_vendor_id" class="form-control base-plugin--select2-ajax type_vendor_id"
+            <select name="jenisUsaha[]" class="form-control base-plugin--select2-ajax jenisUsaha"
                 data-url="{{ rut('ajax.selectJenisUsaha', [
                     'search'=>'all'
-                ]) }}"
+                ]) }}" 
                 data-url-origin="{{ rut('ajax.selectJenisUsaha', [
                     'search'=>'all'
-                ]) }}"
+                ]) }}" multiple
 
-                placeholder="{{ __('Pilih Salah Satu') }}" required>
-                <option value="">{{ __('Pilih Salah Satu') }}</option>
-
-                @if (!empty($record->type_vendor_id))
-                    <option value="{{ $record->jenisUsaha->id }}" selected>{{ $record->jenisUsaha->name }}</option>
-                @endif
+                placeholder="{{ __('Pilih Beberapa') }}" required>
+                <option value="">{{ __('Pilih Beberapa') }}</option>
+                {{-- @if(!empty('type_vendor_id'))
+                    @foreach ('type_vendor_id' as $type)
+                        <option value="{{ $type->type_vendor_id }}" selected>
+                            {{ $type->jenisUsaha->name . ' (' . $type->jenisUsaha->description ?? '' . ')' }}
+                        </option>
+                    @endforeach
+                @endif --}}
             </select>
         </div>
     </div>
+
+    {{-- // Simpan data vendor
+    $vendor = Vendor::create([
+        'nama_vendor' => $request->input('vendor_name'),
+    ]);
+
+    // Simpan relasi jenis usaha
+    $vendor->jenisUsaha()->attach($request->input('jenis_usaha')); --}}
+
+    {{-- <div class="form-group row">
+        <label class="col-md-2 col-form-label">{{ __('Tembusan') }}</label>
+        <div class="col-md-10 parent-group">
+            <select name="cc[]" class="form-control base-plugin--select2-ajax"
+                data-url="{{ route('ajax.selectUser', ['search' => 'level_department']) }}" multiple
+                placeholder="{{ __('Pilih Beberapa') }}">
+                <option value="">{{ __('Pilih Beberapa') }}</option>
+                @foreach ($record->cc as $user)
+                    <option value="{{ $user->id }}" selected>
+                        {{ $user->name . ' (' . $user->position->name ?? '' . ')' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div> --}}
+
     <div class="row">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
@@ -53,7 +81,7 @@
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="nomor_instansi" type="text" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
+                    <input name="kode_instansi" type="text" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
                 </div>
             </div>
         </div>
@@ -100,7 +128,7 @@
         <div class="form-group row">
             <label class="col-md-3 col-form-label">{{ __('Provinsi') }}</label>
             <div class="col-md-9 parent-group">
-                <select name="ref_province_id" class="form-control base-plugin--select2-ajax province_id"
+                <select name="province_id" class="form-control base-plugin--select2-ajax province_id"
                     data-url="{{ rut('ajax.selectProvince', [
                         'search'=>'all'
                     ]) }}"
@@ -119,9 +147,9 @@
         <div class="form-group row">
             <label class="col-md-3 col-form-label">{{ __('Kota') }}</label>
             <div class="col-md-9 parent-group">
-                <select name="ref_city_id" class="form-control base-plugin--select2-ajax city_id"
-                    data-url="{{ rut('ajax.cityOptions', ['province_id' => '']) }}"
-                    data-url-origin="{{ rut('ajax.cityOptionsRoot') }}"
+                <select name="city_id" class="form-control base-plugin--select2-ajax city_id"
+                    data-url="{{ rut('ajax.selectCity', ['province_id']) }}"
+                    data-url-origin="{{ rut('ajax.selectCity', ['province_id']) }}"
                     placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
                     <option value="">{{ __('Pilih Salah Satu') }}</option>
                     @if (!empty($record->city_id))

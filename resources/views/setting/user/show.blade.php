@@ -11,9 +11,9 @@
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-sm-4 col-form-label">{{ __('NPP') }}</label>
+		<label class="col-sm-4 col-form-label">{{ __('NIP') }}</label>
 		<div class="col-sm-8 parent-group">
-			<input type="number" name="npp" value="{{ $record->npp }}" class="form-control" placeholder="{{ __('NPP') }}" maxlength="16" disabled>
+			<input type="number" name="nip" value="{{ $record->nip }}" class="form-control" placeholder="{{ __('NIP') }}" maxlength="16" disabled>
 		</div>
 	</div>
 	<div class="form-group row">

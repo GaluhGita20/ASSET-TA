@@ -11,9 +11,9 @@
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-sm-4 col-form-label">{{ __('NPP') }}</label>
+		<label class="col-sm-4 col-form-label">{{ __('NIP') }}</label>
 		<div class="col-sm-8 parent-group">
-			<input type="number" name="npp" class="form-control" placeholder="{{ __('NPP') }}" maxlength="16">
+			<input type="number" name="nip" class="form-control" placeholder="{{ __('NIP') }}" maxlength="16">
 		</div>
 	</div>
 	<div class="form-group row">
@@ -31,24 +31,28 @@
 	<div class="form-group row">
 		<label class="col-sm-4 col-form-label">{{ __('Struktur') }}</label>
 		<div class="col-sm-8 parent-group">
-			<select name="location_id" class="form-control base-plugin--select2-ajax"
-				id="strukturCtrl"
-				data-url="{{ route('ajax.selectStruct', ['search' => 'position_with_req']) }}"
-                data-url-origin="{{ route('ajax.selectStruct', ['search' => 'position_with_req']) }}"
+			<select name="location_id" class="form-control base-plugin--select2-ajax location_id"
+				{{-- id="strukturCtrl" --}}
+				data-url="{{ route('ajax.selectStruct', ['all']) }}"
+                data-url-origin="{{ route('ajax.selectStruct', ['all']) }}"
 				placeholder="{{ __('Pilih Salah Satu') }}">
 				<option value="">{{ __('Pilih Salah Satu') }}</option>
 			</select>
 		</div>
 	</div>
+
 	<div class="form-group row">
 		<label class="col-sm-4 col-form-label">{{ __('Jabatan') }}</label>
 		<div class="col-sm-8 parent-group">
-			<select name="position_id" id="jabatanCtrl" class="form-control base-plugin--select2-ajax"
+			<select name="position_id" id="jabatanCtrl" class="form-control base-plugin--select2-ajax position_id"
+				data-url="{{ route('ajax.selectPosition', ['by_location']) }}"
+                data-url-origin="{{ route('ajax.selectPosition', ['by_location']) }}"
 				placeholder="{{ __('Pilih Salah Satu') }}">
 				<option value="">{{ __('Pilih Salah Satu') }}</option>
 			</select>
 		</div>
 	</div>
+
 	<div class="form-group row">
 		<label class="col-sm-4 col-form-label">{{ __('Hak Akses') }}</label>
 		<div class="col-sm-8 parent-group">
@@ -59,6 +63,7 @@
 			</select>
 		</div>
 	</div>
+
 	<div class="form-group row">
 		<label class="col-sm-4 col-form-label">{{ __('Password') }}</label>
 		<div class="col-sm-8 parent-group">
@@ -70,6 +75,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="form-group row">
 		<label class="col-sm-4 col-form-label">{{ __('Konfirmasi Password') }}</label>
 		<div class="col-sm-8 parent-group">
@@ -81,6 +87,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="form-group row">
 		<label class="col-sm-4 col-form-label">{{ __('Status') }}</label>
 		<div class="col-sm-8 parent-group">
@@ -96,31 +103,50 @@
 @push('scripts')
 	<script>
 		$(function () {
-			$('.content-page')
-			.on('change', '#strukturCtrl', function(){
-                $.ajax({
-                    method: 'GET',
-                    url: '{{ yurl('/ajax/jabatan-options') }}',
-                    data: {
-                        location_id: $(this).val()
-                    },
-                    success: function(response, state, xhr) {
-                        // let options = `<option value='' selected disabled></option>`;
-                        let options = `<option disabled selected value=''>Pilih Salah Satu</option>`;
-                        for (let item of response) {
-                            options += `<option value='${item.id}'>${item.name}</option>`;
-                        }
-                        $('#jabatanCtrl').select2('destroy');
-                        $('#jabatanCtrl').html(options);
-                        $('#jabatanCtrl').select2();
-                        console.log(54, response, options);
-                    },
-                    error: function(a, b, c) {
-                        console.log(a, b, c);
-                    }
-                });
-            });
+            $('.content-page').on('change', 'select.location_id', function (e) {
+				var me = $(this);
+
+				if (me.val()) {
+					///console.log(me.val());
+					var objectId = $('select.position_id');
+					var urlOrigin = objectId.data('url-origin');
+					var urlParam = $.param({org_struct: me.val()});
+                    // console.log(urlParam);
+					objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+					console.log(decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+					objectId.val(null).prop('disabled', false);
+				}
+				BasePlugin.initSelect2();
+			});
 		});
+
+		// $(function () {
+		// 	$('.content-page')
+		// 	.on('change', '#strukturCtrl', function(){
+        //         $.ajax({
+        //             method: 'GET',
+        //             url: '{{ yurl('/ajax/jabatan-options') }}',
+        //             data: {
+        //                 location_id: $(this).val()
+        //             },
+        //             success: function(response, state, xhr) {
+        //                 // let options = `<option value='' selected disabled></option>`;
+        //                 let options = `<option disabled selected value=''>Pilih Salah Satu</option>`;
+        //                 for (let item of response) {
+        //                     options += `<option value='${item.id}'>${item.name}</option>`;
+        //                 }
+        //                 $('#jabatanCtrl').select2('destroy');
+        //                 $('#jabatanCtrl').html(options);
+        //                 $('#jabatanCtrl').select2();
+        //                 console.log(54, response, options);
+        //             },
+        //             error: function(a, b, c) {
+        //                 console.log(a, b, c);
+        //             }
+        //         });
+        //     });
+		// });
+
 		function togglePasswordVisibility() {
 			const passwordInput = document.getElementById('pwCtrl');
 			const togglePassword = document.getElementById('togglePassword');

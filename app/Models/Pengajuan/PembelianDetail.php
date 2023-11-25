@@ -71,6 +71,7 @@ class PembelianDetail extends Model
     {
         $this->beginTransaction();
         try {
+           
             $data = $request->all();
             if (!empty($request->nominal)) {
                 $data['nominal'] = str_replace('.', '', $request->nominal);

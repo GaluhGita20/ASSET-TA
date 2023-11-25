@@ -1,50 +1,49 @@
+
 @extends('layouts.modal')
 
-@section('action', rut($routes.'.update', $record->id))
 
 @section('modal-body')
-	@method('PATCH')
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label">{{ __('Nama') }}</label>
 		<div class="col-sm-9 parent-group">
-			<input type="text" name="name" value="{{ $record->name }}" class="form-control" placeholder="{{ __('Nama') }}" disabled>
+			<input type="text" name="name" value="{{ $record->name }}" class="form-control" placeholder="{{ __('Nama') }}" readonly>
 		</div>
 	</div>
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label">{{ __('Email') }}</label>
 		<div class="col-sm-9 parent-group">
-			<input type="text" name="email" value="{{ $record->email }}" class="form-control" placeholder="{{ __('Email') }}" disabled>
+			<input type="text" name="email" value="{{ $record->email }}" class="form-control" placeholder="{{ __('Email') }}" readonly>
 		</div>
 	</div>
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label">{{ __('Website') }}</label>
 		<div class="col-sm-9 parent-group">
-			<input type="text" name="website" value="{{ $record->website }}" class="form-control" placeholder="{{ __('Website') }}" disabled>
+			<input type="text" name="website" value="{{ $record->website }}" class="form-control" placeholder="{{ __('Website') }}" readonly>
 		</div>
 	</div>
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label">{{ __('Telepon') }}</label>
 		<div class="col-sm-9 parent-group">
-			<input type="text" name="phone" value="{{ $record->phone }}" class="form-control" placeholder="{{ __('Telepon') }}" disabled>
+			<input type="text" name="phone" value="{{ $record->phone }}" class="form-control" placeholder="{{ __('Telepon') }}" readonly>
 		</div>
 	</div>
 	<div class="form-group row">
 		<label class="col-sm-3 col-form-label">{{ __('Alamat') }}</label>
 		<div class="col-sm-9 parent-group">
-			<textarea type="text" name="address" class="form-control" placeholder="{{ __('Address') }}" disabled>{{ $record->address }}</textarea>
+			<textarea type="text" name="address" class="form-control" placeholder="{{ __('Address') }}" readonly>{{ $record->address }}</textarea>
 		</div>
 	</div>
 	<div class="form-group row">
 		<label class="col-md-3 col-form-label">{{ __('Provinsi') }}</label>
 		<div class="col-md-9 parent-group">
-			<select disabled class="form-control base-plugin--select2-ajax province_id"
+			<select class="form-control base-plugin--select2-ajax province_id"
 				data-url="{{ rut('ajax.selectProvince', [
 					'search'=>'all'
 				]) }}"
 				data-url-origin="{{ rut('ajax.selectProvince', [
 					'search'=>'all'
 				]) }}"
-				placeholder="{{ __('Pilih Salah Satu') }}" required>
+				placeholder="{{ __('Pilih Salah Satu') }}" required disabled>
 				<option value="">{{ __('Pilih Salah Satu') }}</option>
 				@if (!empty($record->city_id))
 					<option value="{{ $record->city->province_id }}" selected>{{ $record->city->province->name }}</option>
@@ -55,10 +54,10 @@
 	<div class="form-group row">
 		<label class="col-md-3 col-form-label">{{ __('Kota') }}</label>
 		<div class="col-md-9 parent-group">
-			<select disabled name="city_id" class="form-control base-plugin--select2-ajax city_id"
-				data-url="{{ rut('ajax.cityOptions', ['province_id' => '']) }}"
-				data-url-origin="{{ rut('ajax.cityOptionsRoot') }}"
-				placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
+			<select name="city_id" class="form-control base-plugin--select2-ajax city_id"
+				data-url="{{ rut('ajax.selectCity', ['province_id']) }}"
+				data-url-origin="{{ rut('ajax.selectCity', ['province_id']) }}"
+				placeholder="{{ __('Pilih Salah Satu') }}" disabled>
 				<option value="">{{ __('Pilih Salah Satu') }}</option>
 				@if (!empty($record->city_id))
 					<option value="{{ $record->city_id }}" selected>{{ $record->city->name }}</option>
@@ -67,6 +66,5 @@
 		</div>
 	</div>
 @endsection
-
 @section('buttons')
 @endsection

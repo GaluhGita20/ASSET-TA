@@ -5,9 +5,10 @@ namespace App\Models\Master\Org;
 use App\Imports\Master\OrgStructImport;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Aspect\Aspect;
+use App\Models\Master\Geografis\Province;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Risk\LastAudit;
-use App\Models\Master\Risk\RiskAssessment;
+// use App\Models\Master\Risk\RiskAssessment;
 use App\Models\Model;
 use App\Models\Rkia\Summary;
 
@@ -76,10 +77,10 @@ class OrgStruct extends Model
     //     return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'group_id', 'struct_id');
     // }
 
-    public function structGroup()
-    {
-        return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'struct_id', 'group_id');
-    }
+    // public function structGroup()
+    // {
+    //     return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'struct_id', 'group_id');
+    // }
 
     public function positions()
     {
@@ -89,6 +90,11 @@ class OrgStruct extends Model
     public function letterNo()
     {
         return $this->hasMany(LetterNo::class, 'department_id');
+    }
+
+    public function provinces()
+    {
+        return $this->belongsTo(Province::class, 'province_id');
     }
 
     public function city()
@@ -253,7 +259,7 @@ class OrgStruct extends Model
         // if (in_array($this->type, [1, 2, 3, 4, 5])) return false;
         if (in_array($this->level, ['root', 'bod'])) return false;
         // if ($this->child()->exists()) return false;
-        if ($this->structGroup()->exists()) return false;
+        // if ($this->structGroup()->exists()) return false;
         if ($this->positions()->exists()) return false;
 
         return true;

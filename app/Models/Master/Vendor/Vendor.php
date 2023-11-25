@@ -21,30 +21,33 @@ class Vendor extends Model
     public $table = 'ref_vendor';
 
     protected $fillable = [
-        "nomor_instansi",
         "name",
-        "type_vendor_id",
-        "kode_rekening",
+        // "id_vendor",
         "pimpinan", 
+        "kode_rekening",
+        "kode_instansi",
         "telp",
         "email",
         "contact_person",
         "address",
-        "ref_province_id",
-        "ref_city_id",
-        "ref_distric_id",
+        "province_id",
+        "city_id",
     ];
 
     public function provinsi() {
-        return $this->belongsTo(Province::class, 'ref_province_id');
+        return $this->belongsTo(Province::class, 'province_id');
     }
 
-    public function jenisUsaha() {
-        return $this->belongsTo(TypeVendor::class, 'type_vendor_id');
+    // public function jenisUsaha() {
+    //     return $this->hasMany(TypeVendorDetails::class, 'type_vendor_id');
+    // }
+    public function jenisUsaha()
+    {
+        return $this->belongsToMany(TypeVendor::class, 'ref_type_vendor_details','vendor_id');
     }
 
     public function kota() {
-        return $this->belongsTo(City::class, 'ref_city_id');
+        return $this->belongsTo(City::class, 'city_id');
     }
 
     public function getProvinceName() {
@@ -55,7 +58,6 @@ class Vendor extends Model
         return $this->jenisUsaha->name;
     }
     
-
     public function getCityName() {
         return $this->kota->name;
     }
@@ -100,6 +102,12 @@ class Vendor extends Model
         try {
             $this->fill($request->all());
             $this->save();
+
+            $this->jenisUsaha()->sync($request->jenisUsaha);
+            //type_id masuk ke type_vendor_id  && $this->id masuk ke $vendor_id
+
+            //$this->childOfGroup()->sync($request->department);
+
             $this->saveLogNotify();
             // $this->dd($request->all());
 

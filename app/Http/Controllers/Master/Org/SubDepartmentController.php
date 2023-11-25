@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Master\Org;
 
 use App\Exports\GenerateExport;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\Org\BodRequest;
+use App\Http\Requests\Master\Org\SubDepartmentRequest;
 use App\Models\Master\Org\OrgStruct;
 use Illuminate\Http\Request;
 
@@ -89,7 +89,7 @@ class SubDepartmentController extends Controller
         return $this->render($this->views . '.create');
     }
 
-    public function store(BodRequest $request)
+    public function store(SubDepartmentRequest $request)
     {
         $record = new OrgStruct;
         return $record->handleStoreOrUpdate($request, 'subdepartment');
@@ -105,7 +105,7 @@ class SubDepartmentController extends Controller
         return $this->render($this->views . '.edit', compact('record'));
     }
 
-    public function update(BodRequest $request, OrgStruct $record)
+    public function update(SubDepartmentRequest $request, OrgStruct $record)
     {
         return $record->handleStoreOrUpdate($request, 'subdepartment');
     }

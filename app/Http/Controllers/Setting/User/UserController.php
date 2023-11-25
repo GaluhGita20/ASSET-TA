@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Setting\User;
 
 use App\Exports\Setting\UserTemplateExport;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Setting\User\PendidikanUserRequest;
-use App\Http\Requests\Setting\User\SertifikasiUserRequest;
+// use App\Http\Requests\Setting\User\PendidikanUserRequest;
+// use App\Http\Requests\Setting\User\SertifikasiUserRequest;
 use App\Http\Requests\Setting\User\UserRequest;
-use App\Models\Auth\Pendidikan;
-use App\Models\Auth\Sertifikasi;
+// use App\Models\Auth\Pendidikan;
+// use App\Models\Auth\Sertifikasi;
 use App\Models\Auth\User;
 use Illuminate\Http\Request;
 
@@ -66,7 +66,7 @@ class UserController extends Controller
         $records = User::grid()
             ->filters()
             ->dtGet()
-            ->orderBy('updated_at', 'DESC');
+            ->orderBy('position_id', 'DESC');
 
         return \DataTables::of($records)
             ->addColumn(
@@ -146,21 +146,21 @@ class UserController extends Controller
                         'id' => $record->id,
                     ];
 
-                    $actions[] = [
-                        'type' => 'custom',
-                        'icon' => 'fas fa-file-contract text-primary',
-                        'page' => true,
-                        'label' => '&nbsp;Sertifikasi',
-                        'url' => rut($this->routes . '.sertifikasi', $record->id),
-                    ];
+                    // $actions[] = [
+                    //     'type' => 'custom',
+                    //     'icon' => 'fas fa-file-contract text-primary',
+                    //     'page' => true,
+                    //     'label' => '&nbsp;Sertifikasi',
+                    //     'url' => rut($this->routes . '.sertifikasi', $record->id),
+                    // ];
 
-                    $actions[] = [
-                        'type' => 'custom',
-                        'icon' => 'fas fa-file-contract text-info',
-                        'page' => true,
-                        'label' => '&nbsp;Pendidikan',
-                        'url' => rut($this->routes . '.pendidikan', $record->id),
-                    ];
+                    // $actions[] = [
+                    //     'type' => 'custom',
+                    //     'icon' => 'fas fa-file-contract text-info',
+                    //     'page' => true,
+                    //     'label' => '&nbsp;Pendidikan',
+                    //     'url' => rut($this->routes . '.pendidikan', $record->id),
+                    // ];
 
                     if ($user->id == 1) {
                         $actions[] = [
@@ -205,275 +205,276 @@ class UserController extends Controller
         return $this->render($this->views . '.show', compact('record'));
     }
 
-    public function pendidikan(User $record)
-    {
-        $grid = [
-            $this->makeColumn('name:num|label:#|sortable:false|width:20px'),
-            $this->makeColumn('name:jenjang|label:Jenjang Pendidikan|sortable:false|className:text-center'),
-            $this->makeColumn('name:institusi|label:Institusi Pendidikan|sortable:false|className:text-center'),
-            $this->makeColumn('name:tahun_lulus|label:Tahun Kelulusan|sortable:false|className:text-center'),
-            $this->makeColumn('name:lampiran|label:Lampiran|sortable:false|className:text-center'),
-            $this->makeColumn('name:action|label:#|sortable:false'),
-        ];
+    // public function pendidikan(User $record)
+    // {
+    //     $grid = [
+    //         $this->makeColumn('name:num|label:#|sortable:false|width:20px'),
+    //         $this->makeColumn('name:jenjang|label:Jenjang Pendidikan|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:institusi|label:Institusi Pendidikan|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:tahun_lulus|label:Tahun Kelulusan|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:lampiran|label:Lampiran|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:action|label:#|sortable:false'),
+    //     ];
 
-        $this->prepare(
-            [
-                'tableStruct' => [
-                    'url' => rut($this->routes . '.pendidikan.grid', $record->id),
-                    'datatable_1' => $grid
-                ],
-            ]
-        );
-        return $this->render($this->views . '.pendidikan.index', compact('record'));
-    }
+    //     $this->prepare(
+    //         [
+    //             'tableStruct' => [
+    //                 'url' => rut($this->routes . '.pendidikan.grid', $record->id),
+    //                 'datatable_1' => $grid
+    //             ],
+    //         ]
+    //     );
+        
+    //     return $this->render($this->views . '.pendidikan.index', compact('record'));
+    // }
 
-    public function pendidikanGrid(User $record)
-    {
-        $user = auth()->user();
-        $records = Pendidikan::whereHas(
-                'user',
-                function ($q) use ($record) {
-                    $q->where('user_id', $record->id);
-                }
-            )
-            ->dtGet();
+    // public function pendidikanGrid(User $record)
+    // {
+    //     $user = auth()->user();
+    //     $records = Pendidikan::whereHas(
+    //             'user',
+    //             function ($q) use ($record) {
+    //                 $q->where('user_id', $record->id);
+    //             }
+    //         )
+    //         ->dtGet();
 
-        return \DataTables::of($records)
-            ->addColumn(
-                'num',
-                function ($detail) {
-                    return request()->start;
-                }
-            )
-            ->addColumn(
-                'jenjang',
-                function ($detail) {
-                    return $detail->jenjang_pendidikan;
-                }
-            )
-            ->addColumn(
-                'institusi',
-                function ($detail) {
-                    return $detail->institute;
-                }
-            )
-            ->addColumn(
-                'tahun_lulus',
-                function ($detail) {
-                    return $detail->thn_lulus;
-                }
-            )
-            ->addColumn(
-                'lampiran',
-                function ($detail) {
-                    $str = "<span class='badge badge-info'>" . $detail->files()->where('flag', 'lampiran_pendidikan')->count() . " Files</span>";
-                    return $str;
-                }
-            )
-            ->addColumn(
-                'action',
-                function ($detail) {
-                    $actions = [];
-                    $actions[] = [
-                        'type' => 'show',
-                        'url' => rut($this->routes . '.pendidikan.detailShow', $detail->id),
-                    ];
-                    $actions[] = [
-                        'type' => 'edit',
-                        'url' => rut($this->routes.'.pendidikan.detailEdit', $detail->id),
-                    ];
-                    $actions[] = [
-                        'type' => 'delete',
-                        'url' => rut($this->routes . '.pendidikan.detailDestroy', $detail->id),
-                        'text' => $detail->name ?? $detail->item->name ?? '',
-                    ];
-                    return $this->makeButtonDropdown($actions, $detail->id);
-                }
-            )
-            ->rawColumns(['action', 'updated_by', 'lampiran'])
-            ->make(true);
-    }
+    //     return \DataTables::of($records)
+    //         ->addColumn(
+    //             'num',
+    //             function ($detail) {
+    //                 return request()->start;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'jenjang',
+    //             function ($detail) {
+    //                 return $detail->jenjang_pendidikan;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'institusi',
+    //             function ($detail) {
+    //                 return $detail->institute;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'tahun_lulus',
+    //             function ($detail) {
+    //                 return $detail->thn_lulus;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'lampiran',
+    //             function ($detail) {
+    //                 $str = "<span class='badge badge-info'>" . $detail->files()->where('flag', 'lampiran_pendidikan')->count() . " Files</span>";
+    //                 return $str;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'action',
+    //             function ($detail) {
+    //                 $actions = [];
+    //                 $actions[] = [
+    //                     'type' => 'show',
+    //                     'url' => rut($this->routes . '.pendidikan.detailShow', $detail->id),
+    //                 ];
+    //                 $actions[] = [
+    //                     'type' => 'edit',
+    //                     'url' => rut($this->routes.'.pendidikan.detailEdit', $detail->id),
+    //                 ];
+    //                 $actions[] = [
+    //                     'type' => 'delete',
+    //                     'url' => rut($this->routes . '.pendidikan.detailDestroy', $detail->id),
+    //                     'text' => $detail->name ?? $detail->item->name ?? '',
+    //                 ];
+    //                 return $this->makeButtonDropdown($actions, $detail->id);
+    //             }
+    //         )
+    //         ->rawColumns(['action', 'updated_by', 'lampiran'])
+    //         ->make(true);
+    // }
 
-    public function pendidikanDetailCreate(User $record)
-    {
-        return $this->render($this->views . '.pendidikan.create', compact('record'));
-    }
+    // public function pendidikanDetailCreate(User $record)
+    // {
+    //     return $this->render($this->views . '.pendidikan.create', compact('record'));
+    // }
 
-    public function pendidikanDetailEdit($id)
-    {
-        $detail = Pendidikan::find($id);
-        return $this->render($this->views . '.pendidikan.edit', compact('detail'));
-    }
+    // public function pendidikanDetailEdit($id)
+    // {
+    //     $detail = Pendidikan::find($id);
+    //     return $this->render($this->views . '.pendidikan.edit', compact('detail'));
+    // }
 
-    public function pendidikanDetailShow($id)
-    {
-        $detail = Pendidikan::find($id);
-        return $this->render($this->views . '.pendidikan.show', compact('detail'));
-    }
+    // public function pendidikanDetailShow($id)
+    // {
+    //     $detail = Pendidikan::find($id);
+    //     return $this->render($this->views . '.pendidikan.show', compact('detail'));
+    // }
 
-    public function pendidikanDetailUpdate(PendidikanUserRequest $request, $id)
-    {
-        $detail = Pendidikan::find($id);
-        $record = User::find($detail->user_id);
-        return $record->handleStoreOrUpdatePendidikan($request);
+    // public function pendidikanDetailUpdate(PendidikanUserRequest $request, $id)
+    // {
+    //     $detail = Pendidikan::find($id);
+    //     $record = User::find($detail->user_id);
+    //     return $record->handleStoreOrUpdatePendidikan($request);
 
-    }
+    // }
 
-    public function pendidikanDetailDestroy($id)
-    {
-        $detail = Pendidikan::find($id);
-        $record = User::find($detail->user_id);
-        return $record->handleDestroyPendidikan($id);
+    // public function pendidikanDetailDestroy($id)
+    // {
+    //     $detail = Pendidikan::find($id);
+    //     $record = User::find($detail->user_id);
+    //     return $record->handleDestroyPendidikan($id);
 
-    }
+    // }
 
-    public function pendidikanDetailStore(PendidikanUserRequest $request, $id)
-    {
-        $record = User::find($id);
-        return $record->handleStoreOrUpdatePendidikan($request);
-    }
+    // public function pendidikanDetailStore(PendidikanUserRequest $request, $id)
+    // {
+    //     $record = User::find($id);
+    //     return $record->handleStoreOrUpdatePendidikan($request);
+    // }
 
-    public function sertifikasi(User $record)
-    {
-        $grid = [
-            $this->makeColumn('name:num|label:#|sortable:false|width:20px'),
-            $this->makeColumn('name:nama_sertif|label:Nama Sertifikat|sortable:false|className:text-center'),
-            $this->makeColumn('name:no_sertif|label:Nomor Sertifikat|sortable:false|className:text-center'),
-            $this->makeColumn('name:tgl_sertif|label:Tgl Sertifikat|sortable:false|className:text-center'),
-            $this->makeColumn('name:lembaga|label:Lembaga|sortable:false|className:text-center'),
-            $this->makeColumn('name:lampiran|label:Lampiran|sortable:false|className:text-center'),
-            $this->makeColumn('name:action|label:#|sortable:false'),
-        ];
+    // public function sertifikasi(User $record)
+    // {
+    //     $grid = [
+    //         $this->makeColumn('name:num|label:#|sortable:false|width:20px'),
+    //         $this->makeColumn('name:nama_sertif|label:Nama Sertifikat|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:no_sertif|label:Nomor Sertifikat|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:tgl_sertif|label:Tgl Sertifikat|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:lembaga|label:Lembaga|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:lampiran|label:Lampiran|sortable:false|className:text-center'),
+    //         $this->makeColumn('name:action|label:#|sortable:false'),
+    //     ];
 
-        $this->prepare(
-            [
-                'tableStruct' => [
-                    'url' => rut($this->routes . '.sertifikasi.grid', $record->id),
-                    'datatable_1' => $grid
-                ],
-            ]
-        );
-        return $this->render($this->views . '.sertifikasi.index', compact('record'));
-    }
+    //     $this->prepare(
+    //         [
+    //             'tableStruct' => [
+    //                 'url' => rut($this->routes . '.sertifikasi.grid', $record->id),
+    //                 'datatable_1' => $grid
+    //             ],
+    //         ]
+    //     );
+    //     return $this->render($this->views . '.sertifikasi.index', compact('record'));
+    // }
 
-    public function sertifikasiGrid(User $record)
-    {
-        $user = auth()->user();
-        $records = Sertifikasi::whereHas(
-                'user',
-                function ($q) use ($record) {
-                    $q->where('user_id', $record->id);
-                }
-            )
-            ->dtGet();
+    // public function sertifikasiGrid(User $record)
+    // {
+    //     $user = auth()->user();
+    //     $records = Sertifikasi::whereHas(
+    //             'user',
+    //             function ($q) use ($record) {
+    //                 $q->where('user_id', $record->id);
+    //             }
+    //         )
+    //         ->dtGet();
 
-        return \DataTables::of($records)
-            ->addColumn(
-                'num',
-                function ($detail) {
-                    return request()->start;
-                }
-            )
-            ->addColumn(
-                'nama_sertif',
-                function ($detail) {
-                    return $detail->nama_sertif;
-                }
-            )
-            ->addColumn(
-                'no_sertif',
-                function ($detail) {
-                    return $detail->no_sertif;
-                }
-            )
-            ->addColumn(
-                'tgl_sertif',
-                function ($detail) {
-                    return $detail->tgl_sertif->translatedFormat('d F Y');
-                }
-            )
-            ->addColumn(
-                'lembaga',
-                function ($detail) {
-                    return $detail->lembaga;
-                }
-            )
-            ->addColumn(
-                'lampiran',
-                function ($detail) {
-                    $str = "<span class='badge badge-info'>" . $detail->files()->where('flag', 'lampiran_sertifikasi')->count() . " Files</span>";
-                    return $str;
-                }
-            )
-            ->addColumn(
-                'action',
-                function ($detail) {
-                    $actions = [];
-                    $actions[] = [
-                        'type' => 'show',
-                        'url' => rut($this->routes . '.sertifikasi.detailShow', $detail->id),
-                    ];
-                    $actions[] = [
-                        'type' => 'edit',
-                        'url' => rut($this->routes.'.sertifikasi.detailEdit', $detail->id),
-                    ];
-                    $actions[] = [
-                        'type' => 'delete',
-                        'url' => rut($this->routes . '.sertifikasi.detailDestroy', $detail->id),
-                        'text' => $detail->name ?? $detail->item->name ?? '',
-                    ];
-                    return $this->makeButtonDropdown($actions, $detail->id);
-                }
-            )
-            ->rawColumns(['action', 'updated_by', 'lampiran'])
-            ->make(true);
-    }
+    //     return \DataTables::of($records)
+    //         ->addColumn(
+    //             'num',
+    //             function ($detail) {
+    //                 return request()->start;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'nama_sertif',
+    //             function ($detail) {
+    //                 return $detail->nama_sertif;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'no_sertif',
+    //             function ($detail) {
+    //                 return $detail->no_sertif;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'tgl_sertif',
+    //             function ($detail) {
+    //                 return $detail->tgl_sertif->translatedFormat('d F Y');
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'lembaga',
+    //             function ($detail) {
+    //                 return $detail->lembaga;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'lampiran',
+    //             function ($detail) {
+    //                 $str = "<span class='badge badge-info'>" . $detail->files()->where('flag', 'lampiran_sertifikasi')->count() . " Files</span>";
+    //                 return $str;
+    //             }
+    //         )
+    //         ->addColumn(
+    //             'action',
+    //             function ($detail) {
+    //                 $actions = [];
+    //                 $actions[] = [
+    //                     'type' => 'show',
+    //                     'url' => rut($this->routes . '.sertifikasi.detailShow', $detail->id),
+    //                 ];
+    //                 $actions[] = [
+    //                     'type' => 'edit',
+    //                     'url' => rut($this->routes.'.sertifikasi.detailEdit', $detail->id),
+    //                 ];
+    //                 $actions[] = [
+    //                     'type' => 'delete',
+    //                     'url' => rut($this->routes . '.sertifikasi.detailDestroy', $detail->id),
+    //                     'text' => $detail->name ?? $detail->item->name ?? '',
+    //                 ];
+    //                 return $this->makeButtonDropdown($actions, $detail->id);
+    //             }
+    //         )
+    //         ->rawColumns(['action', 'updated_by', 'lampiran'])
+    //         ->make(true);
+    // }
 
-    public function sertifikasiDetailCreate(User $record)
-    {
-        return $this->render($this->views . '.sertifikasi.create', compact('record'));
-    }
+    // public function sertifikasiDetailCreate(User $record)
+    // {
+    //     return $this->render($this->views . '.sertifikasi.create', compact('record'));
+    // }
 
-    public function sertifikasiDetailEdit($id)
-    {
-        $detail = Sertifikasi::find($id);
-        return $this->render($this->views . '.sertifikasi.edit', compact('detail'));
-    }
+    // public function sertifikasiDetailEdit($id)
+    // {
+    //     $detail = Sertifikasi::find($id);
+    //     return $this->render($this->views . '.sertifikasi.edit', compact('detail'));
+    // }
 
-    public function sertifikasiDetailShow($id)
-    {
-        $detail = Sertifikasi::find($id);
-        return $this->render($this->views . '.sertifikasi.show', compact('detail'));
-    }
+    // public function sertifikasiDetailShow($id)
+    // {
+    //     $detail = Sertifikasi::find($id);
+    //     return $this->render($this->views . '.sertifikasi.show', compact('detail'));
+    // }
 
-    public function sertifikasiDetailUpdate(SertifikasiUserRequest $request, $id)
-    {
-        $detail = Sertifikasi::find($id);
-        $record = User::find($detail->user_id);
-        return $record->handleStoreOrUpdateSertifikasi($request);
+    // public function sertifikasiDetailUpdate(SertifikasiUserRequest $request, $id)
+    // {
+    //     $detail = Sertifikasi::find($id);
+    //     $record = User::find($detail->user_id);
+    //     return $record->handleStoreOrUpdateSertifikasi($request);
 
-    }
+    // }
 
-    public function sertifikasiDetailDestroy($id)
-    {
-        $detail = Sertifikasi::find($id);
-        $record = User::find($detail->user_id);
-        return $record->handleDestroySertifikasi($id);
+    // public function sertifikasiDetailDestroy($id)
+    // {
+    //     $detail = Sertifikasi::find($id);
+    //     $record = User::find($detail->user_id);
+    //     return $record->handleDestroySertifikasi($id);
 
-    }
+    // }
 
-    public function sertifikasiDetailStore(SertifikasiUserRequest $request, $id)
-    {
-        $record = User::find($id);
-        return $record->handleStoreOrUpdateSertifikasi($request);
-    }
+    // public function sertifikasiDetailStore(SertifikasiUserRequest $request, $id)
+    // {
+    //     $record = User::find($id);
+    //     return $record->handleStoreOrUpdateSertifikasi($request);
+    // }
 
-    public function detail(User $record)
-    {
-        $record->position = $record->position;
-        $record->struct = $record->position->location;
-        return $record;
-    }
+    // public function detail(User $record)
+    // {
+    //     $record->position = $record->position;
+    //     $record->struct = $record->position->location;
+    //     return $record;
+    // }
 
 
     public function edit(User $record)
@@ -486,10 +487,10 @@ class UserController extends Controller
         return $record->handleStoreOrUpdate($request);
     }
 
-    public function destroy(User $record)
-    {
-        return $record->handleDestroy();
-    }
+    // public function destroy(User $record)
+    // {
+    //     return $record->handleDestroy();
+    // }
 
     public function resetPassword(User $record)
     {

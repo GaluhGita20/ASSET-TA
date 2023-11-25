@@ -100,15 +100,15 @@ class PembelianAsetController extends Controller
             })
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [];
-
                 if ($record->checkAction('show', $this->perms)) {
                     $actions[] = [
                         'type' => 'show',
-                        'page' => true,
+                        // 'page' => true,
                         'id' => $record->id,
                         'url' => route($this->routes . '.show', $record->id),
                     ];
                 }
+
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
                         'type' => 'edit',
@@ -116,6 +116,7 @@ class PembelianAsetController extends Controller
                         'url' => route($this->routes . '.edit', $record->id),
                     ];
                 }
+
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
                         'type' => 'edit',
@@ -126,6 +127,7 @@ class PembelianAsetController extends Controller
                         'url' => route($this->routes . '.detail', $record->id),
                     ];
                 }
+
                 if ($record->checkAction('delete', $this->perms)) {
                     $actions[] = [
                         'type' => 'delete',
@@ -133,12 +135,15 @@ class PembelianAsetController extends Controller
                         'url' => route($this->routes . '.destroy', $record->id),
                     ];
                 }
+
                 if ($record->checkAction('approval', $this->perms)) {
                     $actions[] = 'type:approval|page:true|label:Approval';
                 }
+
                 if ($record->checkAction('tracking', $this->perms)) {
                     $actions[] = 'type:tracking';
                 }
+
                 if ($record->checkAction('history', $this->perms)) {
                     $actions[] = 'type:history';
                 }
@@ -162,7 +167,14 @@ class PembelianAsetController extends Controller
 
     public function edit(Pembelian $record)
     {
-        return $this->render($this->views . '.edit', compact('record'));
+        $type ='edit';
+        return $this->render($this->views . '.edit', compact('record','type'));
+    }
+
+    public function show(Pembelian $record)
+    {
+        $type ='show';
+        return $this->render($this->views . '.show', compact('record','type'));
     }
 
     public function detailGrid(Pembelian $record)
@@ -230,10 +242,22 @@ class PembelianAsetController extends Controller
                 'action',
                 function ($detail) use ($user, $record) {
                     $actions = [];
+                   
+
                     $actions[] = [
                         'type' => 'show',
                         'url' => route($this->routes . '.detailShow', $detail->id),
                     ];
+                    $actions[] = [
+                        'type' => 'edit',
+                        'url' => route($this->routes . '.detailEdit', $detail->id),
+                    ];
+                    if ($detail->pembelian->checkAction('edit', $this->perms)) {
+                        $actions[] = [
+                            'type' => 'delete',
+                            'url' => route($this->routes . '.detailDestroy', $detail->id),
+                        ];
+                    }
                     return $this->makeButtonDropdown($actions, $detail->id);
                 }
             )
@@ -265,39 +289,45 @@ class PembelianAsetController extends Controller
     public function detailCreate(Pembelian $record)
     {
         $baseContentReplace = 'base-modal--render';
-
+        $type ='create';
+ 
         return $this->render($this->views . '.detail.create', compact('record', 'baseContentReplace'));
     }
 
     public function detailStore(PembelianDetailRequest $request, Pembelian $record)
     {
         $detail = new PembelianDetail;
+       
         return $record->handleDetailStoreOrUpdate($request, $detail);
     }
 
     public function detailEdit(PembelianDetail $detail)
     {
-        $record = $detail->pj;
+        
+        //$record = Pembelian::where('id', $detail->pembelian_id)->first('id');
+        $record = $detail->pembelian;
         $baseContentReplace = 'base-modal--render';
-        return $this->render($this->views . '.detail.edit', compact('record', 'detail', 'baseContentReplace'));
+        return $this->render($this->views . '.detail.edit', compact('detail','record','baseContentReplace'));
     }
 
-    public function detailUpdate(PembelianDetailRequest $request, PembelianDetail $detail)
+    public function detailUpdate(PembelianDetailRequest $request,  PembelianDetail $detail)
     {
-        $record = $detail->pj;
-        return $record->handleDetailStoreOrUpdate($request, $detail);
+        $record = $detail->pembelian;
+        return $record->handleDetailStoreOrUpdate($request,$detail);
     }
 
     public function detailShow(PembelianDetail $detail)
     {
-        $record = $detail->pj;
+        // $record = $detail->pj;
+        // dd($detail);
+        $type ='show';
         $baseContentReplace = 'base-modal--render';
-        return $this->render($this->views . '.detail.show', compact('record', 'detail', 'baseContentReplace'));
+        return $this->render($this->views . '.detail.show', compact('type','detail', 'baseContentReplace'));
     }
 
     public function detailDestroy(PembelianDetail $detail)
     {
-        $record = $detail->pj;
+        $record = $detail->pembelian;
         return $record->handleDetailDestroy($detail);
     }
 
@@ -306,7 +336,7 @@ class PembelianAsetController extends Controller
         return $record->handleStoreOrUpdate($request);
     }
 
-    public function updateSummary(PembelianDetailRequest $request, Pembelian $record)
+    public function updateSummary(PembelianRequest $request, Pembelian $record)
     {
         return $record->handleStoreOrUpdate($request);
     }
@@ -353,10 +383,10 @@ class PembelianAsetController extends Controller
         return $this->render('globals.history', compact('record'));
     }
 
-    public function show(Pembelian $record)
-    {
-        return $this->render($this->views . '.show', compact('record'));
-    }
+    // public function show(Pembelian $record)
+    // {
+    //     return $this->render($this->views . '.show', compact('record'));
+    // }
 
     public function revisi(Pembelian $record, Request $request)
     {

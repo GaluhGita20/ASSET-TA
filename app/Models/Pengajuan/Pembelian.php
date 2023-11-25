@@ -26,7 +26,6 @@ class Pembelian extends Model
         'regarding',
         'sentence_start',
         'sentence_end',
-
         'status',
         'version',
         'upgrade_reject'
@@ -102,6 +101,7 @@ class Pembelian extends Model
             if ($request->is_submit) {
                 $this->handleSubmitSave($request);
             }
+
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -113,9 +113,11 @@ class Pembelian extends Model
     {
         $this->beginTransaction();
         try {
+            
             $detail->fill($request->all());
+          
             $this->details()->save($detail);
-            $this->save();
+            $detail->save();
             $this->saveLogNotify();
             return $this->commitSaved();
         } catch (\Exception $e) {
@@ -136,6 +138,22 @@ class Pembelian extends Model
             return $this->rollbackDeleted($e);
         }
     }
+
+    public function handleDetailDestroy(PembelianDetail $detail)
+    {
+        $this->beginTransaction();
+        try {
+            $this->saveLogNotify();
+            $detail->delete();
+
+            return $this->commitDeleted([
+                'redirect' => route(request()->routes . '.detail', $this->id)
+            ]);
+        } catch (\Exception $e) {
+            return $this->rollbackDeleted($e);
+        }
+    }
+
 
     public function handleApprove($request)
     {

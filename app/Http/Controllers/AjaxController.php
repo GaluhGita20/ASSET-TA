@@ -12,6 +12,8 @@ use App\Models\Master\Geografis\Province;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use Illuminate\Http\Request;
+use App\Models\Master\Vendor\TypeVendor;
+// use App\Models\Geografis\Province;
 use Illuminate\Support\Str;
 
 
@@ -197,6 +199,10 @@ class AjaxController extends Controller
             case 'parent_subsection':
                 $items = $items->whereIn('level', ['subdepartment']);
                 break;
+            case 'by_level':
+                $req = $request->input('level_id');
+                $items = $items->whereIn('level', [$req]);
+                break;
             default:
                 $items = $items->whereNull('id');
                 break;
@@ -233,7 +239,9 @@ class AjaxController extends Controller
                 $items = $items;
                 break;
             case 'by_location':
-                $items = $items->where('location_id', $request->id);
+                //dd($request->org_struct);
+                $req = $request->input('org_struct');
+                $items = $items->where('location_id', $req);
                 break;
             case 'divisi_spi':
                 $location_id = OrgStruct::where('name', 'Satuan Pengawas Internal')->firstOrFail();
@@ -257,10 +265,12 @@ class AjaxController extends Controller
 
     public function selectUser($search, Request $request)
     {
+   
         $items = User::keywordBy('name')
             ->has('position')
             ->where('status', 'active')
             ->orderBy('name');
+
         switch ($search) {
             case 'all':
                 $items = $items
@@ -292,6 +302,21 @@ class AjaxController extends Controller
                             'struct',
                             function ($qq) {
                                 $qq->where('level', 'department');
+                            }
+                        );
+                    }
+                );
+                break;
+            case 'org_struct':
+                // $dep = $request->org_struct;
+                $req = $request->input('org_struct');
+                $items = $items->whereHas(
+                    'position',
+                    function ($q) use($req) {
+                        $q->whereHas(
+                             'struct',
+                             function ($qq) use ($req) {
+                                $qq->where('location_id', $req);
                             }
                         );
                     }
@@ -344,5 +369,25 @@ class AjaxController extends Controller
         }
         return response()->json(compact('results', 'more'));
 
+    }
+
+    public function selectCity($search, Request $request){
+        $req = $request->input('province_id');
+        $items = City::where('province_id',$req);
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
+    public function selectProvince($search, Request $request){
+        $items = Province::all();
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+
+    }
+
+    public function selectJenisUsaha($search, Request $request){
+        $items = TypeVendor::all();
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name','id');
     }
 }

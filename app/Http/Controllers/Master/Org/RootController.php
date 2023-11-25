@@ -39,6 +39,8 @@ class RootController extends Controller
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
                     $this->makeColumn('name:phone|label:Telepon|className:text-center'),
+                    $this->makeColumn('name:province|label:Provinsi|className:text-left|width:400px'),
+                    $this->makeColumn('name:kabupaten|label:Kabupaten/Kota|className:text-left|width:400px'),
                     $this->makeColumn('name:address|label:Alamat|className:text-left|width:400px'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
@@ -66,6 +68,12 @@ class RootController extends Controller
             ->addColumn('address', function ($record) {
                 return $record->address?? null;
             })
+            ->addColumn('province', function ($record) {
+                return $record->provinces->name ?? null;
+            })
+            ->addColumn('kabupaten', function ($record) {
+                return $record->city->name?? null;
+            })
             ->addColumn('updated_by', function ($record) {
                 return $record->createdByRaw();
             })
@@ -76,7 +84,7 @@ class RootController extends Controller
                 ];
                 return $this->makeButtonDropdown($actions);
             })
-            ->rawColumns(['action','updated_by', 'name', 'phone', 'address'])
+            ->rawColumns(['action','updated_by', 'name', 'phone', 'address','kabupaten','province'])
             ->make(true);
     }
 
