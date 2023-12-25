@@ -449,23 +449,23 @@ class User extends Authenticatable
         return false;
     }
 
-    public function approvalType()
-    {
-        $flag = $this->position->location->flag ?? 0;
-        $parent_flag = $this->position->location->parent->flag ?? 0;
-        if ($flag == 2) {
-            return '01'; // Korwil Utama
-        };
-        if ($flag == 3) {
-            return '02'; // Korwil Barat
-        };
-        if ($flag == 4) {
-            return '03'; // Korwil Timur
-        };
-        if ($flag == 1 || $parent_flag == 1) {
-            return '00'; // SPI
-        };
-    }
+    // public function approvalType()
+    // {
+    //     $flag = $this->position->location->flag ?? 0;
+    //     $parent_flag = $this->position->location->parent->flag ?? 0;
+    //     if ($flag == 2) {
+    //         return '01'; // Korwil Utama
+    //     };
+    //     if ($flag == 3) {
+    //         return '02'; // Korwil Barat
+    //     };
+    //     if ($flag == 4) {
+    //         return '03'; // Korwil Timur
+    //     };
+    //     if ($flag == 1 || $parent_flag == 1) {
+    //         return '00'; // SPI
+    //     };
+    // }
 
     public function getLastNotificationId()
     {

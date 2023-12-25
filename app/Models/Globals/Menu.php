@@ -88,6 +88,8 @@ class Menu extends Model
                 foreach ($flows as $key => $val) {
                     $flow = $this->flows()->firstOrNew(['role_id' => $val['role_id']]);
                     $flow->type     = $val['type'];
+                    $flow->type_position     = $val['type_position'];
+                    $flow->position_id     = $val['position_id'] ?? NULL;
                     $flow->order    = $order;
                     $flow->save();
                     $flows_ids[] = $flow->id;

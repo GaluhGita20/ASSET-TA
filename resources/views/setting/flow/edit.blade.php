@@ -13,7 +13,10 @@
             <thead>
                 <tr>
                     <th class="text-center" style="width: 30px;">#</th>
-                    <th class="text-center">Hak Akses</th>
+                    <th class="text-center">Berdasarkan Role</th>
+                    <th class="text-center">Role</th>
+                    <th class="text-center">Tipe Posisi</th>
+                    <th class="text-center">Jabatan</th>
                     <th class="text-center" style="width: 100px;">Sekuensial</th>
                     <th class="text-center" style="width: 100px;">Paralel</th>
                     <th class="text-center valign-middle" style="width: 100px;">
@@ -29,6 +32,12 @@
                 @forelse ($record->flows as $flow)
                     <tr data-key="{{ $loop->iteration }}">
                         <td class="text-center no">{{ $loop->iteration }}</td>
+						<td class="text-center parent-group">
+                        	<label class="checkbox checkbox-lg d-inline-block checkbox-rounded">
+                                <input type="radio" class="approve check" name="flows[{{ $loop->iteration }}][with_role]" value="1" {{ $flow->with_role == 1 ? 'checked' : '' }}>
+                                <span></span>
+                            </label>
+                        </td>
                         <td class="text-left parent-group">
                         	<select name="flows[{{ $loop->iteration }}][role_id]"
                         		class="form-control base-plugin--select2-ajax"
@@ -36,6 +45,25 @@
                         		data-placeholder="{{ __('Pilih Salah Satu') }}">
                         		@if ($flow->role)
                         			<option value="{{ $flow->role->id }}">{{ $flow->role->name }}</option>
+                        		@endif
+                        	</select>
+                        </td>
+						<td class="text-left parent-group">
+                        	<select name="flows[{{ $loop->iteration }}][type_position]"
+                        		class="form-control base-plugin--select2 type_position"
+                        		data-placeholder="{{ __('Pilih Salah Satu') }}">
+                        		<option {{ $flow->type_position == 1 ? 'selected' : '' }} value="1">{{ __('ALL POSITION') }}</option>
+                        		<option {{ $flow->type_position == 2 ? 'selected' : '' }} value="2">{{ __('BY HEAD DEPARTEMEN') }}</option>
+                        		<option {{ $flow->type_position == 3 ? 'selected' : '' }} value="3">{{ __('BY POSITION') }}</option>
+                        	</select>
+                        </td>
+						<td class="text-left parent-group">
+                        	<select name="flows[{{ $loop->iteration }}][position_id]"
+                        		class="form-control base-plugin--select2-ajax"
+                        		data-url="{{ rut('ajax.selectPosition', 'all') }}"
+                        		data-placeholder="{{ __('Pilih Salah Satu') }}">
+                        		@if ($flow->position)
+                        			<option value="{{ $flow->position->id }}">{{ $flow->position->name }}</option>
                         		@endif
                         	</select>
                         </td>

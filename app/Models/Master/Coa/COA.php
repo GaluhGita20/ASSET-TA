@@ -20,7 +20,7 @@ class COA extends Model
     use HasFiles,  RaidModel, ResponseTrait, Utilities, HasApprovals;
     // use HasUuids;
     // protected $primaryKey = 'uuid';
-    protected $table = 'ref_coa';
+    protected $table = 'ref_kode_aset_bmd';
 
     protected $fillable = [
         'kode_akun',

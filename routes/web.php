@@ -53,6 +53,62 @@ Route::middleware('auth')->group(function () {
             }
         );
 
+    Route::namespace('Pengajuan')
+    ->prefix('pengajuan')
+    ->name('pengajuan.')
+    ->group(
+            function () {
+                Route::name('perencanaan-aset.')
+                ->prefix('perencanaan-aset')
+                ->group(
+                    function(){
+                        Route::post('{record}/updateSummary', 'PerencanaanAsetController@updateSummary')->name('updateSummary');
+                        Route::post('{record}/detailGrid', 'PerencanaanAsetController@detailGrid')->name('detailGrid');
+                        Route::get('detail/{record}', 'PerencanaanAsetController@detail')->name('detail');
+                        Route::get('detailCreate/{record}', 'PerencanaanAsetController@detailCreate')->name('detailCreate');
+                        Route::get('detailShow/{detail}', 'PerencanaanAsetController@detailShow')->name('detailShow');
+                        Route::get('detailEdit/{detail}', 'PerencanaanAsetController@detailEdit')->name('detailEdit');
+                        Route::get('detailApprove/{detail}', 'PerencanaanAsetController@detailApprove')->name('detailApprove');
+                        Route::get('historyDetail/{detail}', 'PerencanaanAsetController@historyDetail')->name('historyDetail');
+                        Route::delete('detailDestroy/{detail}', 'PerencanaanAsetController@detailDestroy')->name('detailDestroy');
+                        Route::post('detailUpdate/{detail}', 'PerencanaanAsetController@detailUpdate')->name('detailUpdate');
+                        Route::post('detailUpdateApprove/{detail}', 'PerencanaanAsetController@detailUpApprove')->name('detailUpdateApprove');
+                        Route::post('detailStore', 'PerencanaanAsetController@detailStore')->name('detailStore');
+                        Route::post('reject/{id}','PerencanaanAsetController@reject')->name('reject');
+                    }
+                );
+                Route::grid('perencanaan-aset', 'PerencanaanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+            }
+        );
+    
+        Route::namespace('Transaksi')
+        ->prefix('transaksi')
+        ->name('transaksi.')
+        ->group(
+            function () {
+                Route::name('waiting-purchase.')
+                ->prefix('waiting-purchase')
+                ->group(
+                    function(){
+                        Route::post('store', 'ListPembelianController@submitSave')->name('store');
+                        Route::post('storeDetail', 'ListPembelianController@storeDetail')->name('storeDetail');
+                        Route::post('deleteDetail{id}', 'ListPembelianController@deleteDetail')->name('deleteDetail');
+                      //  Route::get('{id}', 'ListPembelianController@editDetail')->name('editDetail');
+                        // Route::get('/create/{data}', 'ListPembelianController@create')->name('create');
+                    }
+                );
+                Route::delete('waiting-purchase/detailDestroy/{detail}', 'ListPembelianController@detailDestroy')->name('waiting-purchase.detailDestroy');
+                Route::grid('waiting-purchase', 'ListPembelianController');
+                
+                Route::grid('pengadaan-aset', 'PengadaanAsetController');
+                Route::get('pengadaan-aset/editUpdate/{id}', 'PengadaanAsetController@editUpdate')->name('pengadaan-aset.editUpdate');
+
+                
+            }
+        );
+
     //monitoring
     Route::namespace('Monitoring')
         ->group(
@@ -92,11 +148,18 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectPosition', 'AjaxController@selectPosition')->name('selectPosition');
                 Route::post('{search}/selectUser', 'AjaxController@selectUser')->name('selectUser');
                 Route::post('{search}/selectCity', 'AjaxController@selectCity')->name('selectCity');
+                Route::post('{search}/selectDistrict', 'AjaxController@selectDistrict')->name('selectDistrict');
                 Route::post('{search}/selectProvince', 'AjaxController@selectProvince')->name('selectProvince');
                 Route::post('{search}/selectCoa', 'AjaxController@selectCoa')->name('selectCoa');
-
+                Route::post('{search}/selectAsetRS','AjaxController@selectAsetRS')->name('selectAsetRS');
                 Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
+                Route::post('{search}/selectJenisPengadaan', 'AjaxController@selectJenisPengadaan')->name('selectJenisPengadaan');
+                Route::post('{search}/selectVendor', 'AjaxController@selectVendor')->name('selectVendor');
+                Route::post('{search}/selectSSBiaya', 'AjaxController@selectSSBiaya')->name('selectSSBiaya');
+                Route::post('{search}/selectDetailUsulan', 'AjaxController@selectDetailUsulan')->name('selectDetailUsulan');
+                Route::post('{search}/selectAsetBeli', 'AjaxController@selectAsetBeli')->name('selectAsetBeli');
                 //select level struct org
+                // selectDetailUsulan
                 // Route::post('{search}/selectStruct', 'AjaxController@selectStruct')->name('selectStruct');
             }
         );
@@ -218,7 +281,7 @@ Route::middleware('auth')->group(function () {
                             Route::grid('district', 'DistrictController');
                         }
                     );
-
+                
                 Route::namespace('Coa')
                     ->prefix('coa')
                     ->name('coa.')
@@ -242,11 +305,34 @@ Route::middleware('auth')->group(function () {
                             Route::grid('type-vendor', 'TypeVendorController');
                         }
                     );
-
+                Route::namespace('Dana')
+                    ->group(
+                        function () {
+                            Route::grid('dana', 'SumberDanaController');
+                        }
+                    );
                 Route::namespace('Location')
+                    ->group(
+                        function () {
+                            Route::grid('location', 'LocationController');
+                        }
+                    );
+                Route::namespace('Pemutihan')
+                    ->group(
+                        function () {
+                            Route::grid('data-pemutihan', 'PemutihanController');
+                        }
+                    );
+                Route::namespace('Pengadaan')
                 ->group(
                     function () {
-                        Route::grid('location', 'LocationController');
+                        Route::grid('data-pengadaan', 'PengadaanController');
+                    }
+                );
+                Route::namespace('Aset')
+                ->group(
+                    function () {
+                        Route::grid('data-aset', 'AsetController');
                     }
                 );
             }

@@ -18,7 +18,7 @@ class Location extends Model
         'name',
         'space_code',
         'departemen_id', 
-        'space_manager_id',
+        'pic_id',
         'floor_position',
     ];
 
@@ -30,7 +30,7 @@ class Location extends Model
     /** RELATION **/
     public function user()
     {
-        return $this->belongsTo(User::class, 'space_manager_id');
+        return $this->belongsTo(User::class, 'pic_id');
     }
 
     public function orgLocation()
@@ -38,31 +38,30 @@ class Location extends Model
         return $this->belongsTo(OrgStruct::class, 'departemen_id');;
     }
 
+   
     /** SCOPE **/
-    // public function scopeFilters($query)
-    // {
-    //     return $query->filterBy(['code', 'name', 'parent_id'])
-    //                 ->when(
-    //                     $parent_parent_id = request()->parent_parent_id,
-    //                     function ($q) use ($parent_parent_id){
-    //                         $q->whereHas('parent', function ($qq) use ($parent_parent_id){
-    //                             $qq->where('parent_id', $parent_parent_id);
-    //                         });
-    //                     }
-    //                 )
-    //                 ->latest();
-    // }
+
+    public function scopeFilters($query)
+    {
+        return $query->filterBy(['name','departemen_id'])
+                    ->when(
+                        $departemen_departemen_id = request()->departemen_departemen_id,
+                        function ($q) use ($departemen_departemen_id){
+                            $q->whereHas('orgLocation', function ($qq) use ($departemen_departemen_id){
+                                $qq->where('departemen_id', $departemen_departemen_id);
+                            });
+                        }
+                    )
+                     ->latest();
+    }   
+    
 
 
     public function scopeGrid($query)
     {
-        return $query->latest();
+        //return $query->latest();
+        return $query->orderBy('space_code');
     }
-
-    // public function scopeFilters($query)
-    // {
-    //     return $query->filterBy(['code', 'name']);
-    // }
 
     /** SAVE DATA **/
     public function handleStoreOrUpdate($request)

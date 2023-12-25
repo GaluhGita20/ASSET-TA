@@ -70,12 +70,6 @@ class CoaAsetTetapController extends Controller
                 }
             )
             ->addColumn(
-                'deskripsi',
-                function ($record) {
-                    return '<p class="my-auto text-left" style="display: -webkit-box; -webkit-line-clamp: 3;-webkit-box-orient: vertical;overflow: hidden;text-overflow: ellipsis;">'.$record->deskripsi . '</p>';
-                }
-            )
-            ->addColumn(
                 'updated_by',
                 function ($record) {
                     return $record->createdByRaw();
@@ -106,7 +100,7 @@ class CoaAsetTetapController extends Controller
                     'kode_akun',
                     'nama_akun',
                     'tipe_akun',
-                    'deskripsi',
+                    // 'deskripsi',
                     'updated_by',
                     'action'
                 ]
@@ -124,7 +118,7 @@ class CoaAsetTetapController extends Controller
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-left'),
                     $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-left'),
                     $this->makeColumn('name:tipe_akun|label:Tipe Akun Utama|className:text-center'),
-                    $this->makeColumn('name:deskripsi|label:Deskripsi|width:200px|classname:text-left'),
+                   // $this->makeColumn('name:deskripsi|label:Deskripsi|width:200px|classname:text-left'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],

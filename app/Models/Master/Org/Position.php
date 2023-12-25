@@ -176,6 +176,37 @@ class Position extends Model
         return in_array($this->location_id , $lists);
     }
 
+    public function imKepalaDeparetemen()
+    {
+        $temp = OrgStruct::department()->get();
+        $user = auth()->user();
+
+        $lists = [];
+        foreach($temp as $dd){
+            if($user->position->level == 'kepala' && $user->position->location_id == $dd->id){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function imKepalaDeparetemenWithLocation($locaton_id)
+    {
+        $temp = OrgStruct::department()->get();
+        $user = auth()->user();
+
+        $lists = [];
+        foreach($temp as $dd){
+            if(in_array($location_id, $dd->getIdsWithChild())){
+                if($user->position->level == 'kepala' && $user->positon->location_id == $dd->id){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
     // public function imLevelManajerSPI()
     // {
     //     $temp = Position::whereHas('level', function ($q) {

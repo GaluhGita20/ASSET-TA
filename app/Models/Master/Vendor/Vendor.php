@@ -6,6 +6,7 @@ use App\Imports\Master\ExampleImport;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Geografis\Province;
+use App\Models\Master\Geografis\District;
 use App\Models\Master\Vendor\TypeVendor;
 use App\Models\Model;
 use App\Models\Traits\RaidModel;
@@ -23,19 +24,23 @@ class Vendor extends Model
     protected $fillable = [
         "name",
         // "id_vendor",
-        "pimpinan", 
-        "kode_rekening",
-        "kode_instansi",
+        "leader", 
+        "instansi_code",
         "telp",
         "email",
         "contact_person",
         "address",
         "province_id",
         "city_id",
+        "district_id"
     ];
 
     public function provinsi() {
         return $this->belongsTo(Province::class, 'province_id');
+    }
+
+    public function daerah() {
+        return $this->belongsTo(District::class, 'district_id');
     }
 
     // public function jenisUsaha() {
@@ -89,8 +94,7 @@ class Vendor extends Model
 
     public function scopeFilters($query)
     {
-        return $query->filterBy(['name'])
-        ->filterBy(['type_vendor_id']);
+        return $query->filterBy(['name']);
     }
 
     /*******************************
@@ -102,8 +106,8 @@ class Vendor extends Model
         try {
             $this->fill($request->all());
             $this->save();
-
-            $this->jenisUsaha()->sync($request->jenisUsaha);
+          
+            // $this->jenisUsaha()->sync($request->jenisUsaha);
             //type_id masuk ke type_vendor_id  && $this->id masuk ke $vendor_id
 
             //$this->childOfGroup()->sync($request->department);
@@ -121,6 +125,7 @@ class Vendor extends Model
     {
         $this->beginTransaction();
         try {
+            $this->jenisUsaha()->detach($this->vendor_id);
             $this->saveLogNotify();
             $this->delete();
 

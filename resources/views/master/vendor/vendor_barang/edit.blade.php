@@ -25,9 +25,6 @@
                 <option value="">{{ __('Pilih Salah Satu') }}</option>
                 {{-- @if (!empty($record->jenisUsaha)) --}}
                     @foreach($record->jenisUsaha as $jj)
-                    {{-- <option value="{{ $jj->id }}" selected>
-                        {{ $jj->name . ' (' . $jj->jenisUsaha->name ?? '' . ')' }}
-                    </option> --}}
                         <option value="{{ $jj->id }}" {{ in_array($jj->id, $record->jenisUsaha->pluck('id')->toArray()) ? 'selected' : '' }}>{{ $jj->name }}</option>
                     @endforeach        
                 {{-- @endif --}}
@@ -51,21 +48,14 @@
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nama Pimpinan') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="pimpinan" value={{ $record->pimpinan }} type="text" class="form-control" placeholder="{{ __('Nama Pimpinan') }}">
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Rekening') }}</label>
-                <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="kode_rekening" value={{ $record->kode_rekening }} type="text" class="form-control" placeholder="{{ __('Nomor Rekening') }}">
+                    <input name="leader" value={{ $record->leader }} type="text" class="form-control" placeholder="{{ __('Nama Pimpinan') }}">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="kode_instansi" type="text" value="{{ $record->kode_instansi }}" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
+                    <input name="instansi_code" type="text" value="{{ $record->instansi_code }}" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
                 </div>
             </div>
         </div>
@@ -142,6 +132,22 @@
                 </select>
             </div>
         </div>
+
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label">{{ __('Daerah') }}</label>
+            <div class="col-md-9 parent-group">
+                <select name="district_id" class="form-control base-plugin--select2-ajax district_id"
+                    data-url="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+                    data-url-origin="{{ rut('ajax.selectDistrict',['city_id']) }}"
+                    placeholder="{{ __('Pilih Salah Satu') }}" required>
+                    <option value="">{{ __('Pilih Salah Satu') }}</option>
+                    @if (!empty($record->district_id))
+					    <option value="{{ $record->district_id }}" selected>{{ $record->daerah->name }}</option>
+				    @endif
+                </select>
+            </div>
+        </div>
     </div>
     </div>
 @endsection
@@ -163,6 +169,21 @@
 			});
 
 		});
+
+        $(function () {
+			$('.content-page').on('change', 'select.city_id', function (e) {
+				var me = $(this);
+				if (me.val()) {
+					var objectId = $('select.district_id');
+					var urlOrigin = objectId.data('url-origin');
+					var urlParam = $.param({city_id: me.val()});
+					objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+					objectId.val(null).prop('disabled', false);
+				}
+				BasePlugin.initSelect2();
+			});
+		});
+        
 	</script>
 
 	<script>

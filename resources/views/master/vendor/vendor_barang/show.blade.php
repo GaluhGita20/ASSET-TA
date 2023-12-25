@@ -13,7 +13,13 @@
     </div>
     <div class="form-group row">  
         <label class="col-md-3 col-form-label">{{ __('Jenis Usaha') }}</label>
-        <div class="col-md-9 parent-group">
+        <div class="col-md-9 parent-group mt-2">
+            @foreach($record->jenisUsaha as $jj)
+                <p>{{ $jj->name}}</p>
+                {{-- <option value="{{ $jj->id }}" {{ in_array($jj->id, $record->jenisUsaha->pluck('id')->toArray()) ? 'selected' : '' }} readonly >{{ $jj->name }}</option> --}}
+            @endforeach  
+        </div>
+        {{-- <div class="col-md-9 parent-group">
             <select name="jenisUsaha[]" class="form-control base-plugin--select2-ajax"
                 data-url="{{ route('ajax.selectJenisUsaha', [
                     'search'=>'all'
@@ -24,7 +30,7 @@
                         <option value="{{ $jj->id }}" {{ in_array($jj->id, $record->jenisUsaha->pluck('id')->toArray()) ? 'selected' : '' }} readonly >{{ $jj->name }}</option>
                     @endforeach        
             </select>
-        </div>
+        </div> --}}
     </div>
 
     <div class="row">

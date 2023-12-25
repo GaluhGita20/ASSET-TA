@@ -25,7 +25,10 @@ class CreateSysMenuTable extends Migration
             $table->id();
             $table->unsignedBigInteger('menu_id');
             $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('position_id')->nullable();
             $table->smallInteger('type')->default(1)->comment('1:sequence/berurutan, 2:pararel/berbarengan');
+            $table->smallInteger('type_position')->default(1)->comment('1:ALL, 2: BY HEAD DEPARTEMENT, 3:By Position');
+            $table->smallInteger('with_role')->default(0);
             $table->integer('order')->default(1);
             $table->commonFields();
 

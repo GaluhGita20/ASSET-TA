@@ -69,12 +69,6 @@ class CoaController extends Controller
                 }
             )
             ->addColumn(
-                'deskripsi',
-                function ($record) {
-                    return '<p class="my-auto text-left" style="display: -webkit-box; -webkit-line-clamp: 3;-webkit-box-orient: vertical;overflow: hidden;text-overflow: ellipsis;">'.$record->deskripsi . '</p>';
-                }
-            )
-            ->addColumn(
                 'updated_by',
                 function ($record) {
                     return $record->createdByRaw();

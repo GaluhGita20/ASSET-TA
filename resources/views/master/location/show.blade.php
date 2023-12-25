@@ -1,7 +1,6 @@
 @extends('layouts.modal')
 
 @section('modal-body')
-	
     <div class="form-group row">
 		<label class="col-3 col-form-label">{{ __('Nama') }}</label>
 		<div class="col-9 parent-group">
@@ -46,11 +45,11 @@
     <div class="form-group row">
 		<label class="col-3 col-form-label">{{ __('Penanggung Jawab') }}</label>
 		<div class="col-9 parent-group">
-			<select name="space_manager_id" class="form-control base-plugin--select2-ajax space_manager_id"
+			<select name="pic_id" class="form-control base-plugin--select2-ajax pic_id"
 				data-url="{{ route('ajax.selectUser', ['org_struct']) }}"
                 data-url-origin="{{ route('ajax.selectUser', ['org_struct']) }}"
 				data-placeholder="{{ __('Pilih Penangung Jawab Ruang') }}" disabled
-				@if($record->space_manager_id == NULL) disabled @endif>
+				@if($record->pic_id == NULL) disabled @endif>
 				<option value="">{{ __('Pilih Struktur Organisasi') }}</option>
 				<option value="{{ $record->user->id }}" selected>{{ $record->user->name }}</option>
 			</select>

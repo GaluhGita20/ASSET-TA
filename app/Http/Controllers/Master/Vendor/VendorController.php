@@ -9,6 +9,7 @@ use App\Models\Master\Vendor\Vendor;
 use App\Models\Master\Vendor\TypeVendor;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Geografis\Province;
+use App\Models\Master\Geografis\District;
 use App\Support\Base;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -34,7 +35,7 @@ class VendorController extends Controller
                 'breadcrumb' => [
                     'Master' => route($this->routes . '.index'),
                     'Vendor' => route($this->routes . '.index'),
-                    'Vendor Barang' => route($this->routes . '.index'),
+                    'Vendor' => route($this->routes . '.index'),
                 ]
             ]
         );
@@ -47,6 +48,7 @@ class VendorController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:name|label:Vendor|className:text-left'),
+                    $this->makeColumn('name:jenis_usaha|label:Jenis Usaha|className:text-left'),
                     $this->makeColumn('name:address|label:Alamat|className:text-left'),
                     $this->makeColumn('name:email|label:Email|className:text-left'),
                     $this->makeColumn('name:telp|label:Nomor Telpon Instansi|className:text-left'),
@@ -73,6 +75,12 @@ class VendorController extends Controller
                 'num',
                 function ($record) {
                     return request()->start;
+                }
+            )
+            ->addColumn(
+                'jenis_usaha',
+                function ($record) {
+                    return implode('<br>, ', $record->jenisUsaha->pluck('name')->toArray());
                 }
             )
             ->addColumn(
@@ -133,18 +141,12 @@ class VendorController extends Controller
                 }
             )
         
-            ->rawColumns(['contact_person','email', 'telp', 'address', 'name', 'action', 'updated_by'])
+            ->rawColumns(['contact_person','email', 'telp', 'address', 'name','jenis_usaha','action', 'updated_by'])
             ->make(true);
     }
 
     public function create()
     {
-    //     // $data = $this->datas;
-    //     // $page_action = "create";
-    //     $provinces = Province::select("id", "name")->get();
-    //     //$record = new Vendor();
-    //     //$this->pushBreadcrumb(['Tambah' => route($this->routes . '.create', $record)]);
-    //     return $this->render($this->views.'.create',compact('provinces'));
         $page_action = "create";
         $type ="create";
         $record= new Vendor;
@@ -167,11 +169,6 @@ class VendorController extends Controller
 
     public function edit(Vendor $record)
     {
-        //$this->pushBreadcrumb(['Detil' => route($this->routes . '.edit', $record)]);
-        //$province = Province::where('id', $record->ref_province_id)->first();
-        //$city = City::where('id', $record->ref_city_id)->first();
-        //$page_action = "edit";
-       // $record= Vendor::findOrFail($id);
         return $this->render($this->views . '.edit', compact('record'));
     }
 

@@ -27,13 +27,7 @@
 
                 placeholder="{{ __('Pilih Beberapa') }}" required>
                 <option value="">{{ __('Pilih Beberapa') }}</option>
-                {{-- @if(!empty('type_vendor_id'))
-                    @foreach ('type_vendor_id' as $type)
-                        <option value="{{ $type->type_vendor_id }}" selected>
-                            {{ $type->jenisUsaha->name . ' (' . $type->jenisUsaha->description ?? '' . ')' }}
-                        </option>
-                    @endforeach
-                @endif --}}
+
             </select>
         </div>
     </div>
@@ -67,21 +61,21 @@
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nama Pimpinan') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="pimpinan" type="text" class="form-control" placeholder="{{ __('Nama Pimpinan') }}">
+                    <input name="leader" type="text" class="form-control" placeholder="{{ __('Nama Pimpinan') }}">
                 </div>
             </div>
 
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Rekening') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
                     <input name="kode_rekening" type="text" class="form-control" placeholder="{{ __('Nomor Rekening') }}">
                 </div>
-            </div>
+            </div> --}}
 
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}</label>
                 <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="kode_instansi" type="text" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
+                    <input name="instansi_code" type="text" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
                 </div>
             </div>
         </div>
@@ -158,6 +152,21 @@
                 </select>
             </div>
         </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label">{{ __('Daerah') }}</label>
+            <div class="col-md-9 parent-group">
+                <select name="district_id" class="form-control base-plugin--select2-ajax district_id"
+                    data-url="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+                    data-url-origin="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+                    placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
+                    <option value="">{{ __('Pilih Salah Satu') }}</option>
+                    @if (!empty($record->district_id))
+                        <option value="{{ $record->district_id }}" selected>{{ $record->daerah->name }}</option>
+                    @endif
+                </select>
+            </div>
+        </div>
     </div>
     </div>
 @endsection
@@ -172,6 +181,19 @@
 					var objectId = $('select.city_id');
 					var urlOrigin = objectId.data('url-origin');
 					var urlParam = $.param({province_id: me.val()});
+					objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+					console.log(decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+                    objectId.val(null).prop('disabled', false);
+				}
+				BasePlugin.initSelect2();
+			});
+
+            $('.content-page').on('change', 'select.city_id', function (e) {
+				var me = $(this);
+				if (me.val()) {
+					var objectId = $('select.district_id');
+					var urlOrigin = objectId.data('url-origin');
+					var urlParam = $.param({city_id: me.val()});
 					objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
 					console.log(decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
                     objectId.val(null).prop('disabled', false);

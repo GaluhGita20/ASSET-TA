@@ -68,7 +68,23 @@
 <div class="form-group row">
 	<label class="col-sm-4 col-form-label">{{ __('Role') }}</label>
 	<div class="col-sm-8 parent-group">
-		@if($record->id == 1)
+	
+            <select name="roles[]" class="form-control base-plugin--select2-ajax"
+                data-url="{{ rut('ajax.selectRole', [
+                    'search'=>'all'
+                ]) }}" 
+                data-url-origin="{{ rut('ajax.selectRole', [
+                    'search'=>'all'
+                ]) }}" multiple
+
+                placeholder="{{ __('Pilih Beberapa') }}" required>
+                <option value="">{{ __('Pilih Beberapa') }}</option>
+				@foreach ($record->roles as $val)
+					<option value="{{ $val->id }}" selected>{{ $val->name }}</option>
+				@endforeach
+            </select>
+     
+		{{-- @if($record->id == 1)
 		@foreach ($record->roles as $role)
 		<input class="d-none" name="roles[]" value="{{ $role->id }}">
 		@endforeach
@@ -87,7 +103,7 @@
 				<option value="{{ $val->id }}" selected>{{ $val->name }}</option>
 			@endforeach
 		</select>
-		@endif
+		@endif --}}
 	</div>
 </div>
 @if ($record->id == 1)

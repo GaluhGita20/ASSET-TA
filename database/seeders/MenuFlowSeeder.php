@@ -13,40 +13,31 @@ class MenuFlowSeeder extends Seeder
         $data = [
             // RISK ASSESSMENT
             [
-                'module'   => 'pengajuan',
-                'submenu' => [
+                'module'   => 'perencanaan-aset',
+                'FLOWS'     => [
                     [
-                        'module'   => 'pengajuan_pembelian-aset',
+                        "role_id"   => 5,
+                        "type"      => 1,
+                        "type_position" => 1,
+                        "position_id" => NULL
+                    ],
+                ],
+            ],
+            [
+                'module'   => 'transaksi',
+                'submenu'  => [
+                    [
+                        'module'   => 'transaksi_berita-acara',
                         'FLOWS'     => [
                             [
                                 "role_id"   => 5,
                                 "type"      => 1,
+                                "type_position" => 1,
+                                "position_id" => NULL
                             ],
                         ],
-                    ],
-                    [
-                        'module'   => 'pengajuan_berita-acara',
-                        'FLOWS'     => [
-                            [
-                                "role_id"   => 3,
-                                "type"      => 1,
-                            ],
-                        ],
-                    ],
-                    [
-                        'module'   => 'pengajuan_registrasi-aset',
-                        'FLOWS'     => [
-                            [
-                                "role_id"   => 3,
-                                "type"      => 1,
-                            ],
-                            [
-                                "role_id"   => 2,
-                                "type"      => 1,
-                            ],
-                        ],
-                    ],
-                ]
+                    ]
+                ],
             ],
         ];
 
@@ -79,6 +70,8 @@ class MenuFlowSeeder extends Seeder
                                 'menu_id'   => $submenu->id,
                                 'role_id'   => $flow['role_id'],
                                 'type'      => $flow['type'],
+                                'type_position'      => $flow['type_position'],
+                                'position_id'      => $flow['position_id'],
                                 'order'     => $f++,
                             ]);
                             $record->save();
@@ -94,6 +87,8 @@ class MenuFlowSeeder extends Seeder
                         'menu_id'   => $menu->id,
                         'role_id'   => $flow['role_id'],
                         'type'      => $flow['type'],
+                        'type_position'      => $flow['type_position'],
+                        'position_id'      => $flow['position_id'],
                         'order'     => $f++,
                     ]);
                     $record->save();

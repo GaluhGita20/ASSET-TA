@@ -7,12 +7,19 @@ use App\Models\Auth\User;
 use App\Models\Globals\Notification;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Coa\COA;
+use App\Models\Master\Aset\Aset;
+use App\Models\Master\Pengadaan\Pengadaan;
+use App\Models\Pengajuan\PerencanaanDetail;
+use App\Models\Master\Dana\Dana;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Geografis\Province;
+use App\Models\Master\Geografis\District;
+use App\Models\Master\Vendor\TypeVendor;
+use App\Models\Master\Vendor\Vendor;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use Illuminate\Http\Request;
-use App\Models\Master\Vendor\TypeVendor;
+
 // use App\Models\Geografis\Province;
 use Illuminate\Support\Str;
 
@@ -263,6 +270,75 @@ class AjaxController extends Controller
         return $this->responseSelect2($items, 'name', 'id');
     }
 
+
+    public function selectDetailUsulan($search)
+    {
+   
+        $query = PerencanaanDetail::with('asetd')
+        ->select('ref_aset_id', \DB::raw('COUNT(*) as total'))
+        ->where('status', 'waiting.purchase');
+        $items = $query->groupBy('ref_aset_id')->paginate();
+        
+        $items->getCollection()->transform(function ($item) {
+            $item->aset_id = $item->asetd->id;
+            $item->aset_name = $item->asetd->name;
+            return $item;
+        });
+
+        return $this->responseSelect2($items, 'aset_name','aset_id');
+    }
+
+    public function selectAsetBeli($search, Request $request)
+    {
+        $req = $request->input('aset_id');
+
+        $items = PerencanaanDetail::with(['asetd','perencanaan.struct.name'])
+            ->select('ref_aset_id', 'id', 'desc_spesification', 'qty_agree')
+            ->where('ref_aset_id', $req)
+            ->where('status', 'waiting.purchase')->get();
+        $results = [];
+
+       // $structNames = $items->pluck('perencanaan.struct.name');
+
+
+        foreach ($items as $item) {
+            $results[] = [
+                'id' => $item->id,
+                'text' => "Aset".' : '.$item->asetd->name.', '.'Spesifikasi'.' : '.$item->desc_spesification.', '.'Jumlah'.' : '.$item->qty_agree.', '.'Departemen'.' : '.$item->struct->name,
+                // 'spesifikasi' => $item->desc_spesification,
+                // 'jumlah' => $item->qty_agree,
+            ];
+        }
+    
+        return response()->json(compact('results'));
+        //$items = $items->paginate();
+
+    //     $results = [];
+    //    // $more = $items->hasMorePages();
+
+    //     foreach ($items as $item) {
+    //         $results[] = [
+    //             'id' => $item->id,
+    //             'Nama Aset' => $item->asetd->name,
+    //             'Spesifikasi' => $item->desc_spesification,
+    //             'jumlah pembelian' => $item->qty_agree,
+    //         ];
+    //     }
+        //return response()->json(compact('results'));
+
+       
+
+        // $results = [];
+        // $more = $items->hasMorePages();
+        // foreach ($items as $item) {
+        //     $results[] = ['id' => $item->id, 'text' => $item->name . ' (' . ($item->position->name ?? '') . ')'];
+        // }
+        // return response()->json(compact('results', 'more'));
+
+    }
+
+
+
     public function selectUser($search, Request $request)
     {
    
@@ -371,9 +447,54 @@ class AjaxController extends Controller
 
     }
 
+
+    public function selectAsetRS($search, Request $request){
+        $items = Aset::keywordBy('name')->orderBy('jenis_aset');
+        switch ($search) {
+            case 'all':
+                $items = $items;
+                break;
+            default:
+                $items = $items->whereNull('id');
+                break;
+        }
+
+        $items = $items->when(
+            $not = $request->not,
+            function ($q) use ($not) {
+                $q->where('id', '!=', $not);
+            }
+        )->get();
+        $results = [];
+        $more = false;
+
+        $jenis_asets = ['Tanah', 'Peralatan Mesin', 'Gedung Bangunan', 'Jalan Irigasi Jaringan', 'Aset Tetap Lainya'];
+        $i = 0;
+        foreach ($jenis_asets  as $tipe_akun) {
+            if ($items->where('jenis_aset', $tipe_akun)->count()) {
+                foreach ($items->where('jenis_aset', $tipe_akun) as $item) {
+                    $results[$i]['text'] = strtoupper($item->jenis_aset);
+                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                }
+                $i++;
+            }
+        }
+        return response()->json(compact('results', 'more'));
+
+    }
+
+   
+
     public function selectCity($search, Request $request){
         $req = $request->input('province_id');
         $items = City::where('province_id',$req);
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
+    public function selectDistrict($search, Request $request){
+        $req = $request->input('city_id');
+        $items = District::where('city_id',$req);
         $items = $items->paginate();
         return $this->responseSelect2($items, 'name', 'id');
     }
@@ -382,7 +503,24 @@ class AjaxController extends Controller
         $items = Province::all();
         $items = $items->paginate();
         return $this->responseSelect2($items, 'name', 'id');
+    }
 
+    public function selectVendor($search, Request $request){
+        $items = Vendor::all();
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
+    public function selectJenisPengadaan($search, Request $request){
+        $items = Pengadaan::all();
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
+    public function selectSSBiaya($search, Request $request){
+        $items = Dana::all();
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
     }
 
     public function selectJenisUsaha($search, Request $request){

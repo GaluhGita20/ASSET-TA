@@ -41,8 +41,8 @@ class LocationController extends Controller
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:code|label:Kode|className:text-center'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
-                    $this->makeColumn('name:departemen|label:Struktur|className:text-center'),
-                    $this->makeColumn('name:space_manager|label:Penanggung Jawab Ruang|className:text-center'),
+                    $this->makeColumn('name:departemen|label:Unit|className:text-center'),
+                    $this->makeColumn('name:pic_id|label:PIC|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -54,7 +54,7 @@ class LocationController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Location::grid()->dtGet();
+        $records = Location::grid()->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn('num', function ($record) {
@@ -69,7 +69,7 @@ class LocationController extends Controller
             ->addColumn('departemen', function ($record) {
                 return $record->orgLocation->name ?? null;
             })
-            ->addColumn('space_manager', function ($record) {
+            ->addColumn('pic_id', function ($record) {
                 return $record->user->name ?? null;
             })
             ->addColumn('updated_by', function ($record) {
@@ -89,7 +89,7 @@ class LocationController extends Controller
                 }
                 return $this->makeButtonDropdown($actions);
             })
-            ->rawColumns(['action','updated_by', 'space_manager','departemen','name','code'])
+            ->rawColumns(['action','updated_by', 'pic_id','departemen','name','code'])
             ->make(true);
     }
 
@@ -125,33 +125,38 @@ class LocationController extends Controller
         return $record->handleDestroy();
     }
 
-    public function import()
-    {
-        if (request()->get('download') == 'template') {
-            return $this->template();
-        }
-        return $this->render($this->views.'.import');
-    }
-
-    public function template()
-    {
-        $fileName = date('Y-m-d').' Template Import Data '. $this->prepared('title') .'.xlsx';
-        $view = $this->views.'.template';
-        $data = [];
-        return \Excel::download(new GenerateExport($view, $data), $fileName);
-    }
-
-    public function importSave(Request $request)
-    {
-        $request->validate([
-            'uploads.uploaded' => 'required',
-            'uploads.temp_files_ids.*' => 'required',
-        ],[],[
-            'uploads.uploaded' => 'Lampiran',
-            'uploads.temp_files_ids.*' => 'Lampiran',
-        ]);
-
-        $record = new Location;
-        return $record->handleImport($request, 'bod');
-    }
+   
 }
+
+
+
+
+// public function import()
+// {
+//     if (request()->get('download') == 'template') {
+//         return $this->template();
+//     }
+//     return $this->render($this->views.'.import');
+// }
+
+// public function template()
+// {
+//     $fileName = date('Y-m-d').' Template Import Data '. $this->prepared('title') .'.xlsx';
+//     $view = $this->views.'.template';
+//     $data = [];
+//     return \Excel::download(new GenerateExport($view, $data), $fileName);
+// }
+
+// public function importSave(Request $request)
+// {
+//     $request->validate([
+//         'uploads.uploaded' => 'required',
+//         'uploads.temp_files_ids.*' => 'required',
+//     ],[],[
+//         'uploads.uploaded' => 'Lampiran',
+//         'uploads.temp_files_ids.*' => 'Lampiran',
+//     ]);
+
+//     $record = new Location;
+//     return $record->handleImport($request, 'bod');
+// }

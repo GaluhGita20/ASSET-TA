@@ -30,8 +30,7 @@ class DistrictTableSeeder extends Seeder
     {
         foreach ($data as $val) {
             $city = City::where('code', $val->city_id)->first();
-            $kec = District::where('code', $val->id)
-                ->first();
+            $kec = District::where('code', $val->id)->first();
             if (!$kec) {
                 $kec = new District;
                 $kec->code = $val->id;

@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionSeeder::class);
         $this->call(MasterSeeder::class);
         $this->call(MenuFlowSeeder::class);
+        $this->call(DistrictTableSeeder::class);
        
         // COA
         $this->call(CoaTanahSeeder::class);

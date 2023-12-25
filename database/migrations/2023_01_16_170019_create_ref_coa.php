@@ -14,7 +14,7 @@ class CreateRefCoa extends Migration
     public function up()
     {
         Schema::create(
-            'ref_coa',
+            'ref_kode_aset_bmd',
             function (Blueprint $table) {
                 $table->id();
                 $table->string('kode_akun')->unique();

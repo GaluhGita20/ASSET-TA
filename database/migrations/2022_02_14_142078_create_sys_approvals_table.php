@@ -22,14 +22,14 @@ class CreateSysApprovalsTable extends Migration
             $table->integer('order')->default(1);
             $table->string('status')->default('new')->comment('new|rejected|approved');
             $table->unsignedBigInteger('user_id')->nullable();
-            // $table->unsignedBigInteger('position_id')->nullable();
+            $table->unsignedBigInteger('position_id')->nullable();
             $table->text('note')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->commonFields();
 
             $table->foreign('role_id')->references('id')->on('sys_roles');
             $table->foreign('user_id')->references('id')->on('sys_users');
-            // $table->foreign('position_id')->references('id')->on('ref_positions');
+            $table->foreign('position_id')->references('id')->on('ref_positions');
         });
     }
 

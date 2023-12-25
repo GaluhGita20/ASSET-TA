@@ -3,6 +3,7 @@
 namespace App\Models\Globals;
 
 use App\Models\Auth\Role;
+use App\Models\Master\Org\Position;
 use App\Models\Model;
 
 class MenuFlow extends Model
@@ -11,7 +12,10 @@ class MenuFlow extends Model
     protected $fillable = [
         'menu_id', 
         'role_id', 
+        'position_id',
         'type',
+        'type_postion',
+        'with_role',
         'order',
     ];
 
@@ -39,6 +43,11 @@ class MenuFlow extends Model
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class, 'position_id');
     }
 
     public function scopeHasModule($query, $module)

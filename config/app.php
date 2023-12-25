@@ -168,7 +168,7 @@ return [
         /*
          * Package Service Providers...
          */
-        Felixkiss\UniqueWithValidator\ServiceProvider::class,
+        //Felixkiss\UniqueWithValidator\ServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Webklex\PDFMerger\Providers\PDFMergerServiceProvider::class,
 
