@@ -1,4 +1,5 @@
 @extends('layouts.pageSubmit', ['container' => 'container'])
+
 @section('action', route($routes . '.store'))
 
 @section('page-content')
@@ -6,13 +7,6 @@
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
-                <div class="card-header">
-                    <h3 class="card-title">@yield('card-title', $title)</h3>
-                    <div class="card-toolbar">
-                        @include('layouts.forms.btnBackTop')
-                    </div>
-                </div>
-
                 <div class="row mb-3">
                     <div class="col-sm-12">
                         <div class="card card-custom">
@@ -27,8 +21,24 @@
     </div>
 @endsection
 
-@section('buttons')
-@endsection
+{{-- @section('buttons')
+    @if(auth()->user()->hasRole('PPK') )
+    {{-- @if(auth()->user()->roles[0]->name != 'Direksi') --}}
+        {{-- @if (auth()->user()->checkPerms($perms.'.create'))
+        <a href="{{ $urlAdd ?? (\Route::has($routes.'.create') ? rut($routes.'.create') : 'javascript:;') }}"
+            class="btn btn-info ml-2 {{ empty($baseContentReplace) ? 'base-modal--render' : 'base-content--replace' }}"
+            data-modal-backdrop="false"
+            data-modal-size="{{ $modal_size ?? 'modal-md' }}"
+            data-modal-v-middle="false">
+            <i class="fa fa-plus"></i> Data
+        </a>
+        @endif
+    @endif
 
-@push('scripts')
+@endsection  --}}
+
+@push('script')
+
+    
 @endpush
+

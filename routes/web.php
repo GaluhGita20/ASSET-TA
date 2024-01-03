@@ -45,6 +45,14 @@ Route::middleware('auth')->group(function () {
         ->group(
             function () {
                 Route::get('home', 'DashboardController@index')->name('home');
+                Route::post('chartAset', 'DashboardController@chartAset')->name('dashboard.chartAset');
+                Route::post('chartAsetKIBA', 'DashboardController@chartAsetKIBA')->name('dashboard.chartAsetKIBA');
+                Route::post('chartAsetKIBB', 'DashboardController@chartAsetKIBB')->name('dashboard.chartAsetKIBB');
+                Route::post('chartAsetKIBC', 'DashboardController@chartAsetKIBC')->name('dashboard.chartAsetKIBC');
+                Route::post('chartAsetKIBD', 'DashboardController@chartAsetKIBD')->name('dashboard.chartAsetKIBD');
+                Route::post('chartAsetKIBE', 'DashboardController@chartAsetKIBE')->name('dashboard.chartAsetKIBE');
+                Route::post('chartAsetKIBF', 'DashboardController@chartAsetKIBF')->name('dashboard.chartAsetKIBF');
+                Route::post('progressAset', 'DashboardController@progressAset')->name('dashboard.progressAset');
                 Route::post('progress', 'DashboardController@progress')->name('dashboard.progress');
                 Route::post('chartFinding', 'DashboardController@chartFinding')->name('dashboard.chartFinding');
                 Route::post('chartFollowup', 'DashboardController@chartFollowup')->name('dashboard.chartFollowup');
@@ -68,13 +76,18 @@ Route::middleware('auth')->group(function () {
                         Route::get('detailCreate/{record}', 'PerencanaanAsetController@detailCreate')->name('detailCreate');
                         Route::get('detailShow/{detail}', 'PerencanaanAsetController@detailShow')->name('detailShow');
                         Route::get('detailEdit/{detail}', 'PerencanaanAsetController@detailEdit')->name('detailEdit');
+                        Route::get('detailEditHarga/{detail}', 'PerencanaanAsetController@detailEditHarga')->name('detailEditHarga');
                         Route::get('detailApprove/{detail}', 'PerencanaanAsetController@detailApprove')->name('detailApprove');
                         Route::get('historyDetail/{detail}', 'PerencanaanAsetController@historyDetail')->name('historyDetail');
+                        // Route::get('laporan/{record}', 'PerencanaanAsetController@laporan')->name('laporan');
+                        // Route::get('laporanDetail/{detail}', 'PerencanaanAsetController@laporanDetail')->name('laporanDetail');
                         Route::delete('detailDestroy/{detail}', 'PerencanaanAsetController@detailDestroy')->name('detailDestroy');
+                        Route::post('detailUpHarga/{detail}', 'PerencanaanAsetController@detailUpHarga')->name('detailUpHarga');
                         Route::post('detailUpdate/{detail}', 'PerencanaanAsetController@detailUpdate')->name('detailUpdate');
                         Route::post('detailUpdateApprove/{detail}', 'PerencanaanAsetController@detailUpApprove')->name('detailUpdateApprove');
                         Route::post('detailStore', 'PerencanaanAsetController@detailStore')->name('detailStore');
                         Route::post('reject/{id}','PerencanaanAsetController@reject')->name('reject');
+
                     }
                 );
                 Route::grid('perencanaan-aset', 'PerencanaanAsetController', [
@@ -94,7 +107,12 @@ Route::middleware('auth')->group(function () {
                     function(){
                         Route::post('store', 'ListPembelianController@submitSave')->name('store');
                         Route::post('storeDetail', 'ListPembelianController@storeDetail')->name('storeDetail');
-                        Route::post('deleteDetail{id}', 'ListPembelianController@deleteDetail')->name('deleteDetail');
+                        Route::post('detailStore', 'ListPembelianController@detailStore')->name('detailStore');
+                        Route::get('showDetail/{detail}', 'ListPembelianController@showDetail')->name('showDetail');
+                        Route::get('EditDetail/{detail}', 'ListPembelianController@editDetail')->name('editDetail');
+                        Route::post('detailUpdate/{detail}', 'ListPembelianController@detailUpdate')->name('detailUpdate');
+                        Route::delete('destroyDetail/{detail}', 'ListPembelianController@destroyDetail')->name('destroyDetail');
+                        //transaksi.waiting-purchase.detailStore
                       //  Route::get('{id}', 'ListPembelianController@editDetail')->name('editDetail');
                         // Route::get('/create/{data}', 'ListPembelianController@create')->name('create');
                     }
@@ -102,9 +120,12 @@ Route::middleware('auth')->group(function () {
                 Route::delete('waiting-purchase/detailDestroy/{detail}', 'ListPembelianController@detailDestroy')->name('waiting-purchase.detailDestroy');
                 Route::grid('waiting-purchase', 'ListPembelianController');
                 
-                Route::grid('pengadaan-aset', 'PengadaanAsetController');
+                //Route::grid('pengadaan-aset', 'PengadaanAsetController');
+                Route::grid('pengadaan-aset', 'PengadaanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
                 Route::get('pengadaan-aset/editUpdate/{id}', 'PengadaanAsetController@editUpdate')->name('pengadaan-aset.editUpdate');
-
+                Route::post('pengadaan-aset/rejected/{id}', 'PengadaanAsetController@rejected')->name('pengadaan-aset.rejected');
                 
             }
         );
@@ -154,6 +175,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectAsetRS','AjaxController@selectAsetRS')->name('selectAsetRS');
                 Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
                 Route::post('{search}/selectJenisPengadaan', 'AjaxController@selectJenisPengadaan')->name('selectJenisPengadaan');
+                Route::post('{search}/selectRoom', 'AjaxController@selectRoom')->name('selectRoom');
                 Route::post('{search}/selectVendor', 'AjaxController@selectVendor')->name('selectVendor');
                 Route::post('{search}/selectSSBiaya', 'AjaxController@selectSSBiaya')->name('selectSSBiaya');
                 Route::post('{search}/selectDetailUsulan', 'AjaxController@selectDetailUsulan')->name('selectDetailUsulan');
@@ -163,6 +185,55 @@ Route::middleware('auth')->group(function () {
                 // Route::post('{search}/selectStruct', 'AjaxController@selectStruct')->name('selectStruct');
             }
         );
+
+    Route::namespace('Laporan')
+        ->prefix('laporan')
+        ->name('laporan.')
+        ->group(
+            function () {
+                Route::grid('perencanaan-aset', 'LaporanPerencanaanController');
+                Route::grid('penerimaan-aset', 'LaporanPenerimaanController');
+                Route::get('perencanaan-aset/detailShow/{detail}', 'LaporanPerencanaanController@detailShow')->name('perencanaan-aset.detailShow');
+                // Route::get('penerimaan-aset/detailShow/{detail}', 'LaporanPenerimaanController@detailShow')->name('penerimaan-aset.detailShow');
+        });
+
+    Route::namespace('Inventaris')
+        ->prefix('inventaris')
+        ->name('inventaris.')
+        ->group(
+            function () {
+                Route::grid('inventaris-aset','InventarisController');
+                Route::grid('kib-b','KIBBController');
+                Route::grid('kib-a','KIBAController');
+                Route::grid('kib-c','KIBCController');
+                Route::grid('kib-d','KIBDController');
+                Route::grid('kib-e','KIBEController');
+                Route::grid('kib-f','KIBFController');
+                Route::get('create/kib-b','KIBBController@createKibB')->name('kib-b.createKibB');
+                Route::post('storeDetail', 'InventarisController@storeDetail')->name('inventaris-aset.storeDetail');
+                Route::post('storeDetailKibA', 'InventarisController@storeDetailKibA')->name('inventaris-aset.storeDetailKibA');
+                Route::post('storeDetailKibB', 'InventarisController@storeDetailKibB')->name('inventaris-aset.storeDetailKibB');
+                Route::post('storeDetailKibC', 'InventarisController@storeDetailKibC')->name('inventaris-aset.storeDetailKibC');
+                Route::post('storeDetailKibD', 'InventarisController@storeDetailKibD')->name('inventaris-aset.storeDetailKibD');
+                Route::post('storeDetailKibE', 'InventarisController@storeDetailKibE')->name('inventaris-aset.storeDetailKibE');
+                Route::post('storeDetailKibF', 'InventarisController@storeDetailKibF')->name('inventaris-aset.storeDetailKibF');
+                // Route::get('showDetail/{detail}', 'ListPembelianController@showDetail')->name('showDetail');
+                Route::get('kib-e/detailShow/{detail}', 'KIBEController@showDetail')->name('kib-e.showDetail');
+                Route::get('kib-d/detailShow/{detail}', 'KIBDController@showDetail')->name('kib-d.showDetail');
+
+                Route::get('kib-c/detailShow/{detail}', 'KIBCController@showDetail')->name('kib-C.showDetail');
+                Route::get('kib-b/detailShow/{detail}', 'KIBBController@showDetail')->name('kib-B.showDetail');
+
+                Route::get('kib-a/detailShow/{detail}', 'KIACController@showDetail')->name('kib-A.showDetail');
+                Route::get('kib-f/detailShow/{detail}', 'KIFBController@showDetail')->name('kib-F.showDetail');
+                // Route::post('kib-e/detailShow/{detail}','KIBEController@detailShow')->name('kib-e.detailShow');
+
+
+            });
+
+
+
+
 
     // Setting
     Route::namespace('Setting')

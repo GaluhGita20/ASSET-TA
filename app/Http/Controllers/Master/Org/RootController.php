@@ -84,7 +84,7 @@ class RootController extends Controller
                 ];
                 return $this->makeButtonDropdown($actions);
             })
-            ->rawColumns(['action','updated_by', 'name', 'phone', 'address','kabupaten','province'])
+            ->rawColumns(['action','updated_by'])
             ->make(true);
     }
 

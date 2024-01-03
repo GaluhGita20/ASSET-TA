@@ -35,21 +35,14 @@ class PermissionSeeder extends Seeder
                 'action'        => ['view', 'create', 'edit', 'delete', 'approve'],
             ],
             [
-                'name'          => 'transaksi.waiting-purchase',
-                'action'        => ['view', 'create', 'edit', 'delete', 'approve'],
-            ],
-            [
                 'name'          => 'transaksi.pengadaan-aset',
                 'action'        => ['view', 'create', 'edit', 'delete', 'approve'],
             ],
+
             [
-                'name'          => 'transaksi.berita-acara',
-                'action'        => ['view', 'create', 'edit','delete' ,'approve'],
+                'name'          => 'registrasi.inventaris-aset',
+                'action'        => ['view', 'create', 'edit'],
             ],
-            // [
-            //     'name'          => 'pengajuan.registrasi-aset',
-            //     'action'        => ['view', 'create', 'edit', 'approve'],
-            // ],
             
             /** REPORT **/
             [
@@ -74,13 +67,13 @@ class PermissionSeeder extends Seeder
             [
                 'name'  => 'Administrator',
                 'PERMISSIONS'   => [
-                    'dashboard'                 => ['view'],
-                    'perencanaan-aset'   => ['view', 'create', 'edit', 'delete', 'approve'],
-                    'transaksi.waiting-purchase'   => ['view', 'create', 'edit', 'delete', 'approve'],
-                    'transaksi.berita-acara'  => ['view', 'create', 'edit', 'approve'],
-                    'transaksi.pengadaan-aset' => ['view', 'create', 'edit', 'approve'],
-                    'master'                    => ['view', 'create', 'edit', 'delete'],
-                    'setting'                   => ['view', 'create', 'edit', 'delete'],
+                    'dashboard'                    => ['view'],
+                    'perencanaan-aset'             => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'transaksi.pengadaan-aset'     => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'registrasi.inventaris-aset'   => ['view', 'create', 'edit'],
+                    // 'transaksi.pengadaan-aset'     => ['view', 'create', 'edit', 'approve'],
+                    'master'                       => ['view', 'create', 'edit', 'delete'],
+                    'setting'                      => ['view', 'create', 'edit', 'delete'],
                 ],
             ],
             [
@@ -88,9 +81,8 @@ class PermissionSeeder extends Seeder
                 'PERMISSIONS'   => [
                     'dashboard'                 => ['view'],
                     'perencanaan-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
-                    // 'pengajuan.penerimaan-aset'   => ['view', 'create', 'edit', 'delete','approve'],
-                    // 'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
-                    // 'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'transaksi.pengadaan-aset'     => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'registrasi.inventaris-aset'   => ['view', 'create', 'edit'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],
@@ -100,9 +92,8 @@ class PermissionSeeder extends Seeder
                 'PERMISSIONS'   => [
                     'dashboard'                 => ['view'],
                     'perencanaan-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
-                    'transaksi.waiting-purchase'   => ['view', 'create', 'edit', 'delete', 'approve'],
-                    'transaksi.berita-acara'  => ['view', 'create', 'edit', 'approve'],
-                    'transaksi.pengadaan-aset' => ['view', 'create', 'edit', 'approve'],
+                    'transaksi.pengadaan-aset'     => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'registrasi.inventaris-aset'   => ['view', 'create', 'edit'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],
@@ -112,9 +103,8 @@ class PermissionSeeder extends Seeder
                 'PERMISSIONS'   => [
                     'dashboard'                 => ['view'],
                     'perencanaan-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
-                    // 'pengajuan.penerimaan-aset'   => ['view', 'create', 'edit', 'delete','approve'],
-                    // 'pengajuan.berita-acara'    => ['view', 'create', 'edit', 'approve'],
-                    // 'pengajuan.registrasi-aset' => ['view', 'create', 'edit', 'approve'],
+                    'transaksi.pengadaan-aset'     => ['view', 'create', 'edit', 'delete', 'approve'],
+                    'registrasi.inventaris-aset'   => ['view', 'create', 'edit'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],

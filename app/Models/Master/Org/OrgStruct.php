@@ -6,6 +6,7 @@ use App\Imports\Master\OrgStructImport;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Aspect\Aspect;
 use App\Models\Master\Geografis\Province;
+use App\Models\Master\Geografis\District;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Risk\LastAudit;
 // use App\Models\Master\Risk\RiskAssessment;
@@ -27,7 +28,8 @@ class OrgStruct extends Model
         'phone',
         'address',
         'province_id',
-        'city_id'
+        'city_id',
+        'district_id'
     ];
 
     /** MUTATOR **/
@@ -72,6 +74,8 @@ class OrgStruct extends Model
         return $this->hasMany(OrgStruct::class, 'parent_id')->orderBy('level')->with('child');
     }
 
+   
+
     // public function childOfGroup()
     // {
     //     return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'group_id', 'struct_id');
@@ -101,6 +105,12 @@ class OrgStruct extends Model
     {
         return $this->belongsTo(City::class, 'city_id');
     }
+
+    public function daerah()
+    {
+        return $this->belongsTo(District::class, 'district_id');
+    }
+
 
     /** SCOPE **/
     public function scopeFilters($query)
@@ -290,7 +300,7 @@ class OrgStruct extends Model
     public function getIdsWithChild()
     {
         $ids = [$this->id];
-        foreach ($this->child as $child) {
+        foreach ($this->child as $child) { //ambil child dari level $ids
             $ids = array_merge($ids, $child->getIdsWithChild());
         }
         return $ids;

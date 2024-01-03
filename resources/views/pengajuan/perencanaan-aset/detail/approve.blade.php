@@ -4,7 +4,7 @@
 
 @section('modal-body')
     @method('POST')
-    <input type="hidden" name="is_submit" value="0">
+    {{-- <input type="hidden" name="is_submit" value=1> --}}
     <input type="hidden" name="detail_id" value="{{ $detail->id }}">
     <input type="hidden" name="perencanaan_id" value="{{ $detail->id }}">
     {{-- <input type="hidden" name="pembelian_id" value="{{ $detail->id }}"> --}}
@@ -12,7 +12,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Nama Akun') }}</label>
+                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
@@ -84,8 +84,8 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" min=1 id ="qty_req" name="qty_req" class="form-control base-plugin--inputmask_currency text-right"
-                            placeholder="{{ __('Jumlah Pengajuan') }}" value="{{ $detail->qty_req }}" oninput="updateTotal()" readonly>
+                        <input type="text" min=1 id ="qty_req" name="qty_req" class="form-control base-plugin--inputmask_currency text-right"
+                            placeholder="{{ __('Jumlah Pengajuan') }}" value="{{ $detail->qty_req }}" oninput="updateTotal()" readonly oninput="updateRejectNoteStatus()">
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 Unit
@@ -103,7 +103,7 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" min=0 id ="HPS_unit_cost" name="HPS_unit_cost" class="form-control base-plugin--inputmask_currency text-right"
+                        <input type="text" min=0 id ="HPS_unit_cost" name="HPS_unit_cost" class="form-control base-plugin--inputmask_currency text-right"
                             placeholder="{{ __('Harga Unit') }}" value="{{ $detail->HPS_unit_cost }}" oninput="updateTotal()" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text">
@@ -122,7 +122,7 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" min=0 id="HPS_total_cost" name="HPS_total_cost" class="form-control base-plugin--inputmask_currency text-right"
+                        <input type="text" min=0 id="HPS_total_cost" name="HPS_total_cost" class="form-control base-plugin--inputmask_currency text-right"
                             placeholder="{{ __('Harga Total Usulan') }}" value="{{ $detail->HPS_total_cost }}" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text" >
@@ -134,7 +134,7 @@
             </div>
         </div>
         
-        @if(auth()->user()->hasRole('Sub Bagian Program Perencanaan') || auth()->user()->hasRole("Direksi"))
+        @if(auth()->user()->hasRole('Sub Bagian Program Perencanaan'))
         <div class="col-sm-12 col-sm-12" >
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
@@ -143,7 +143,7 @@
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
                         <input type="text" id="qty_agree" min=0 name="qty_agree" class="form-control base-plugin--inputmask_currency text-right"
-                            placeholder="{{ __('Jumlah Disetujui') }}" value="{{ $detail->qty_agree ?  $detail->qty_agree : 0}}" oninput="updateTotal()">
+                            placeholder="{{ __('Jumlah Disetujui') }}" value="{{ $detail->qty_agree ?  $detail->qty_agree : 0}}" oninput="updateTotal()" required>
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 Unit
@@ -192,31 +192,21 @@
                 </div>
             </div>
         </div>
+        <div class="col-sm-12 col-sm-12" id="reject_note">
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Catatan Penolakan') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    <textarea class="form-control" id="reject_notes" value ="{{ $detail->reject_notes }}" name="reject_notes" placeholder="{{ __('Catatan Penolakan') }}" required>{{ $detail->reject_notes }}</textarea>
+                </div>
+            </div>
+        </div>
         @endif
     </div>
 @endsection
 
 @push('scripts')
-
-    {{-- <script>
-        function updateTotal() {
-            // Ambil nilai dari input jumlah barang dan harga per barang
-            if(document.getElementById('qty_req').value > 0 && document.getElementById('HPS_unit_cost').value > 0)
-                var quantity = parseInt(document.getElementById('qty_req').value);
-                var price = parseInt(document.getElementById('HPS_unit_cost').value);
-
-            // Hitung total harga
-                var total = quantity * price;
-
-                // Tampilkan total harga pada elemen dengan id 'total'
-                console.log(total)
-                document.getElementById('HPS_total_cost').value = total;
-            
-                var quantity_agree = parseInt(document.getElementById('qty_agree').value);
-                var total_agree = quantity_agree * price;
-                document.getElementById('HPS_total_agree').value = total_agree;
-        }
-    </script> --}}
 
     <script>
         function updateTotal() {
@@ -239,11 +229,29 @@
                 var total = parseInt(quantity) * parseInt(price);
                 var total_agree = quantity_agree * price;
 
-                console.log(total)
                 document.getElementById('HPS_total_cost').value = parseInt(total);
                 document.getElementById('HPS_unit_cost').value = parseInt(price)
                 document.getElementById('HPS_total_agree').value = parseInt(total_agree);
-        }
+
+               // var rejectNoteInput = document.getElementById('reject_note');
+                var rejectNoteInputDetail = document.getElementById('reject_notes');
+
+                // if (quantity_agree !== undefined && quantity !== undefined) {
+                //     if (quantity_agree < quantity || quantity_agree == 0 ) {
+                //       // rejectNoteInput.style.display = 'block'; 
+                //        rejectNoteInputDetail.setAttribute('required');
+                //     } else {
+                //        rejectNoteInputDetail.removeAttribute('required');
+                //        //rejectNoteInput.style.display = 'none'; 
+                //     }
+                // }
+            }
+            
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function () {
+            updateTotal();
+           // updateRejectNoteStatus();
+        });
     </script>
 
     <script src="{{ '/assets/js/global.js' }}"></script>

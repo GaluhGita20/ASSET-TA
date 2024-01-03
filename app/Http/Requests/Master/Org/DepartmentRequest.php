@@ -17,4 +17,12 @@ class DepartmentRequest extends FormRequest
 
         return $rules;
     }
+
+    public function messages(){
+        return [
+            'name.required' => 'Unit Departemen Harus Diisi.',
+            'parent_id.required' => 'Induk Unit Departemen Harus Diisi.',
+            'name.unique' => 'Unit Departemen Sudah Tersedia.',
+        ];
+    }
 }

@@ -53,29 +53,95 @@ return [
     [
         'name' => 'transaksi',
         'title' => 'Transaksi Aset',
-        'icon' => 'fa fa-road',
+        'icon' => 'fa fa-money-bill',
         'submenu' => [
             [
                 'name' => 'transaksi_waiting-purchase',
-                'perms' => 'transaksi.waiting-purchase',
-                'title' => 'Usulan Pengadaan',
+                'perms' => 'transaksi.pengadaan-aset',
+                'title' => 'Usulan Pembelian Aset',
                 'url' => '/transaksi/waiting-purchase',
             ],
             [
                 'name' => 'transaksi_pengadaan-aset',
                 'perms' => 'transaksi.pengadaan-aset',
-                'title' => 'Pengdadaan Aset',
-                'url' => '/transaksi/pengadaan-aset',
-            ],
-            
-            [
-                'name' => 'transaksi_berita-acara',
-                'perms' => 'transaksi.berita-acara',
                 'title' => 'Penerimaan Aset',
-                'url' => '/transaksi/berita-acara',
+                'url' => '/transaksi/pengadaan-aset',
             ],
         ]
     ],
+    [
+        'name' => 'inventaris',
+        'title' => 'Aset',
+        'icon' => 'fa fa-cube',
+        'submenu' => [
+            [
+                'name' => 'inventaris',
+                'title' => 'Inventaris Aset',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/inventaris-aset',
+            ],
+            [
+                'name' => 'inventaris_kib-a',
+                'title' => 'Aset KIB A',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/kib-a',
+            ],
+            [
+                'name' => 'inventaris_kib-b',
+                'title' => 'Aset KIB B',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/kib-b',
+            ],
+            
+            [
+                'name' => 'inventaris_kib-c',
+                'title' => 'Aset KIB C',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/kib-c',
+            ],
+            [
+                'name' => 'inventaris_kib-d',
+                'title' => 'Aset KIB D',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/kib-d',
+            ],
+            [
+                'name' => 'inventaris_kib-e',
+                'title' => 'Aset KIB E',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/kib-e',
+            ],
+            
+            [
+                'name' => 'inventaris_kib-f',
+                'title' => 'Aset KIB F',
+                'perms' => 'registrasi.inventaris-aset',
+                'url' => '/inventaris/kib-f',
+            ],
+        ]
+    ],
+
+    [
+        'name' => 'pelaporan',
+        'title' => 'Pelaporan',
+        'icon' => 'fa fa-book',
+        'submenu' => [
+            [
+                'name' => 'laporan_perencanaan-aset',
+                'perms' => 'perencanaan-aset',
+                'title' => 'Usulan Aset',
+                'url' => '/laporan/perencanaan-aset',
+            ],
+
+            [
+                'name' => 'laporan_penerimaan-aset',
+                'perms' => 'perencanaan-aset',
+                'title' => 'Penerimaan Aset',
+                'url' => '/laporan/penerimaan-aset',
+            ],
+        ]
+    ],
+    // laporan_perencanaan-aset
     // [
     //     'name' => 'registrasi_aset',
     //     'title' => 'Registrasi Aset',

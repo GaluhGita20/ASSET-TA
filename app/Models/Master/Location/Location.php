@@ -44,15 +44,14 @@ class Location extends Model
     public function scopeFilters($query)
     {
         return $query->filterBy(['name','departemen_id'])
-                    ->when(
-                        $departemen_departemen_id = request()->departemen_departemen_id,
-                        function ($q) use ($departemen_departemen_id){
-                            $q->whereHas('orgLocation', function ($qq) use ($departemen_departemen_id){
-                                $qq->where('departemen_id', $departemen_departemen_id);
-                            });
-                        }
-                    )
-                     ->latest();
+        ->when(
+            $departemen_departemen_id = request()->departemen_departemen_id,
+            function ($q) use ($departemen_departemen_id){
+                $q->whereHas('orgLocation', function ($qq) use ($departemen_departemen_id){
+                    $qq->where('departemen_id', $departemen_departemen_id);
+                });
+            }
+        ) ->latest();
     }   
     
 

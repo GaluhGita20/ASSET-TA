@@ -29,4 +29,15 @@ class LocationRequest extends FormRequest
         return $rules;
     }
 
+    public function messages(){
+        return [
+            'name.required' => 'Nama Ruang Harus Diisi.',
+            'space_code.required' => 'Kode Ruang Harus Diisi.',
+            'space_code.unique' => 'Kode Ruang Ini Sudah Tersedia.',
+            'floor_position.required' => 'Posisi Laintai Harus Diisi.',
+            'departemen_id.required' => 'Nama Unit Departemen Harus Diisi.',
+            'pic_id.required' => 'Penanggung Jawab Harus Diisi.',
+        ];
+    }
+
 }

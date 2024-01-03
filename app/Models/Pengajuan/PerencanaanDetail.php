@@ -8,13 +8,15 @@ use App\Models\Master\Aset\Aset;
 use App\Models\Master\Dana\Dana;
 use App\Models\Transaksi\PembelianTransaksi;
 use Illuminate\Support\Facades\Validator;
-
 use Carbon\Carbon;
+use App\Models\Auth\User;
 use Illuminate\Support\Facades\DB;
 
 
 class PerencanaanDetail extends Model
 {
+
+    
 
     protected $table = 'trans_usulan_details';
 
@@ -25,22 +27,15 @@ class PerencanaanDetail extends Model
         'existing_amount',
         'requirement_standard',
         'qty_req',
+        'is_purchase',
         'status',
         'HPS_unit_cost',
         'HPS_total_cost',
         'HPS_total_agree',
         'sumber_biaya_id',
+        'reject_notes',
     ];
 
-    public function asetd()
-    {
-        return $this->belongsTo(Aset::class, 'ref_aset_id');
-    }
-
-    public function danad()
-    {
-        return $this->belongsTo(Dana::class, 'sumber_biaya_id');
-    }
 
     /*******************************
      ** MUTATOR
@@ -86,10 +81,35 @@ class PerencanaanDetail extends Model
      ** RELATION
      *******************************/
 
-    public function perencanaan()
-    {
-        return $this->belongsTo(Perencanaan::class, 'perencanaan_id');
-    }
+     public function asetd()
+     {
+         return $this->belongsTo(Aset::class, 'ref_aset_id');
+     }
+ 
+     public function danad()
+     {
+         return $this->belongsTo(Dana::class, 'sumber_biaya_id');
+     }
+     public function users()
+     {
+         return $this->belongsTo(User::class, 'created_by');
+     }
+ 
+     public function perencanaanPembelian()
+     {
+         return $this->belongsToMany(PembelianTransaksi::class, 'trans_pivot_perencanaan_pengadaan','detail_usulan_id' ,'pembelian_id');
+     }
+ 
+     public function perencanaanPembelianDetail()
+     {
+         return $this->belongsToMany(PembelianTransaksi::class, 'trans_pivot_perencanaan_pengadaan', 'detail_usulan_id', 'pembelian_id')
+        ->withPivot('pembelian_id', 'detail_usulan_id');
+     }
+ 
+     public function perencanaan()
+     {
+         return $this->belongsTo(Perencanaan::class, 'perencanaan_id');
+     }
 
 
     /*******************************
@@ -101,15 +121,85 @@ class PerencanaanDetail extends Model
          return $query->where('status','draf');
      }
 
+
     public function scopeFilters($query)
     {
-        return $query;
+        // return   $query->filterBy(['aset'])
+        //     ->when(
+        //         $year = request()->procurement_year,
+        //         function ($q) use ($year){
+        //             $q->whereHas('perencanaan', function($qq) use ($year){
+        //                 $qq->where('procurement_year',$year);
+        //             });
+        //     })->latest();
+
+        return $query->when(
+            $jenis_jenis_aset = request()->jenis_aset,
+            function ($q) use ($jenis_jenis_aset){
+                $q->whereHas('asetd', function ($qq) use ($jenis_jenis_aset){
+                $qq->where('name','LIKE', '%' . $jenis_jenis_aset . '%');
+            });
+        })->latest();
+            
     }
 
+    public function scopeLaporan($query){
+        $jenis_jenis_aset = request()->jenis_aset;
+        $tahun_pengadaan = request()->procurement_year;
+        $departemen = request()->struct_id;
+
+       return $query->when($jenis_jenis_aset, function ($q) use ($jenis_jenis_aset) {
+            $q->whereHas('asetd', function ($qq) use ($jenis_jenis_aset) {
+                $qq->where('name', 'LIKE', '%' . $jenis_jenis_aset . '%');
+            });
+        })
+        ->when($tahun_pengadaan && $departemen, function ($q) use ($tahun_pengadaan, $departemen) {
+            $q->whereHas('perencanaan', function ($qq) use ($tahun_pengadaan, $departemen) {
+                $qq->where('procurement_year', $tahun_pengadaan)->where('struct_id', $departemen);
+            });
+        })
+        ->latest();
+
+        
+
+    }
 
     /*******************************
      ** SAVING
      *******************************/
+
+    //non pengadaan
+    public function handleStoreNewData($request){
+        // dd($request->all());
+        if($request->is_purchase == 'no'){
+            $this->status ='waiting purchase';
+            $data = $request->all();
+            $this->fill($data);
+            $this->perencanaan_id = null;
+
+            $value1 = str_replace(['.', ','],'',$request->qty_agree);
+            $this->qty_agree = (int)$value1;
+            $value2 = str_replace(['.', ','],'',$request->HPS_unit_cost);
+            $this->HPS_unit_cost = (int)$value2;
+            
+            $this->HPS_total_agree = $value1 * $value2;
+            $this->save();
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        }
+    }
+
+    public function handleDestroy(){
+        $this->beginTransaction();
+        try {
+            $this->delete();
+
+            return $this->commitDeleted();
+        } catch (\Exception $e) {
+            return $this->rollbackDeleted($e);
+        }
+    }
+
     public function handleStoreOrUpdate($request)
     {
         $this->beginTransaction();
@@ -127,30 +217,43 @@ class PerencanaanDetail extends Model
     }
 
 
+
     public function handleStoreListPembelian($request){ //handle data yang di checklist , untuk dibuat transaksi
 
         $this->beginTransaction();
         try { 
-
+          //
             if ($request->usulan_id != null) {
                 $allIds = collect($request->usulan_id)->flatten()->toArray();
-                $pagu = PerencanaanDetail::whereIn('id', $allIds)
-                    ->sum('HPS_total_agree');
-
-                $jumlah_beli = PerencanaanDetail::whereIn('id', $allIds)
-                    ->sum('qty_agree');
-
-                $data = [
-                    'id' => $allIds,
-                    'pagu' => $pagu,
-                    'jumlah_beli' => $jumlah_beli,
-                ];
-             
-                //session
-                session(['usulan_id' => $allIds]);
-
-                $redirect = route(request()->get('routes') . '.create', $data);
-                return $this->commitSaved(compact('redirect'));
+                
+                // $jenisUsulan = perencanaanPembelian::whereIn('perencanaan_id',$request->)
+                $filter = $this->filterErrorUsulan($allIds);
+                if($filter == 'none'){
+                    //dd($filter);
+                    $pagu = PerencanaanDetail::whereIn('id', $allIds)
+                        ->sum('HPS_total_agree');
+    
+                    $jumlah_beli = PerencanaanDetail::whereIn('id', $allIds)
+                        ->sum('qty_agree');
+    
+                    $data = [
+                        'id' => $allIds,
+                        'pagu' => $pagu,
+                        'jumlah_beli' => $jumlah_beli,
+                    ];
+                 
+                    //session
+                    session(['usulan_id' => $allIds]);
+    
+                    $redirect = route(request()->get('routes') . '.create', $data);
+                    return $this->commitSaved(compact('redirect'));
+                }else{
+                    return $this->rollback(
+                        [
+                            'message' => $filter
+                        ]
+                    );
+                }
             }else{
                 return $this->rollback(
                     [
@@ -158,11 +261,38 @@ class PerencanaanDetail extends Model
                     ]
                 );
             }
-
-            
         } catch (\Exception $e) {
             return $this->rollbackSaved($e);
         }
+
+    }
+
+    public function filterErrorUsulan($idx){
+       
+       
+        $filterTahun = PerencanaanDetail::whereIn('id', $idx)
+            ->whereHas('perencanaan', function ($query) {
+            $currentYear = now()->year; // Mendapatkan tahun saat ini
+            $query->whereYear('procurement_year', $currentYear);
+        })->count();
+
+        $aset = PerencanaanDetail::where('id',$idx[0])->first();
+        $filterAset = PerencanaanDetail::whereIn('id', $idx)
+            ->whereHas('asetd', function ($query) use($aset ) {
+                $query->where('id', $aset->ref_aset_id);
+        })->count();
+
+        $message = 'none';
+        if($filterTahun == 0){
+            $message = 'Data Tahun Pengadaan Harus Tahun '.now()->year;
+            return $message;
+        }elseif($filterAset != count($idx)){
+            $message = 'Silahkan Pilih Aset yang Sejenis';
+            return $message;
+        }else{
+            return $message;
+        }
+        
 
     }
 
@@ -170,7 +300,7 @@ class PerencanaanDetail extends Model
         $data = DB::table('trans_pivot_perencanaan_pengadaan')
             ->where('detail_usulan_id', $id)
             ->first();
-        if($data !=null){
+        if($data !=null){ //ambil data pembelian
             $data1 = PembelianTransaksi::where('id',$data->pembelian_id)->pluck('id');
             return $data1[0];
         }else{
@@ -192,7 +322,7 @@ class PerencanaanDetail extends Model
                        ->where('pembelian_id',$idp)
                        ->delete();
    
-                   $this->status = 'Draf';
+                   $this->status = 'waiting purchase';
                    $this->save();
    
                    return $this->commitDeleted([

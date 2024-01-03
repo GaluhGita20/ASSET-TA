@@ -7,6 +7,7 @@ use App\Http\Requests\Pengajuan\PerencanaanRequest;
 use App\Http\Requests\Pengajuan\PerencanaanDetailRequest;
 use App\Http\Requests\Pengajuan\PerencanaanDisposisiRequest;
 use App\Http\Requests\Transaksi\TransaksiRequest;
+use App\Http\Requests\Transaksi\TransaksiPenerimaanRequest;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Transaksi\PembelianTransaksi;
@@ -15,6 +16,8 @@ use App\Support\Base;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
+use App\Models\Globals\Approval;
 
 class PengadaanAsetController extends Controller
 {
@@ -34,7 +37,6 @@ class PengadaanAsetController extends Controller
             'title' => 'Pengadaan Aset',
             'breadcrumb' => [
                 'Home' => route('home'),
-                // 'Pengajuan' => '#',
                 'Pengadaan Aset' => route($this->routes . '.index'),
             ]
         ]);
@@ -45,10 +47,8 @@ class PengadaanAsetController extends Controller
     {
         $user = auth()->user();
       
-        $records = PembelianTransaksi::grid()->dtGet();
+        $records = PembelianTransaksi::grid()->filters()->dtGet();
         
-        // dd($record);
-    
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {
                 return request()->start;
@@ -60,13 +60,13 @@ class PengadaanAsetController extends Controller
                 return $detail->vendors->name ? $detail->vendors->name : '';
             })
             ->addColumn('no_spk', function ($detail) {
-                return $detail->no_spk ? $detail->no_spk : '';
+                return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->format('Y-m-d').'/'.Carbon::parse($detail->spk_end_date)->format('Y-m-d') : '';
             })
             ->addColumn('spk_start_date', function ($detail) {
-                return $detail->spk_start_date ? $detail->spk_start_date : '';
+                return  Carbon::parse($detail->spk_start_date)->format('Y-m-d');
             })
             ->addColumn('spk_end_date', function ($detail) {
-                return $detail->spk_end_date ? $detail->spk_end_date : '';
+                return  Carbon::parse($detail->spk_end_date)->format('Y-m-d');
             })
             ->addColumn('spk_range_time', function ($detail) {
                 return $detail->spk_range_time ? $detail->spk_range_time .' Hari': '';
@@ -75,28 +75,36 @@ class PengadaanAsetController extends Controller
                 return $detail->pengadaans->name ? $detail->pengadaans->name : '';
             })
             ->addColumn('budget_limit', function ($detail) {
-                return $detail->budget_limit ? $detail->budget_limit : '';
+                return number_format($detail->budget_limit, 0, ',', ',');
             })
             ->addColumn('qty', function ($detail) {
                 return $detail->qty ? $detail->qty : '';
             })
             ->addColumn('unit_cost', function ($detail) {
-                return $detail->unit_cost ? $detail->unit_cost : '';
+                return number_format($detail->unit_cost, 0, ',', ',');
             })
             ->addColumn('shiping_cost', function ($detail) {
-                return $detail->shiping_cost ? $detail->shiping_cost : '0';
+                if($detail->shiping_cost != 0){
+                    return number_format($detail->shiping_cost, 0, ',', ',');
+                }else{
+                    return 0;
+                }
             })
             ->addColumn('tax_cost', function ($detail) {
-                return $detail->tax_cost ? $detail->tax_cost : '0';
+                if($detail->tax_cost != 0){
+                    return number_format($detail->tax_cost, 0, ',', ',');
+                }else{
+                    return 0;
+                }
             })
             ->addColumn('total_cost', function ($detail) {
-                return $detail->total_cost ? $detail->total_cost : '';
+                return number_format($detail->total_cost, 0, ',', ',');
             })
             ->addColumn('status', function ($detail) {
-                return $detail->labelStatus($detail->status ?? 'draf');
+                return $detail->labelStatus($detail->status ?? 'draft');
             })
             ->addColumn('updated_by', function ($detail) use ($user) {
-                if ($detail->status === 'new') {
+                if ($detail->status === 'draf') {
                     return "";
                 } else {
                     return $detail->createdByRaw();
@@ -104,6 +112,7 @@ class PengadaanAsetController extends Controller
             })
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [];
+
                 if ($record->checkAction('show', $this->perms)) {
                     $actions[] = [
                         'type' => 'show',
@@ -112,17 +121,18 @@ class PengadaanAsetController extends Controller
                         'url' => route($this->routes . '.show', $record->id),
                     ];
                 }
+
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
                         'type' => 'edit',
                         'page' => true,
-                        'label' => 'Detail Edit',
+                        'label' => 'Detail',
                         'icon' => 'fa fa-plus text-info',
                         'id' => $record->id,
                         'url' => route($this->routes . '.edit', $record->id),
                     ];
                 }
-
+            
                 if ($record->checkAction('delete', $this->perms)) {
                     $actions[] = [
                         'type' => 'delete',
@@ -132,25 +142,27 @@ class PengadaanAsetController extends Controller
                     ];
                 }
 
-                // if ($record->checkAction('approval', $this->perms)) {
-                //     $actions[] = [
-                //         'type' => 'approval',
-                //         'label' => 'Approval',
-                //         'page' => true,
-                //         'id' => $record->id,
-                //         'url' => route($this->routes . '.approval', $record->id)
-                //     ];
-                // }
+                if ($record->checkAction('approval', $this->perms)) {
+                    $actions[] = [
+                        'type' => 'approval',
+                        'label' => 'Approval',
+                        'page' => true,
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.approval', $record->id)
+                    ];
+                }
 
-                // if ($record->checkAction('tracking', $this->perms)) {
-                //     $actions[] = 'type:tracking';
-                // }
+                if ($record->checkAction('tracking', $this->perms)) {
+                    $actions[] = 'type:tracking';
+                }
 
-                // if ($record->checkAction('history', $this->perms)) {
-                //     $actions[] = 'type:history';
-                // }
+                if ($record->checkAction('history', $this->perms)) {
+                    $actions[] = 'type:history';
+                }
+                
 
                 return $this->makeButtonDropdown($actions, $record->id);
+
             })
             ->rawColumns([
             'trans_name',
@@ -180,21 +192,21 @@ class PengadaanAsetController extends Controller
                 'url' => route($this->routes . ".grid"),
                 'datatable_1' => [
                     $this->makeColumn('name:num|label:#'),
-                    $this->makeColumn('name:trans_name|label:Nama Transaksi Aset|className:text-left|width:150px'),
-                    $this->makeColumn('name:vendor_id|label:Suplier|className:text-left|width:300px'),
-                    $this->makeColumn('name:no_spk|label:Nomor Kontrak|className:text-center,label-info'),
-                    $this->makeColumn('name:spk_start_date|label:Tanggal Mulai Kontrak|className:text-center|width:150px'),
-                    $this->makeColumn('name:spk_end_date|label:Tanggal Selesai Kontrak|className:text-center|width:150px'),
-                    $this->makeColumn('name:spk_range_time|label:Lama Kontrak|className:text-center|width:150px'),
-                    $this->makeColumn('name:jenis_pengadaan_id|label:Jenis Pengadaan|className:text-left|width:300px'),
-                    $this->makeColumn('name:qty|label:Jumlah Pembelian|className:text-left|width:150px'),
-                    $this->makeColumn('name:unit_cost|label:Harga Unit|width:150px'),
-                    $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman|className:text-center|width:150px'),
-                    $this->makeColumn('name:tax_cost|label:Biaya Pajak|className:text-left|width:150px'),
-                    $this->makeColumn('name:total_cost|label:Biaya Total|width:150px'),
+                    $this->makeColumn('name:trans_name|label:Transaksi Aset|className:text-left|width:200px'),
+                    $this->makeColumn('name:vendor_id|label:Suplier|className:text-center|width:300px'),
+                    $this->makeColumn('name:no_spk|label:Nomor SPK|className:text-center|width:200px'),
+                    // $this->makeColumn('name:spk_start_date|label:Tanggal Mulai SPK|className:text-center|width:250px'),
+                    // $this->makeColumn('name:spk_end_date|label:Tanggal Selesai SPK|className:text-center|width:250px'),
+                  //  $this->makeColumn('name:spk_range_time|label:Lama Kontrak|className:text-center|width:200px'),
+                  //  $this->makeColumn('name:jenis_pengadaan_id|label:Jenis Pengadaan|className:text-left|width:300px'),
+                    $this->makeColumn('name:qty|label:Jumlah Pembelian|className:text-center|width:100px'),
+                    $this->makeColumn('name:unit_cost|label:Harga Unit|width:200px'),
+                    $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman|className:text-center|width:200px'),
+                    $this->makeColumn('name:tax_cost|label:Biaya Pajak|className:text-center|width:200px'),
+                    $this->makeColumn('name:total_cost|label:Total|width:200px'),
                     $this->makeColumn('name:status'),
-                    $this->makeColumn('name:updated_by|label:Diperbarui|className:text-left|width:150px'),
-                    $this->makeColumn('name:action|label:Aksi|width:150px'),
+                  //  $this->makeColumn('name:updated_by|label:Diperbarui|className:text-left|width:200px'),
+                    $this->makeColumn('name:action|label:Aksi|width:200px'),
                 ],
             ],
         ]);
@@ -202,7 +214,7 @@ class PengadaanAsetController extends Controller
         return $this->render($this->views . '.index');
     }
 
-    public function edit(PembelianTransaksi $record)
+    public function edit(PembelianTransaksi $record) //edit pembelian transaksi
     {
         $records = $record->getPerencanaanPengadaan($record->id);
         $data = $records['usulan_id'];
@@ -224,20 +236,26 @@ class PengadaanAsetController extends Controller
         return $this->render($this->views . '.edit', compact('record','data'));
     }
 
-    public function update(TransaksiRequest $request, PembelianTransaksi $record)
+    public function show(PembelianTransaksi $record) //show data
     {
-        return $record->handleStoreOrUpdate($request);
+        $records = $record->getPerencanaanPengadaan($record->id);
+        $data = $records['usulan_id'];
+        $this->prepare([
+            'tableStruct' => [
+                'url' => route('transaksi.waiting-purchase'. ".grid", compact('data')),
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
+                    $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center,label-info'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
+                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
+                ],
+            ],
+        ]);
+        return $this->render($this->views . '.show', compact('record','data'));
     }
-
-    // public function reject(Perencanaan $record, Request $request)
-    // {
-    //     $request->validate(
-    //         [
-    //             'note'  => 'required',
-    //         ]
-    //     );
-    //     return $record->handleReject($request);
-    // }
 
     public function editUpdate(Request $request)
     {
@@ -262,9 +280,84 @@ class PengadaanAsetController extends Controller
         return $this->render($this->views . '.edit', compact('record','data'));
     }
 
-
  
+    public function store(TransaksiRequest $request)
+    {
+        $record = new PembelianTransaksi;
+        return $record->handleStoreOrUpdate($request);
+    }
+
+    public function update(TransaksiPenerimaanRequest $request, PembelianTransaksi $record)
+    {
+        return $record->handleStoreOrUpdate($request);
+    }
 
 
+    public function approval(PembelianTransaksi $record)
+    {
+        $records = $record->getPerencanaanPengadaan($record->id);
+        $data = $records['usulan_id'];
+        $this->prepare([
+            'tableStruct' => [
+                'url' => route('transaksi.waiting-purchase'. ".grid", compact('data')),
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
+                    $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center,label-info'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
+                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
+                ],
+            ],
+        ]);
+        return $this->render($this->views . '.show', compact('record','data'));
+    }
+    
+    public function approve(PembelianTransaksi $record, Request $request)
+    {   
+        // dd($record);
+        return $record->handleApprove($request);   
+    }
+
+    public function reject(PembelianTransaksi $record, Request $request)
+    {
+        $request->validate(
+            [
+                'note'  => 'required',
+            ]
+        );
+        return $record->handleReject($request);
+    }
+
+    public function destroy(PembelianTransaksi $record)
+    {
+        return $record->handleDestroy();
+    }
+
+    public function history(PembelianTransaksi $record)
+    {
+        $this->prepare(['title' => 'History Aktivitas']);
+        return $this->render('globals.history', compact('record'));
+    }
+
+    // public function revisi(PembelianTransaksi $record, Request $request)
+    // {
+    //     return $record->handleRevisi($request);
+    // }
+
+    public function tracking(PembelianTransaksi $record)
+    {
+        $module = $this->module;
+        if ($record->status === 'waiting.approval.revisi') {
+            $module = $module . '_upgrade';
+        }
+        return $this->render('globals.tracking', compact('record', 'module'));
+    }
+
+    public function print(PembelianTransaksi $record, $title = '')
+    {
+
+    }
 
 }

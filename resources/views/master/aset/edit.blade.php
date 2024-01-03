@@ -15,11 +15,11 @@
         <div class="col-sm-12 col-md-8 parent-group">
         <select class="form-control base-plugin--select2-ajax" name="jenis_aset" data-placeholder="Kategori Aset">
             <option disabed value="">Tipe Akun Utama</option>
-            <option value="tanah" {{ $record->jenis_aset =='tanah' ? 'selected' : '-' }}>Tanah</option>
-            <option value="peralatan_mesin" {{ $record->jenis_aset =='peralatan_mesin' ? 'selected' : '-' }}>Peralatan Mesin</option>
-            <option value="gedung_bangunan" {{ $record->jenis_aset =='gedung_bangunan' ? 'selected' : '-' }}>Gedung Bangunan</option>
-            <option value="aset_tetap_lainya" {{ $record->jenis_aset =='aset_tetap_lainya' ? 'selected' : '-' }}>Aset Tetap Lainya</option>
-            <option value="jalan_irigasi_jaringan" {{ $record->jenis_aset =='jalan_irigasi_jaringan' ? 'selected' : '-' }}>Jalan Irigasi Jaringan</option>
+            <option value="Tanah" {{ $record->jenis_aset =='Tanah' ? 'selected' : '-' }}>Tanah</option>
+            <option value="Peralatan Mesin" {{ $record->jenis_aset =='Peralatan Mesin' ? 'selected' : '-' }}>Peralatan Mesin</option>
+            <option value="Gedung Bangunan" {{ $record->jenis_aset =='Gedung Bangunan' ? 'selected' : '-' }}>Gedung Bangunan</option>
+            <option value="Aset Tetap Lainya" {{ $record->jenis_aset =='Aset Tetap Lainya' ? 'selected' : '-' }}>Aset Tetap Lainya</option>
+            <option value="Jalan Irigasi Jaringan" {{ $record->jenis_aset =='Jalan Irigasi Jaringan' ? 'selected' : '-' }}>Jalan Irigasi Jaringan</option>
         </select>
         </div>
     </div> 

@@ -9,15 +9,27 @@
 		@csrf
 		@yield('modal-body')
 	</div>
-	@section('buttons')
-		<div class="modal-footer">
-			{{-- @if($type == 'edit' || $type=='create') --}}
-				@section('modal-footer')
-					@include('layouts.forms.btnSubmitModal')
-				@show
-			{{-- @endif --}}
-		</div>
-	@show
+
+	<?php
+// Periksa apakah variabel $type telah didefinisikan
+	if (!isset($type)) {
+		// Jika belum, atur $type ke nilai default 'create'
+		$type = 'create';
+	}
+	?>
+
+	@if ($type != 'show')
+	{{-- @if(request()->route()->getName() != $routes.'.show') --}}
+		@section('buttons')
+			<div class="modal-footer">
+				{{-- @if($type == 'edit' || $type=='create') --}}
+					@section('modal-footer')
+						@include('layouts.forms.btnSubmitModal')
+					@show
+				{{-- @endif --}}
+			</div>
+		@show
+	@endif
 </form>
 
 @stack('scripts')

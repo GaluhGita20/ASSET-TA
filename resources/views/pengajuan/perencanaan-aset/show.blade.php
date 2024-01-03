@@ -1,11 +1,14 @@
 @extends('layouts.pageSubmit')
+@section('action', rut($routes . '.reject', $record->id))
 
-@section('action', route($routes . '.update', $record->id))
+{{-- @extends('layouts.pageSubmit')
+
+@section('action', route($routes . '.update', $record->id)) --}}
 
 @section('card-body')
 @section('page-content')
-    @method('PATCH')
-    @csrf
+    {{-- @method('PATCH')
+    @csrf --}}
     <!-- header -->
     <div class="row mb-3">
         <div class="col-sm-12">
@@ -79,7 +82,7 @@
                 <div class="card-body p-8">
                     <div class="row">
                         <div class="col-sm-12">
-                        <div class="form-group row">
+                            {{-- <div class="form-group row">
                                 <label class="col-md-2 col-form-label">{{ __('Kepada Yth') }}</label>
                                 <div class="col-md-10 parent-group">
                                     <select name="user_kepada" class="form-control base-plugin--select2-ajax"
@@ -93,8 +96,29 @@
                                         @endif
                                     </select>
                                 </div>
+                            </div> --}}
+                            <div class="form-group row">
+                                <div class="col-2 pr-0">
+                                    <label class="col-form-label">{{ __('Pembukaan') }}</label>
+                                </div>
+                                <div class="col-10 parent-group">
+                                    <textarea name="sentence_start" class="base-plugin--summernote" placeholder="{{ __('Pembukaan') }}" data-height="200" disabled>
+                                        @if(isset($record->sentence_start)) {!! $record->sentence_start !!}
+                                        @else
+                                        <p>Dengan hormat,<br>Dalam rangka meningkatkan kualitas mutu pelayanan di {{ Config::get("base.company.name") }}, kami mengajukan pembelian aset di {{ $record->struct->name }}. Adapun daftar kebutuhan aset yang kami ajukan terlampir.</p>
+                                        @endif
+                                    </textarea>
+                                </div>
                             </div>
                             <div class="form-group row">
+                                <div class="col-2 pr-0">
+                                    <label class="col-form-label">{{ __('Penutupan') }}</label>
+                                </div>
+                                <div class="col-10 parent-group">
+                                    <textarea name="sentence_end" class="base-plugin--summernote" placeholder="{{ __('Penutupan') }}" data-height="200" disabled>{!! isset($record->sentence_end) ? $record->sentence_end : "<p>Demikian surat pengajuan ini kami buat, besar harapan agar dapat ditindak lanjuti dan direalisasikan, atas perhatiannya kami sampaikan terima kasih.</p>"  !!}</textarea>
+                                </div>
+                            </div>
+                            {{-- <div class="form-group row">
                                 <div class="col-2 pr-0">
                                     <label class="col-form-label">{{ __('Pembukaan') }}</label>
                                 </div>
@@ -111,26 +135,20 @@
                                 <div class="col-10 parent-group">
                                     <textarea name="sentence_end" value="{{ $record->sentence_end }}" class="base-plugin--summernote" placeholder="{{ __('Penutupan') }}" data-height="200" disabled>{!! $record->sentence_end !!}</textarea>
                                 </div>
-                            </div>
+                            </div> --}}
+
                         </div>
                     </div>
                 </div>
 
-
                 @if (request()->route()->getName() == $routes.'.approval')
-                
                 <div class="card-footer">
                     <div class="d-flex justify-content-between">
-                        @if ($record->checkAction('approval', $perms) || auth()->user()->position->location->level=='department')
+                        @if ($record->checkAction('approval', $perms) || auth()->user()->position->level == "kepala" &&  auth()->user()->position->location->level == "department" )
                             @include('layouts.forms.btnBack')
                             @include('layouts.forms.btnDropdownApproval')
                             @include('layouts.forms.modalReject')
                         @endif
-                        {{-- @if (auth()->user()->position->location->level=='department')
-                            @include('layouts.forms.btnBack')
-                             @include('layouts.forms.btnDropdownApproval')
-                            @include('layouts.forms.modalReject')
-                        @endif --}}
                     </div>
                 </div>
                 @endif

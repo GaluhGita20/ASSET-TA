@@ -107,7 +107,7 @@ class Vendor extends Model
             $this->fill($request->all());
             $this->save();
           
-            // $this->jenisUsaha()->sync($request->jenisUsaha);
+            $this->jenisUsaha()->sync($request->jenisUsaha);
             //type_id masuk ke type_vendor_id  && $this->id masuk ke $vendor_id
 
             //$this->childOfGroup()->sync($request->department);

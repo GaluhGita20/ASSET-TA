@@ -33,4 +33,12 @@ class PemutihanRequest extends FormRequest
         return $rules;
     }
 
+    public function messages(){
+        return [
+            'name.required' => 'Nama Pemutihan Harus Diisi.',
+            'name.unique' => 'Nama Pemutihan Sudah Digunakan.',
+            'description.required' => 'Deskripsi Harus Diisi.',
+        ];
+    }
+
 }

@@ -113,16 +113,14 @@
                                     <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="qty" name="qty" placeholder="{{ __('Jumlah Beli') }}" value="{{ $jumlah_beli }}" readonly oninput="updateTotal()">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">
-                                                    Unit
-                                                </span>
-                                            </div>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="qty" name="qty" placeholder="{{ __('Jumlah Beli') }}" value="{{ $jumlah_beli }}" readonly oninput="updateTotal()">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                Unit
+                                            </span>
                                         </div>
-                                 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -134,7 +132,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id='budget_limit' name="budget_limit" placeholder="{{ __('Pagu') }}" value="{{ $pagu }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" id='budget_limit' name="budget_limit" placeholder="{{ __('Pagu') }}" value="{{ $pagu }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -148,11 +146,11 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga Unit Barang') }}</label>
+                                    <label class="col-form-label">{{ __('Harga Unit') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="number" min=0 name="unit_cost" id = "unit_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                        <input type="text" min=0 name="unit_cost" id = "unit_cost" class="form-control base-plugin--inputmask_currency text-right"
                                             placeholder="{{ __('Harga Unit Barang') }}" value="0"  oninput="updateTotal()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
@@ -171,7 +169,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="number" min=0 name="tax_cost" id="tax_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                        <input type="text" min=0 name="tax_cost" id="tax_cost" class="form-control base-plugin--inputmask_currency text-right"
                                             placeholder="{{ __('Biaya Pajak') }}" value="0"  oninput="updateTotal()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
@@ -190,7 +188,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="number" min=0 name="shiping_cost" id="shiping_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                        <input type="text" min=0 name="shiping_cost" id="shiping_cost" class="form-control base-plugin--inputmask_currency text-right"
                                             placeholder="{{ __('Biaya Pengiriman') }}" value="0"  oninput="updateTotal()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
@@ -226,6 +224,7 @@
                         @include('layouts.forms.btnBack')
                         @include('layouts.forms.btnSubmitModal')
                     </div>
+
                 </div>
             </div>
         </div>
@@ -235,10 +234,15 @@
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
+                {{-- header --}}
                 <div class="card-header">
                     <h3 class="card-title">Lampiran List Usulan Pembelian</h3>
                 </div>
+
                 <div class="card-body p-8">
+                    {{-- filter --}}
+                    
+                    {{-- data --}}
                     <div class="row mb-3">
                         <div class="col-sm-12">
                             <div class="card card-custom">
@@ -281,30 +285,39 @@
 @endsection
 
 @push('scripts')
-
 <script>
-    function updateTotal() {
-        // Ambil nilai dari input jumlah barang dan harga per barang
-        if(document.getElementById('qty').value > 0 && document.getElementById('unit_cost').value > 0)
-            var quantity = parseInt(document.getElementById('qty').value);
-            var price = parseInt(document.getElementById('unit_cost').value);
-            var tax = parseInt(document.getElementById('tax_cost').value);
-            var shiping = parseInt(document.getElementById('shiping_cost').value);
-            var pagu = parseInt(document.getElementById('budget_limit').value);
+function updateTotal() {
+    var quantity = document.getElementById('qty').value;
+    var unit_cost = document.getElementById('unit_cost').value;
+    var tax = document.getElementById('tax_cost').value;
+    var shiping = document.getElementById('shiping_cost').value;
+    var pagu = document.getElementById('budget_limit').value;
 
-        // Hitung total harga
-            var total = (quantity * price) + tax + shiping;
+    quantity= quantity.replace(/[^0-9]/g, '');
+    unit_cost= unit_cost.replace(/[^0-9]/g, '');
+    tax= tax.replace(/[^0-9]/g, '');
+    shiping= shiping.replace(/[^0-9]/g, '');
+    pagu= pagu.replace(/[^0-9]/g, '');
 
-            if(total >  pagu){
-                alert("Nilai total melebihi batas anggaran!");
-
-                total = 0;
-            }
-
-            // Tampilkan total harga pada elemen dengan id 'total'
-            console.log(total)
-            document.getElementById('total_cost').value = total;
-    }
-</script>
+    quantity = parseInt(quantity);
+    unit_cost = parseInt(unit_cost);
+    tax = parseInt(tax);
+    shiping = parseInt(shiping);
+    pagu = parseInt(pagu);
     
+    if(quantity > 0 && unit_cost > 0){
+        console.log(quantity);
+        var total = parseInt(quantity) * parseInt(unit_cost) + tax + shiping;
+        if(total > pagu){
+            alert("Nilai total melebihi batas anggaran!");
+            document.getElementById('total_cost').value = 0;
+        }else{
+            document.getElementById('total_cost').value = parseInt(total);
+        }
+        // console.log(total)
+    }
+        
+       // document.getElementById('HPS_unit_cost').value = parseInt(price)
+}
+</script>
 @endpush

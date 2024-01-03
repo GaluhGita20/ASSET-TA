@@ -37,7 +37,7 @@
 	<div class="form-group row">
 		<label class="col-md-3 col-form-label">{{ __('Provinsi') }}</label>
 		<div class="col-md-9 parent-group">
-			<select class="form-control base-plugin--select2-ajax province_id"
+			<select name="province_id" class="form-control base-plugin--select2-ajax province_id"
 				data-url="{{ rut('ajax.selectProvince', [
 					'search'=>'all'
 				]) }}"
@@ -66,6 +66,20 @@
 			</select>
 		</div>
 	</div>
+	<div class="form-group row">
+		<label class="col-md-3 col-form-label">{{ __('Daerah') }}</label>
+		<div class="col-md-9 parent-group">
+			<select name="district_id" class="form-control base-plugin--select2-ajax district_id"
+				data-url="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+				data-url-origin="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+				placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
+				<option value="">{{ __('Pilih Salah Satu') }}</option>
+				@if (!empty($record->district_id))
+					<option value="{{ $record->district_id }}" selected>{{ $record->daerah->name }}</option>
+				@endif
+			</select>
+		</div>
+	</div>
 @endsection
 
 @push('scripts')
@@ -84,6 +98,22 @@
 				BasePlugin.initSelect2();
 			});
 		});
+		
+		$(function () {
+			$('.content-page').on('change', 'select.city_id', function (e) {
+					var me = $(this);
+					if (me.val()) {
+						var objectId = $('select.district_id');
+						var urlOrigin = objectId.data('url-origin');
+						var urlParam = $.param({city_id: me.val()});
+						objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+						console.log(decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
+						objectId.val(null).prop('disabled', false);
+					}
+					BasePlugin.initSelect2();
+			});
+		});
+
 	</script>
 	<script>
 		$('.modal-dialog').removeClass('modal-md').addClass('modal-lg');

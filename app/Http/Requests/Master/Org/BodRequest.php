@@ -35,7 +35,10 @@ class BodRequest extends FormRequest
     public function messages()
     {
         return [
-            'different' => 'zxc'
+            'different' => 'zxc',
+            'parent_id.required' => 'Nama Induk Perusahaan Harus Diisi',
+            'name.unique' => 'Nama Departemen Ini Sudah Dgunakan',
+            'name.required' => 'Nama Departemen Diperlukan',
         ];
     }
 }

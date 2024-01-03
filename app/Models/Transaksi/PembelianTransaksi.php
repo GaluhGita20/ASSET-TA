@@ -6,17 +6,29 @@ use App\Models\Model;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Master\Aset\Aset;
+use App\Models\Traits\HasApprovals;
+use App\Models\Traits\HasFiles;
+use App\Support\Base;
+use App\Models\Globals\MenuFlow;
+use App\Models\Auth\User;
 use App\Models\Master\Dana\Dana;
 use App\Models\Master\Vendor\Vendor;
 use App\Models\Master\Pengadaan\Pengadaan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use DateTime;
+use App\Models\Auth\Role;
+use App\Models\Globals\Approval;
+use App\Models\Master\Org\OrgStruct;
+use App\Models\Master\Org\Position;
+use Telegram\Bot\Laravel\Facades\Telegram;
+
 
 
 class PembelianTransaksi extends Model
 {
-
+    use HasFiles, HasApprovals;
     protected $table = 'trans_aset';
 
     protected $fillable = [
@@ -38,26 +50,19 @@ class PembelianTransaksi extends Model
         'location_receipt',
         'status',
         'sp2d_date',
-        'condition_aset',
+        'sp2d_code',
         'asset_test_results',
         'location_receipt',
     ];
 
-    // protected $casts = [
-    //     'spk_start_date'          => 'date',
-    //     'spk_end_date'          => 'date',
-    //     'receipt_date'          => 'date',
-    // ];
+    protected $casts = [
+        'spk_start_date'        => 'date',
+        'spk_end_date'          => 'date',
+        'receipt_date'          => 'date',
+        'sp2d_date'             => 'date',
+    ];
 
-    public function vendors()
-    {
-        return $this->belongsTo(Vendor::class, 'vendor_id');
-    }
-
-    public function pengadaans()
-    {
-        return $this->belongsTo(Pengadaan::class, 'jenis_pengadaan_id');
-    }
+ 
 
    
     /*******************************
@@ -77,43 +82,47 @@ class PembelianTransaksi extends Model
         $this->attributes['receipt_date'] = Carbon::createFromFormat('d/m/Y', $value);
     }
 
+    public function setSP2DDateAttribute($value)
+    {
+        $this->attributes['sp2d_date'] = Carbon::createFromFormat('d/m/Y', $value);
+    }
+
     public function setTotalCostAttribute($value = '')
     {
         $value = str_replace(['.', ','], '', $value);
         $this->attributes['total_cost'] = (int) $value;
     }
 
-    public function setRequirementStandardAttribute($value = '')
+    public function setUnitCostAttribute($value = '')
     {
         $value = str_replace(['.', ','], '', $value);
-        $this->attributes['requirement_standard'] = (int) $value;
+        $this->attributes['unit_cost'] = (int) $value;
     }
 
-    public function setQtyReqAttribute($value = '')
+    public function setQtyAttribute($value = '')
     {
         $value = str_replace(['.', ','], '', $value);
-        $this->attributes['qty_req'] = (int) $value;
+        $this->attributes['qty'] = (int) $value;
     }
 
-
-    public function setHpsUnitCost($value ='')
+    public function setBudgetLimitUnitCost($value ='')
     {
         $value = str_replace(['.', ','], '', $value);
-        $this->attributes['HPS_unit_cost'] = (int) $value;
+        $this->attributes['budget_limit'] = (int) $value;
     }
 
-    public function setHpsTotalCostAttribute($value='')
+    public function setTaxCostAttribute($value='')
     {
         
         $value = str_replace(['.',','],'',$value);
  
-        $this->attributes['HPS_total_cost'] = (int)$value;
+        $this->attributes['tax_cost'] = (int)$value;
     }
 
-    public function setHpsTotalAgree($value='')
+    public function setShipingCostAttribute($value='')
     {
         $value = str_replace(['.', ','], '', $value);
-        $this->attributes['Hps_total_agree'] = (int) $value;
+        $this->attributes['shiping_cost'] = (int) $value;
     }
 
 
@@ -121,28 +130,68 @@ class PembelianTransaksi extends Model
      ** RELATION
      *******************************/
     
-
-
     public function perencanaanPengadaan()
     {
-        return $this->belongsToMany(PerencanaanDetail::class, 'trans_pivot_perencanaan_pengadaan', 'pembelian_id', 'detail_usulan_id');
+        return $this->belongsToMany(PerencanaanDetail::class, 'trans_pivot_perencanaan_pengadaan','pembelian_id' ,'detail_usulan_id');
     }
 
-   
+    public function pengujianPengadaan()
+    {
+        return $this->belongsToMany(User::class, 'trans_pivot_pengujian','trans_id','user_id');
+    }
 
+    public function vendors()
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id');
+    }
+
+    public function pengadaans()
+    {
+        return $this->belongsTo(Pengadaan::class, 'jenis_pengadaan_id');
+    }
+
+     // public function cc()
+    // {
+    //     return $this->belongsToMany(User::class, 'trans_pengajuan_pembelian_cc', 'perencanaan_id', 'user_id');
+    // }
+
+   
     /*******************************
      ** SCOPE
      *******************************/
 
      public function scopeGrid($query)
      {
-         return $query->latest();
+
+        $user = auth()->user();
+       // dd($user->roles()->pluck('name'));
+        return $query->when(empty(array_intersect(['PPK','Keuangan'], $user->roles->pluck('name')->toArray())),
+            function ($q) use ($user) { 
+                $q->WhereHas('approvals', function ($q) use ($user) {
+                    $q->when($user->id, function ($qq) use ($user) {
+                         $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
+                    },function ($qq) use ($user) {
+                        $qq->orWhereIn('role_id', $user->getRoleIds())
+                        ->orWhere('position_id', $user->position->id);
+                    });
+                });
+            }
+        )
+        ->latest();
      }
 
     public function scopeFilters($query)
     {
-        return $query;
+        // return $query;
+        return $query->filterBy(['no_spk','spk_start_date','spk_end_date'])->when(
+            $jenis_vendor = request()->vendor_id,
+            function ($q) use ($jenis_vendor){
+                $q->whereHas('vendors', function ($qq) use ($jenis_vendor){
+                        $qq->where('id',$jenis_vendor);
+            });
+            })->latest();
     }
+
 
     /*******************************
      ** SAVING
@@ -151,28 +200,90 @@ class PembelianTransaksi extends Model
     {
         $this->beginTransaction();
         try { 
+            if($request->unit_cost == 0){
+                return $this->rollback(
+                    [
+                        'message' => 'Harga Unit Masih 0 !'
+                    ]
+                );
+            }
+            if($request->total_cost == 0){
+                return $this->rollback(
+                    [
+                        'message' => 'Biaya Total Masih 0 !'
+                    ]
+                );
+            }
             $data = $request->all();
-            $this->spk_range_time = 12;
-            $this->fill($data);
-            $this->save();
 
+            $this->fill($data);
+
+            $value1 = str_replace(['.', ','],'',$request->unit_cost);
+            $this->unit_cost = (int)$value1;
+            $value2 = str_replace(['.', ','],'',$request->tax_cost);
+            $this->tax_cost = (int)$value2;
+
+            $value3 = str_replace(['.', ','],'',$request->shiping_cost);
+            $this->shiping_cost = (int)$value3;
+
+            $value4 = str_replace(['.', ','],'',$request->budget_limit);
+            $this->budget_limit = (int)$value4;
+
+            $value5 = str_replace(['.', ','],'',$request->total_cost);
+            $this->total_cost = (int)$value5;
+
+            $value6 = str_replace(['.', ','],'',$request->qty);
+            $this->qty = (int)$value6;
+            
+            
+            $start_time = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
+            $end_time = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
+            $selisih = $start_time->diffInDays($end_time);
+            
+            $this->spk_range_time = $selisih;
+            
+            $this->save();
             $dataArray = json_decode($request->usulan_id, true);
 
             $this->perencanaanPengadaan()->sync($dataArray ?? []);
-            foreach ($dataArray as $id) {
-                PerencanaanDetail::where('id', $id)->update(['status' => 'waiting register']);
+
+            //$this->jenisUsaha()->sync($request->user_id);
+            $this->pengujianPengadaan()->sync($request->user_id ?? []);
+            
+
+            if ($dataArray) {
+                PerencanaanDetail::whereIn('id', $dataArray)->update(['status' => 'waiting receipt']);
             }
 
+            if ($request->is_submit == 1) {
+                $this->handleSubmitSave($request);
+            }
+            
             $redirect = route('transaksi.pengadaan-aset' . '.index');
             return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+          //  Log::error('Kesalahan: ' . $e->getMessage());
+            return $this->rollbackSaved($e->getMessage());
+        }
+    }
+
+    public function handleSubmitSave($request)
+    {
+        $this->beginTransaction();
+        try {
+            // dd('tes');
+            $this->update(['status' => 'waiting.approval']);
+
+            $this->generateApproval($request->module);
+            $this->saveLogNotify();
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+
         } catch (\Exception $e) {
             return $this->rollbackSaved($e);
         }
     }
 
-    // public function getPerencanaanPengadaan($record){
-    //     $data = 
-    // }
 
     public function getPerencanaanPengadaan($record)
     {
@@ -189,7 +300,6 @@ class PembelianTransaksi extends Model
             'usulan_id' => $usulan_id,
             'pagu' => $pagu,
             'jumlah_beli' => $jumlah_beli
-
         ];
 
         $this->budget_limit = $pagu;
@@ -200,15 +310,85 @@ class PembelianTransaksi extends Model
         return $data;
     }
 
-    // public function getPaguJumlahBeli(){
-        
-    // }
+ 
+    public function handleDestroy()
+    {
+        $this->beginTransaction();
+        try {
+            $pivotIds = $this->perencanaanPengadaan()->pluck('detail_usulan_id');
+            PerencanaanDetail::whereIn('id', $pivotIds)->update(['status' => 'waiting purchase']);
+
+            $this->pengujianPengadaan()->wherePivot('trans_id', '=', $this->id)->detach();
+            $this->perencanaanPengadaan()->wherePivot('pembelian_id', '=', $this->id)->detach();
+            $this->saveLogNotify();
+            $this->delete();
+
+            return $this->commitDeleted();
+        } catch (\Exception $e) {
+            return $this->rollbackDeleted($e);
+        }
+    }
+    
+
+
+    public function handleApprove($request)
+    {
+        $this->beginTransaction();
+        try {
+            //dd($request);
+            
+                if ($this->status === 'waiting.approval.revisi') {
+                    $this->approveApproval($request->module . '_upgrade');
+                    if ($this->firstNewApproval($request->module . '_upgrade')) {
+                        $this->update(['status' => 'waiting.approval.revisi']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(
+                            [
+                                'status' => 'draft',
+                                'version' => $this->version + 1,
+                            ]
+                        );
+                        $this->saveLogNotify();
+                    }
+                } else {
+                    $this->approveApproval($request->module);
+                    if ($this->firstNewApproval($request->module)) {
+                        $this->update(['status' => 'waiting.approval']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(['status' => 'completed']);
+                        $this->saveLogNotify();
+                       // $this->_generateReport('completed');
+                    }
+                }
+
+                $user = auth()->user();
+                $flag =  $this->whereHas('approvals',function($q){
+                    $q->where('target_id',$this->id)->where('role_id',2)->where('status','approved');
+                })->count();
+                
+                if($flag == 1){
+                    $data = $this->perencanaanPengadaan('detail_usulan_id');
+                    $detailUsulan = $this->perencanaanPengadaan()->where('pembelian_id', $this->id)->get()->pluck('pivot.detail_usulan_id')->toArray();
+                    PerencanaanDetail::whereIn('id',$detailUsulan)->update(['status' => 'waiting register']);
+                }
+    
+                $redirect = route(request()->get('routes') . '.index');
+                return $this->commitSaved(compact('redirect'));
+
+        } catch (\Exception $e) {
+            $customMessage = 'This is a custom error message';
+            return $this->rollback($customMessage);
+          //  return $this->rollbackSaved($e);
+            
+        }
+    }
 
     public function handleReject($request)
     {
         $this->beginTransaction();
         try {
-            // dd('tes');
             $this->rejectApproval($request->module, $request->note);
             $this->update(['status' => 'rejected']);
             $this->saveLogNotify();
@@ -220,6 +400,125 @@ class PembelianTransaksi extends Model
         }
     }
 
+
+    public function saveLogNotify()
+    {
+        $user = auth()->user()->name;
+        $data = 'Transaksi : ' . $this->trans_name;
+        $routes = request()->get('routes');
+        switch (request()->route()->getName()) {
+            case $routes . '.store':
+                $this->addLog('Membuat ' . $data);
+                $pesan = 'Membuat ' . $data;
+                $this->sendNotification($pesan);
+                if (request()->is_submit) {
+                    $this->addLog('Submit ' . $data);
+                    $this->addNotify([
+                        'message' => 'Waiting Approval ' . $data,
+                        'url' => route($routes . '.approval', $this->id),
+                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                    ]);
+
+                    $pesan = 'Mengajukan Approval '.$data;
+                    $this->sendNotification($pesan);
+                }
+                break;
+            case $routes . '.update':
+                $this->addLog('Mengubah ' . $data);
+                if (request()->is_submit) {
+                    $this->addLog('Submit ' . $data);
+                    $this->addNotify([
+                        'message' => 'Waiting Approval ' . $data,
+                        'url' => route($routes . '.approval', $this->id),
+                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                    ]);
+
+                    $pesan = 'Menunggu Approval ' . $data;
+                    $this->sendNotification($pesan);
+                }
+                break;
+            case $routes . '.destroy':
+                $this->addLog('Menghapus ' . $data);
+                break;
+            case $routes . '.verify':
+                $this->addNotify([
+                    'message' => 'Waiting Approval ' . $data,
+                    'url' => route($routes . '.approval', $this->id),
+                    'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                ]);
+                break;
+            case $routes . '.approve':
+                if (in_array($this->status, ['draft', 'waiting.approval.revisi'])) {
+                    $this->addLog('Menyetujui Revisi ' . $data);
+
+                    $this->addNotify([
+                        'message' => 'Waiting Approval Revisi ' . $data,
+                        'url' => route($routes . '.approval', $this->id),
+                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                    ]);
+
+                    $pesan = 'Waiting Approval Revisi ' . $data;
+                    $this->sendNotification($pesan);
+
+                } else {
+                    $this->addLog('Menyetujui ' . $data);
+
+                    $this->addNotify([
+                        'message' => 'Waiting Approval ' . $data,
+                        'url' => route($routes . '.approval', $this->id),
+                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                    ]);
+                    $pesan = $user.' Menyetujui ' . $data;
+                    $this->sendNotification($pesan);
+                }
+                break;
+                // ada lagi? aman kan?
+                //aman gal thanks suhu
+                // okay ntar kalau ada apa2 lagi ingpoin aja, 24 jam dpn leptop kok aku. Aku putusin koneksi ya byeeee
+            case $routes . '.reject':
+                if (in_array($this->status, ['rejected'])) {
+                    $this->addLog('Menolak ' . $data . ' dengan alasan: ' . request()->get('note'));
+
+                    $this->addNotify([
+                        'message' => 'Menolak ' . $data . ' dengan alasan: ' . request()->get('note'),
+                        'url' => route($routes . '.show', $this->id),
+                        'user_ids' => [$this->created_by],
+                    ]);
+                    $pesan = $user.' Menolak ' . $data;
+                    $this->sendNotification($pesan);
+                } else {
+                    $this->addLog('Menolak Revisi ' . $data . ' dengan alasan: ' . request()->get('note'));
+
+                    $this->addNotify([
+                        'message' => 'Menolak Revisi ' . $data . ' dengan alasan: ' . request()->get('note'),
+                        'url' => route($routes . '.show', $this->id),
+                        'user_ids' => [$this->created_by],
+                    ]);
+                    $pesan = $user.' Menolak ' . $data;
+                    $this->sendNotification($pesan);
+                }
+                break;
+            case $routes . '.revisi':
+                $this->addLog('Revisi ' . $data);
+                $this->addNotify([
+                    'message' => 'Waiting Approval Revisi ' . $data,
+                    'url' => route($routes . '.approval', $this->id),
+                    'user_ids' => $this->getNewUserIdsApproval(request()->get('module') . "_upgrade"),
+                ]);
+                break;
+        }
+    }
+
+    public function sendNotification($pesan)
+    {
+        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+
+        Telegram::sendMessage([
+            'chat_id' => $chatId,
+            'text' => $pesan,
+        ]);
+    }
+
     public function checkAction($action, $perms, $record = null)
     {
         $user = auth()->user();
@@ -228,17 +527,11 @@ class PembelianTransaksi extends Model
                 $checkStatus = in_array($this->status, ['new', 'draft', 'rejected']);
                 return $checkStatus && $user->checkPerms($perms . '.edit');
             case 'delete':
-                $checkStatus = in_array($this->status, ['new', 'draft', 'rejected']);
+                $checkStatus = in_array($this->status, ['new', 'draft']);
                 return $checkStatus && $user->checkPerms($perms . '.delete');
             case 'show':
             case 'history':
                 return true;
-            // case 'verification':
-            //     if ($this->status === 'waiting.verification') {
-            //         return $user->isVerificationKepalaDepartement($this->struct);
-            //     }
-            //     return false;
-            //     break;
             case 'approval':
                 if ($this->status === 'waiting.approval.revisi') {
                     if ($this->checkApproval(request()->get('module') . '_upgrade')) {
@@ -246,18 +539,13 @@ class PembelianTransaksi extends Model
                     }
                 }
                 if ($this->checkApproval(request()->get('module'))) {
+                    // dd(request()->get('module'));
                     $checkStatus = in_array($this->status, ['waiting.approval']);
                     return $checkStatus && $user->checkPerms($perms . '.approve');
                 }
                 break;
             case 'revisi':
                 if ($user->checkPerms($perms . '.edit')) {
-                    // if (isset($this->pembatalan->status) && in_array($this->pembatalan->status, ['waiting.approval', 'waiting.approval.revisi', 'completed'])) {
-                    //     return false;
-                    // }
-                    // if (isset($this->pembayaran->status) &&  in_array($this->pembayaran->status, ['waiting.approval', 'waiting.approval.revisi', 'completed'])) {
-                    //     return false;
-                    // }
                     return $this->status === 'completed';
                 }
                 break;

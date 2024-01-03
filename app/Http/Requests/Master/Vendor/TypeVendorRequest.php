@@ -32,12 +32,13 @@ class TypeVendorRequest extends FormRequest
         ];
          return $rules;
     }
- 
-    // public function attributes()
-    // {
-    //     return [
-    //         'name' => 'Vendor',
-    //         'description' => 'Deskripsi',
-    //     ];
-    // }
+
+    public function messages(){
+        return [
+            'name.required' => 'Nama Jenis Usaha Harus Diisi.',
+            'name.unique' => 'Nama Jenis Usaha Sudah Digunakan.',
+            'description.required' => 'Deskripsi Harus Diisi.',
+        ];
+    } 
+
 }

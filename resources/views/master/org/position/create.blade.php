@@ -8,7 +8,7 @@
 	<div class="form-group row">
         <label class="col-sm-12 col-form-label">{{ __('Level Tingkatan Organisasi') }}</label>
         <div class="col-sm-12 parent-group">
-        <select class="form-control base-plugin--select2-ajax level_id" name="level_id" data-placeholder="Level Organisasi">
+        <select class="form-control base-plugin--select2-ajax level_id" name="level" data-placeholder="Level Organisasi">
             <option value="kepala">Kepala</option>
             <option value="wakil kepala">Wakil Kepala</option>
             <option value="staf">Staf</option>
@@ -28,7 +28,7 @@
 	</div>
 	
 	<div class="form-group row">
-		<label class="col-sm-12 col-form-label">{{ __('Nama') }}</label>
+		<label class="col-sm-12 col-form-label">{{ __('Nama Jabatan') }}</label>
 		<div class="col-sm-12 parent-group">
 			<input type="text" name="name" class="form-control" placeholder="{{ __('Nama') }}">
 		</div>

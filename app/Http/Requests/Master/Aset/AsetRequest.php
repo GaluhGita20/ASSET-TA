@@ -33,4 +33,13 @@ class AsetRequest extends FormRequest
         return $rules;
     }
 
+
+    public function messages(){
+        return [
+            'name.required' => 'Nama Aset Harus Diisi.',
+            'jenis_aset.required' => 'Jenis Aset Harus Diisi.',
+            'name.unique' => 'Nama Aset Ini Sudah Tersedia.',
+        ];
+    }
+
 }

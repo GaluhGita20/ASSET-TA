@@ -17,4 +17,11 @@ class LevelPositionRequest extends FormRequest
 
         return $rules;
     }
+
+    public function messages(){
+        return [
+            'name.required' => 'Nama Harus Diisi.',
+            'name.unique' => 'Nama Sudah Tersedia.',
+        ];
+    }
 }

@@ -42,7 +42,7 @@ class CoaAsetTetapController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Coa::grid()->where('tipe_akun','=','KIB D')->filters()->dtGet();
+        $records = Coa::grid()->where('tipe_akun','=','KIB E')->filters()->dtGet();
 
         return DataTables::of($records)
             ->addColumn(

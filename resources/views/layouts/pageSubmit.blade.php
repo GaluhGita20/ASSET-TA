@@ -7,7 +7,8 @@
 		@include('layouts.base.subheader')
 	@show
 	@section('content-body')
-    <form action="@yield('action', '#')" method="POST"  data-req-method="@yield('req-method')" id="searchform" autocomplete="@yield('autocomplete', 'off')">
+    {{-- @section('filter') --}}
+    <form action="@yield('action', '#')" method="POST"  data-req-method="@yield('req-method')" id="searchform" autocomplete="@yield('autocomplete', 'off')" >
 
 		<div class="d-flex flex-column-fluid">
 			<div class="{{ $container ?? 'container-fluid' }}">

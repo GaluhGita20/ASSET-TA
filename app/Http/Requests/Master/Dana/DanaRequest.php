@@ -33,4 +33,12 @@ class DanaRequest extends FormRequest
         return $rules;
     }
 
+    public function messages(){
+        return [
+            'name.required' => 'Nama Harus Diisi.',
+            'description.required' => 'Deskripsi Harus Diisi.',
+            'name.unique' => 'Jenis Pendanaan Ini Sudah Tersedia.',
+        ];
+    }
+
 }

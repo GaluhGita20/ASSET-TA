@@ -30,7 +30,7 @@ class PerencanaanDetailRequest extends FormRequest
         $rules= [
             'qty_agree' =>['required','lte:qty_req'],
             'HPS_total_agree' =>'required',
-            'sumber_biaya_id' =>'required',
+        //    'sumber_biaya_id' =>'required',
             ];
         return $rules;
 
@@ -52,7 +52,7 @@ class PerencanaanDetailRequest extends FormRequest
         'qty_agree.numeric' => 'Field Jumlah Disetujui harus berupa angka.',
         'qty_agree.lte' => 'Field Jumlah Disetujui harus lebih kecil atau sama dengan Jumlah Yang Diminta.',
         'HPS_total_agree.required' => 'Field HPS Total Disetujui harus diisi.',
-        'ref_sumber_biaya.required' => 'Field Referensi Sumber Biaya harus diisi.',
+       // 'ref_sumber_biaya.required' => 'Field Referensi Sumber Biaya harus diisi.',
     ];
 }
 }

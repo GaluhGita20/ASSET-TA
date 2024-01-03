@@ -7,10 +7,10 @@
 	<div class="form-group row">
         <label class="col-sm-12 col-form-label">{{ __('Level Tingkatan Organisasi') }}</label>
         <div class="col-sm-12 parent-group">
-        <select class="form-control base-plugin--select2-ajax level_id" name="level_id" data-placeholder="Level Organisasi">
-            <option value="bod" {{ $record->location->level == "bod" ? 'selected':'' }}>Direksi</option>
-            <option value="department" {{ $record->location->level == "department" ? 'selected':'' }}>Departement</option>
-            <option value="subdepartment" {{ $record->location->level =="subdepartment" ? 'selected':'' }}>Sub Departement</option>
+        <select class="form-control base-plugin--select2-ajax level" name="level" data-placeholder="Level Organisasi">
+            <option value="kepala" {{ $record->location->level == "kepala" ? 'selected':'' }}>Kepala</option>
+            <option value="wakil kepala" {{ $record->location->level == "wakil kepala" ? 'selected':'' }}>Wakil Kepala</option>
+            <option value="staf" {{ $record->location->level =="staf" ? 'selected':'' }}>Staf</option>
         </select>
         </div>
     </div>

@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-8 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"
-                        placeholder="{{ __('Tgl Surat') }}" data-date-end-date="{{ now() }}" value="{{ $record->date->format('d/m/Y') }}">
+                        placeholder="{{ __('Tgl Surat') }}" data-date-end-date="{{ now() }}" value="{{ $record->date->format('Y-m-d') }}" disabled>
                 </div>
             </div>
         </div>
@@ -34,27 +34,24 @@
                     <label class="col-form-label">{{ __('Unit Kerja') }}</label>
                 </div>
                 <div class="col-10 parent-group">
-                    @if($departemen->location->level == 'departement' || $departemen->location->level == 'bod' || $departemen->location->name == 'Sub Bagian Program Perencanaan')
-                        <select name="struct_id" class="form-control base-plugin--select2-ajax"
-                            data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
-                            data-placeholder="{{ __('Unit Kerja') }}">
-                            <option value="">{{ __('Unit Kerja') }}</option>
-                            @if ($record->struct)
-                                <option value="{{ $record->struct->id }}" selected>
-                                    {{ $record->struct->name }}
-                                </option>
-                            @endif
-                        </select>
-                    @endif
-                    @if($departemen->location->level == 'subdepartemen' || $departemen->location->name != 'Sub Bagian Program Perencanaan')
+                    {{-- @if($departemen->location->level == 'departement' || $departemen->location->level == 'bod' || $departemen->location->name == 'Sub Bagian Program Perencanaan') --}}
+                    <select name="struct_id" class="form-control base-plugin--select2-ajax">
+                        @if ($record->struct)
+                            <option value="{{ $record->struct->id }}" selected>
+                                {{ $record->struct->name }}
+                            </option>
+                        @endif
+                    </select>
+                    {{-- @endif --}}
+                    {{-- @if($departemen->location->level == 'subdepartemen' || $departemen->location->name != 'Sub Bagian Program Perencanaan')
                         <select class="form-control"  name="struct_id">
                             <option value="{{ $departemen->location->id}}" selected> {{ $departemen->location->name }} </option>
                         </select>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
 
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <div class="col-2 pr-0">
                     <label class="col-form-label">{{ __('Jenis Usulan') }}</label>
                 </div>
@@ -67,7 +64,7 @@
                         <option value="no" {{ $record->is_repair =='no' ? 'selected':'-' }}>Pengajuan Pembelian Aset</option>
                     </select>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
@@ -87,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
                 <div class="col-10 parent-group">
                     <div class="custom-file">
@@ -132,7 +129,7 @@
                     @endforeach
                     
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 @endsection

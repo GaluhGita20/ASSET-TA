@@ -1,9 +1,9 @@
 @extends('layouts.modal')
 
-@section('action', route($routes . '.detailUpdateApprove', $detail->id))
+{{-- @section('action', route($routes . '.detailUpdateApprove', $detail->id)) --}}
 
 @section('modal-body')
-    @method('POST')
+    {{-- @method('POST') --}}
     <input type="hidden" name="is_submit" value="0">
     <input type="hidden" name="detail_id" value="{{ $detail->id }}">
     <input type="hidden" name="perencanaan_id" value="{{ $detail->id }}">
@@ -12,7 +12,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Nama Akun') }}</label>
+                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
@@ -84,7 +84,7 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" min=1 id ="qty_req" name="qty_req" class="form-control base-plugin--inputmask_currency text-right"
+                        <input type="text" min=1 id ="qty_req" name="qty_req" class="form-control base-plugin--inputmask_currency text-right"
                             placeholder="{{ __('Jumlah Pengajuan') }}" value="{{ $detail->qty_req }}" oninput="updateTotal()" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text">
@@ -105,7 +105,7 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" min=0 id ="HPS_unit_cost" name="HPS_unit_cost" class="form-control base-plugin--inputmask_currency text-right"
+                        <input type="text" min=0 id ="HPS_unit_cost" name="HPS_unit_cost" class="form-control base-plugin--inputmask_currency text-right"
                             placeholder="{{ __('Harga Unit') }}" value="{{ $detail->HPS_unit_cost }}" oninput="updateTotal()" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text">
@@ -124,7 +124,7 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" min=0 id="HPS_total_cost" name="HPS_total_cost" class="form-control base-plugin--inputmask_currency text-right"
+                        <input type="text" min=0 id="HPS_total_cost" name="HPS_total_cost" class="form-control base-plugin--inputmask_currency text-right"
                             placeholder="{{ __('Harga Total Usulan') }}" value="{{ $detail->HPS_total_cost }}" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text" >
@@ -162,7 +162,7 @@
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
-                        <input type="number" id ="HPS_total_agree" min=0  name="HPS_total_agree" class="form-control base-plugin--inputmask_currency text-right"
+                        <input type="text" id ="HPS_total_agree" min=0  name="HPS_total_agree" class="form-control base-plugin--inputmask_currency text-right"
                             placeholder="{{ __('Harga Total Disetujui') }}" value="{{ $detail->HPS_total_agree ?  $detail->HPS_total_agree : 0}}" readonly >
                         <div class="input-group-append">
                             <span class="input-group-text">
@@ -194,7 +194,34 @@
             </div>
         </div>
         {{-- @endif --}}
+        <div class="col-sm-12 col-sm-12" id="reject_note">
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Catatan Penolakan') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    <textarea class="form-control" id="reject_notes" value ="{{ $detail->reject_notes }}" name="reject_notes" disabled>{{$detail->reject_notes}}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-sm-12">
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Diajukan Oleh') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    @php
+                        $data = strip_tags($detail->createsByRaw());
+                        $data = trim($data);
+                    @endphp
+                    <input class="form-control" type="text" name="created_by" value="{{ preg_replace('/\s+/', ' ', $data) }}" readonly>
+                </div>
+            </div>
+        </div>
+
     </div>
+
 @endsection
 
 @push('scripts')

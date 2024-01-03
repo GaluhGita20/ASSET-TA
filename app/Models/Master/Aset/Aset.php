@@ -41,20 +41,18 @@ class Aset extends Model
 
     public function scopeGrid($query)
     {
-        return $query->orderBy('jenis_aset');
+        return $query->latest();
     }
 
     public function scopeFilters($query)
     {
         return $query->filterBy(['name','jenis_aset'])
-        ->when(
-            $jenis_jenis_aset = request()->jenis_jenis_aset,
-            function ($q) use ($jenis_jenis_aset){
-                $q->whereHas('jenis_aset', function ($qq) use ($jenis_jenis_aset){
-                    $qq->where('jenis_aset', $jenis_jenis_aset);
-                });
-            }
-        )
+        // ->when(
+        //     $jenis_jenis_aset = request()->name,
+        //     function ($q) use ($jenis_jenis_aset){
+        //         $q->where('name','LIKE', '%' . $jenis_jenis_aset . '%');
+        //     }
+        // )
          ->latest();
     }
 

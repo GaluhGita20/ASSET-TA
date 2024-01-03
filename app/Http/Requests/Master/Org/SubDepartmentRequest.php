@@ -17,4 +17,12 @@ class SubDepartmentRequest extends FormRequest
 
         return $rules;
     }
+
+    public function messages(){
+        return [
+            'parent_id.required' => 'Nama Parent Departemen Harus Diisi.',
+            'name.required' => 'Nama Harus Diisi.',
+        ];
+    }
+    
 }

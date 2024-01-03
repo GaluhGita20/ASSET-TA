@@ -65,6 +65,22 @@
 			</select>
 		</div>
 	</div>
+	<div class="form-group row">
+		<label class="col-md-3 col-form-label">{{ __('Daerah') }}</label>
+		<div class="col-md-9 parent-group">
+			<select name="district_id" class="form-control base-plugin--select2-ajax district_id"
+				data-url="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+				data-url-origin="{{ rut('ajax.selectDistrict', ['city_id']) }}"
+				placeholder="{{ __('Pilih Salah Satu') }}" disabled required>
+				<option value="">{{ __('Pilih Salah Satu') }}</option>
+				@if (!empty($record->district_id))
+					<option value="{{ $record->district_id }}" selected>{{ $record->daerah->name }}</option>
+				@endif
+			</select>
+		</div>
+	</div>
+
 @endsection
+
 @section('buttons')
 @endsection

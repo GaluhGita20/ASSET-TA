@@ -8,6 +8,7 @@ use App\Models\Globals\Notification;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Coa\COA;
 use App\Models\Master\Aset\Aset;
+use App\Models\Master\Location\Location;
 use App\Models\Master\Pengadaan\Pengadaan;
 use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Master\Dana\Dana;
@@ -186,6 +187,11 @@ class AjaxController extends Controller
 
     public function selectStruct($search, Request $request)
     {
+        $imKepalaDepartemen =$request->input('departemen_id');
+        if($imKepalaDepartemen){
+            $search = 'parent_subsection';
+        }   
+
         $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
         switch ($search) {
             case 'all':
@@ -226,15 +232,34 @@ class AjaxController extends Controller
 
         $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
         $i = 0;
-        foreach ($levels as $level) {
-            if ($items->where('level', $level)->count()) {
-                foreach ($items->where('level', $level) as $item) {
-                    $results[$i]['text'] = strtoupper($item->show_level);
-                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+        
+        if($imKepalaDepartemen){
+            foreach ($levels as $level) {
+                if ($items->where('level', $level)->count()) {
+                    foreach ($items->where('level', $level) as $item) {
+                        if($item->parent_id == $request->input('departemen_id') ){
+                           // $results[$i]['text'] = strtoupper($item->show_level);
+                            $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                        }
+                    }
+                    $i++;
                 }
-                $i++;
+            }
+            $departemen  = OrgStruct::where('id',$imKepalaDepartemen)->first();
+            array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+           // $results[] = ['id' => $departemen->id, 'text' => $departemen->name];
+        }else{
+            foreach ($levels as $level) {
+                if ($items->where('level', $level)->count()) {
+                    foreach ($items->where('level', $level) as $item) {
+                        $results[$i]['text'] = strtoupper($item->show_level);
+                        $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                    }
+                    $i++;
+                }
             }
         }
+        
         return response()->json(compact('results', 'more'));
     }
 
@@ -414,9 +439,28 @@ class AjaxController extends Controller
 
     public function selectCoa($search, Request $request){
         $items = COA::keywordBy('nama_akun')->orderBy('nama_akun');
+        // $search = $request->input('coa_id');
         switch ($search) {
             case 'all':
                 $items = $items;
+                break;
+            case 'a':
+                $items = $items->where('tipe_akun','KIB A');
+                break;
+            case 'b':
+                $items = $items->where('tipe_akun','KIB B');
+                break;
+            case 'c':
+                $items = $items->where('tipe_akun','KIB C');
+                break;
+            case 'd':
+                $items = $items->where('tipe_akun','KIB D');
+                break;
+            case 'e':
+                $items = $items->where('tipe_akun','KIB E');
+                break;
+            case 'f':
+                $items = $items->where('tipe_akun','KIB F');
                 break;
             default:
                 $items = $items->whereNull('id');
@@ -438,7 +482,7 @@ class AjaxController extends Controller
             if ($items->where('tipe_akun', $tipe_akun)->count()) {
                 foreach ($items->where('tipe_akun', $tipe_akun) as $item) {
                     $results[$i]['text'] = strtoupper($item->show_tipe_akun);
-                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->nama_akun];
+                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->nama_akun.' ( '.$item->kode_akun.' ) '];
                 }
                 $i++;
             }
@@ -488,6 +532,14 @@ class AjaxController extends Controller
     public function selectCity($search, Request $request){
         $req = $request->input('province_id');
         $items = City::where('province_id',$req);
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
+    public function selectRoom($search, Request $request){
+        $req = $request->input('departemen_id');
+     //   dd($req);
+        $items = Location::where('departemen_id',$req);
         $items = $items->paginate();
         return $this->responseSelect2($items, 'name', 'id');
     }

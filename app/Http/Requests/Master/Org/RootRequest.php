@@ -17,4 +17,14 @@ class RootRequest extends FormRequest
 
         return $rules;
     }
+
+
+    public function messages(){
+        return [
+            'name.required' => 'Nama Harus Harus Diisi.',
+            'phone.required' => 'Nomor Telpon Harus Diisi.',
+            'adress.required' => 'Alamat Harus Diisi.',
+        ];
+    }
+
 }

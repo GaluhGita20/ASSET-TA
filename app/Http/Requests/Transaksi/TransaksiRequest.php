@@ -58,8 +58,8 @@ class TransaksiRequest extends FormRequest
     {
         return [
             'trans_name.required' => 'Nama Transaksi wajib diisi.',
-            'ref_vendor.required' => 'Nama Vendor wajib diisi.',
-            'ref_jenis_pengadaan.unique' => 'Jenis Pengadaan wajib diisi.',
+            'vendor_id.required' => 'Nama Vendor wajib diisi.',
+            'jenis_pengadaan_id.required' => 'Jenis Pengadaan wajib diisi.',
             'no_spk.required' => 'Nomor Kontrak wajib diisi.',
             'spk_start_date.required' => 'Tanggal Mulai Kontrak wajib diisi.',
             'spk_end_date.required' => 'Tanggal Selesai Kontrak wajib diisi.',

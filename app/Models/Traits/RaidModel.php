@@ -136,6 +136,41 @@ trait RaidModel
                 </div>';
     }
 
+
+//==================================================
+    public function createsByRaw()
+    {
+        return '<div data-order="' . ($this->created_at) . '" class="text-left make-td-py-0">
+                    <small>
+                        <div class="text-nowrap">
+                            <i data-toggle="tooltip" title="' . \Str::title($this->creatosName()) . '"
+                                class="fa fa-user fa-fw fa-lg mr-2"></i>
+                            ' . \Str::title($this->creatosName()) . '
+                        </div>
+                        <div class="text-nowrap">
+                            <i data-toggle="tooltip" title="' . $this->created_at->format('d M Y, H:i') . '"
+                                class="fa fa-clock fa-fw fa-lg mr-2"></i>
+                            ' . $this->creatiosDate() . '
+                        </div>
+                    </small>
+                </div>';
+    }
+
+    public function creatosName()
+    {
+        // dd($this->creator);
+        return isset($this->creator) ? $this->creator->name : '[System]';
+    }
+
+    public function creatiosDate()
+    {
+        $date = $this->updated_at ?: $this->created_at;
+        return Carbon::parse($date)->translatedFormat('d M Y, H:i');
+    }
+
+//=====================================================
+
+
     public function rescheduleByRaw()
     {
         return '<div data-order="' . ($this->reschedule_at) . '" class="text-left make-td-py-0">

@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        {{-- <div class="form-group row">
             <div class="col-2 pr-0">
                 <label class="col-form-label">{{ __('Jenis Usulan') }}</label>
             </div>
@@ -57,7 +57,7 @@
                     <option value="no" {{ $record->is_repair =='no' ? 'selected':'-' }}>Pengajuan Pembelian Aset</option>
                 </select>
             </div>
-        </div>
+        </div> --}}
 
         <div class="form-group row">
             <div class="col-2 pr-0">
@@ -68,7 +68,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        {{-- <div class="form-group row">
             <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
             <div class="col-10 parent-group">
                 @foreach ($record->files as $file)
@@ -88,6 +88,6 @@
                 </div>
                 @endforeach
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>

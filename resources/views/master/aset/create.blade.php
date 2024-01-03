@@ -19,7 +19,7 @@
             <option value="Peralatan Mesin">Peralatan Mesin</option>
             <option value="Gedung Bangunan">Gedung Bangunan</option>
             <option value="Aset Tetap Lainya">Aset Tetap Lainya</option>
-            <option value="Jalan Irgasi Jaringan">Jalan Irigasi Jaringan</option>
+            <option value="Jalan Irigasi Jaringan">Jalan Irigasi Jaringan</option>
         </select>
         </div>
     </div> 

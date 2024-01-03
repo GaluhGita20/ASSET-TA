@@ -11,7 +11,7 @@
                         <option value="{{ $user->id }}" selected>
                             {{ $user->name . ' (' . $user->position->name ?? '' . ')' }}
                         </option>
-                    @endif
+                    @endifaf
                 </select>
             </div>
         </div> --}}
@@ -36,5 +36,6 @@
                 <textarea name="sentence_end" class="base-plugin--summernote" placeholder="{{ __('Penutupan') }}" data-height="200">{!! isset($record->sentence_end) ? $record->sentence_end : "<p>Demikian surat pengajuan ini kami buat, besar harapan agar dapat ditindak lanjuti dan direalisasikan, atas perhatiannya kami sampaikan terima kasih.</p>"  !!}</textarea>
             </div>
         </div>
+        
     </div>
 </div>

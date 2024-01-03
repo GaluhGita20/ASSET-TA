@@ -33,4 +33,14 @@ class CoaRequest extends FormRequest
         return $rules;
     }
 
+    public function messages(){
+        return [
+            'kode_akun.required' => 'Kode Akun Harus Diisi.',
+            'nama_akun.required' => 'Nama Akun Harus Diisi.',
+            'tipe_akun.required' => 'Tipe Akun Harus Diisi.',
+            'kode_akun.unique' => 'Kode Akun Ini Sudah Tersedia.',
+            'nama_akun.unique' => 'Nama Akun Ini Sudah Tersedia.',
+        ];
+    }
+
 }

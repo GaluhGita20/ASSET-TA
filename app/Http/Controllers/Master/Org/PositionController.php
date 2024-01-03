@@ -96,6 +96,7 @@ class PositionController extends Controller
 
     public function store(PositionRequest $request)
     {
+        // dd($request);
         $record = new Position;
         return $record->handleStoreOrUpdate($request);
     }

@@ -13,7 +13,7 @@ trait HasFiles
         return $this->morphMany(Files::class,'target')
                     ->when(!is_null($module), function ($q) use ($module) {
                         $q->whereModule($module);
-                    });
+        });
     }
 
     public function saveFilesByTemp($data, $module = null, $flag = null)

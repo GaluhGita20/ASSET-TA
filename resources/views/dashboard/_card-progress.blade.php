@@ -1,5 +1,5 @@
 <div class="col-12">
-	<div class="row card-progress-wrapper" data-url="{{ rut($routes.'.progress') }}">
+	<div class="row card-progress-wrapper" data-url="{{ rut($routes.'.progressAset') }}">
 		@php
 			$cards = collect(json_decode(json_encode($progress)));
 			$length = count($cards);
@@ -23,7 +23,7 @@
 									<div class="d-flex justify-content-between">
 										<span class="text-nowrap">Completed/Total</span>
 										<span class="text-nowrap">
-											<span class="completed">0</span>/<span class="total">0</span>
+											<span class="active">0</span>/<span class="not_-active">0</span>
 										</span>
 									</div>
 								</div>
@@ -66,8 +66,8 @@
 					if (resp.data && resp.data.length) {
 						$.each(resp.data, function (i, item) {
 							var card = wrapper.find('.card[data-name="'+item.name+'"]');
-							card.find('.completed').html(item.completed);
-							card.find('.total').html(item.total);
+							card.find('.active').html(item.active);
+							card.find('.not_active').html(item.not_active);
 							card.find('.percent-text').html(item.percent+'%');
 							card.find('.percent-bar').css('width', item.percent+'%');
 						});

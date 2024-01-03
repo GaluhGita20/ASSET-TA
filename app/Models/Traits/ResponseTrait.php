@@ -84,11 +84,28 @@ trait ResponseTrait
 		return $this->responseSuccess($params);
 	}
 
+	// public function rollback($params = [])
+	// {
+	// 	\DB::rollback();
+	// 	return $this->responseError($params);
+		
+	// }
+
 	public function rollback($params = [])
 	{
 		\DB::rollback();
-		return $this->responseError($params);
+
+		// Check if $params is an array and contains a 'message' key
+		if (is_array($params) && isset($params['message'])) {
+			$errorMessage = $params['message'];
+		} else {
+			// If $params is a string, or if 'message' key is not set, use it as is
+			$errorMessage = $params;
+		}
+
+		return $this->responseError($errorMessage);
 	}
+
 
 	// Saved
 	public function commitSaved($params = [])
@@ -98,14 +115,38 @@ trait ResponseTrait
 		return $this->responseSuccess(array_merge(compact('message'), $params));
 	}
 
+	// public function rollbackSaved($e, $params = [])
+	// {
+	// 	\DB::rollback();
+	// 	$message = __('base.error.saved');
+	// 	$errors = $e->getMessage();
+	// 	$traces = $e->getTrace();
+	// 	return $this->responseError(array_merge(compact('message', 'errors', 'traces'), $params));
+	// }
+
 	public function rollbackSaved($e, $params = [])
 	{
 		\DB::rollback();
+		
+		// Inisialisasi pesan dan error dengan nilai default
 		$message = __('base.error.saved');
-		$errors = $e->getMessage();
-		$traces = $e->getTrace();
-		return $this->responseError(array_merge(compact('message', 'errors', 'traces'), $params));
+		$errors = $e; // Set nilai errors dengan nilai $e
+
+		// Periksa apakah $e adalah objek pengecualian
+		if ($e instanceof Exception) {
+			// Jika $e adalah objek pengecualian, ambil pesan kesalahan dari objek tersebut
+			$errors = $e->getMessage();
+		}
+
+		// Dapatkan trace jika $e adalah objek pengecualian
+		$traces = ($e instanceof Exception) ? $e->getTrace() : [];
+
+		// Gabungkan data untuk dikirim ke metode responseError
+		$data = array_merge(compact('message', 'errors', 'traces'), $params);
+
+		return $this->responseError($data);
 	}
+
 
 	// Deleted
 	public function commitDeleted($params = [])

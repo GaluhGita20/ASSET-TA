@@ -123,10 +123,23 @@
                                         @else
                                             @foreach ($orders = $menu->flows()->get()->groupBy('order') as $i => $flows)
                                                 @foreach ($flows as $j => $flow)
-                                                    <span
-                                                        class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
+                                                    <span class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
                                                         data-toggle="tooltip"
-                                                        title="{{ $flow->show_type }}">{{ $flow->role->name }}</span>
+                                                        @if($flow->role->name == 'Umum')
+                                                            title="{{ $flow->show_type }}">Departemen
+                                                        @else 
+                                                            title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                        @endif
+                                                    </span>
+                                                
+                                                    {{-- <span
+                                                        class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
+                                                        data-toggle="tooltip"  {{  $flow->role->name == 'Umum'}}  ?? title="{{ $flow->show_type }}">Departemen
+                                                        @else 
+                                                            title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                        @endif
+                                                    </span> --}}
+
                                                     @if (!($i === $orders->keys()->last() && $j === $flows->keys()->last()))
                                                         <i class="fas fa-angle-double-right text-muted mx-2"></i>
                                                     @endif

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use Illuminate\Http\Request;
+use App\Models\Inventaris\Aset;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -169,6 +170,81 @@ class DashboardController extends Controller
             'data' => $cards
         ]);
     }
+
+
+
+    public function progressAset(Request $request)
+    {
+
+        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB A')->count();
+        $active = Aset::where('status', 'not active')->where('type','KIB A')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+
+        $cards[] = [
+            'name' => 'Aset Tanah',
+            'not_active' => $not_active,
+            'active' => $active,
+            // 'percent' => $pembelian_percent,
+        ];
+
+        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB B')->count();
+        $active = Aset::where('status', 'not active')->where('type','KIB B')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+
+        $cards[] = [
+            'name' => 'Aset Peralatan Mesin',
+            'not_active' => $not_active,
+            'active' => $active,
+            // 'percent' => $pembelian_percent,
+        ];
+
+        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB C')->count();
+        $active = Aset::where('status', 'not active')->where('type','KIB C')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+
+        $cards[] = [
+            'name' => 'Aset Gedung Bangunan',
+            'not_active' => $not_active,
+            'active' => $active,
+            // 'percent' => $pembelian_percent,
+        ];
+
+        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB D')->count();
+        $active = Aset::where('status', 'not active')->where('type','KIB D')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+
+        $cards[] = [
+            'name' => 'Aset Jalan Irigasi Jaringan',
+            'not_active' => $not_active,
+            'active' => $active,
+            // 'percent' => $pembelian_percent,
+        ];
+
+        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB E')->count();
+        $active = Aset::where('status', 'not active')->where('type','KIB E')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+
+        $cards[] = [
+            'name' => 'Aset Tetap Lainya',
+            'not_active' => $not_active,
+            'active' => $active,
+            // 'percent' => $pembelian_percent,
+        ];
+
+        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB F')->count();
+        $active = Aset::where('status', 'not active')->where('type','KIB F')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+
+        $cards[] = [
+            'name' => 'Aset Kontruksi Pembangunan',
+            'not_active' => $not_active,
+            'active' => $active,
+            // 'percent' => $pembelian_percent,
+        ];
+
+        // data dijadikan bentuk json 
+        return response()->json(
+            [
+                'data' => $cards
+            ]
+        );
+    }
+
+
 
     public function chartFinding(Request $request)
     {
@@ -387,5 +463,460 @@ class DashboardController extends Controller
         }
 
         return $obj;
+    }
+
+
+    public function chartAset(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+
+        // ['year' => $request->stage_year ?? date('Y')]: Ini adalah array yang berisi elemen 'year' yang akan digabungkan (merge) dengan data dalam permintaan ($request). 'year' adalah kunci (key) dalam array yang akan digunakan untuk menyimpan nilai.
+
+        // $request->stage_year: Merupakan cara untuk mengakses nilai dari elemen 'stage_year' dalam objek permintaan ($request). Jadi, ini mencoba untuk mendapatkan nilai 'stage_year' dari permintaan.
+
+        // ??: Ini adalah operator null coalescing. Jika nilai sebelumnya ($request->stage_year) adalah null atau tidak terdefinisi, maka nilai setelah operator ?? (date('Y')) akan digunakan sebagai nilai alternatif.
+
+        // date('Y'): Ini adalah fungsi PHP yang mengembalikan tahun saat ini dalam format 4 digit. Misalnya, jika sekarang tahun 2023, maka fungsi ini akan mengembalikan string '2023'.
+
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBA = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB A')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBB = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB B')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBC = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB C')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBD = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB D')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBE = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB E')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBF = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB F')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBA'] = array_fill(0, 12, 0);
+        $temp_data['KIBB'] = array_fill(0, 12, 0);
+        $temp_data['KIBC'] = array_fill(0, 12, 0);
+        $temp_data['KIBD'] = array_fill(0, 12, 0);
+        $temp_data['KIBE'] = array_fill(0, 12, 0);
+        $temp_data['KIBF'] = array_fill(0, 12, 0);
+
+        foreach ($KIBA as $row) {
+            $temp_data['KIBA'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBB as $row) {
+            $temp_data['KIBB'][$row->month-1] = $row->total_not_completed;
+        }
+
+        foreach ($KIBC as $row) {
+            $temp_data['KIBC'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBD as $row) {
+            $temp_data['KIBD'][$row->month-1] = $row->total_not_completed;
+        }
+
+        foreach ($KIBE as $row) {
+            $temp_data['KIBE'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBF as $row) {
+            $temp_data['KIBF'][$row->month-1] = $row->total_not_completed;
+        }
+
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB A',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA'],
+                ],
+                [
+                    'name' => 'Aset KIB B',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBB'],
+                ],
+                [
+                    'name' => 'Aset KIB C',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBC'],
+                ],
+                [
+                    'name' => 'Aset KIB D',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBD'],
+                ],
+                [
+                    'name' => 'Aset KIB E',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBE'],
+                ],
+                [
+                    'name' => 'Aset KIB F',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBF'],
+                ],
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60','#28A58F','#91176F','#12789F','#A8C720'],
+        ];
+    }
+
+
+    public function chartAsetKIBA(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBA1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB A')->where('status','active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB A')->where('status','not active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBA1'] = array_fill(0, 12, 0);
+        $temp_data['KIBA2'] = array_fill(0, 12, 0);
+
+        foreach ($KIBA1 as $row) {
+            $temp_data['KIBA1'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBA2 as $row) {
+            $temp_data['KIBA2'][$row->month-1] = $row->total_not_completed;
+        }
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB A Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA1'],
+                ],
+                [
+                    'name' => 'Aset KIB A Not Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA2'],
+                ],
+
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60'],
+        ];
+    }
+
+
+    public function chartAsetKIBB(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBB1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB B')->where('status','active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBB2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB B')->where('status','not active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBB1'] = array_fill(0, 12, 0);
+        $temp_data['KIBB2'] = array_fill(0, 12, 0);
+
+        foreach ($KIBB1 as $row) {
+            $temp_data['KIBB1'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBB2 as $row) {
+            $temp_data['KIBB2'][$row->month-1] = $row->total_not_completed;
+        }
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB B Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBB1'],
+                ],
+                [
+                    'name' => 'Aset KIB B Not Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBB2'],
+                ],
+
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60'],
+        ];
+    }
+
+    public function chartAsetKIBC(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBA1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB C')->where('status','active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB C')->where('status','not active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBA1'] = array_fill(0, 12, 0);
+        $temp_data['KIBA2'] = array_fill(0, 12, 0);
+
+        foreach ($KIBA1 as $row) {
+            $temp_data['KIBA1'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBA2 as $row) {
+            $temp_data['KIBA2'][$row->month-1] = $row->total_not_completed;
+        }
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB C Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA1'],
+                ],
+                [
+                    'name' => 'Aset KIB C Not Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA2'],
+                ],
+
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60'],
+        ];
+    }
+
+
+    public function chartAsetKIBD(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBA1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB D')->where('status','active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB D')->where('status','not active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBA1'] = array_fill(0, 12, 0);
+        $temp_data['KIBA2'] = array_fill(0, 12, 0);
+
+        foreach ($KIBA1 as $row) {
+            $temp_data['KIBA1'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBA2 as $row) {
+            $temp_data['KIBA2'][$row->month-1] = $row->total_not_completed;
+        }
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB D Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA1'],
+                ],
+                [
+                    'name' => 'Aset KIB D Not Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA2'],
+                ],
+
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60'],
+        ];
+    }
+
+
+    public function chartAsetKIBE(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBA1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB E')->where('status','active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB E')->where('status','not active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBA1'] = array_fill(0, 12, 0);
+        $temp_data['KIBA2'] = array_fill(0, 12, 0);
+
+        foreach ($KIBA1 as $row) {
+            $temp_data['KIBA1'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBA2 as $row) {
+            $temp_data['KIBA2'][$row->month-1] = $row->total_not_completed;
+        }
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB E Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA1'],
+                ],
+                [
+                    'name' => 'Aset KIB E Not Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA2'],
+                ],
+
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60'],
+        ];
+    }
+
+    public function chartAsetKIBF(Request $request)
+    {
+        $request->merge(['year' => $request->stage_year ?? date('Y')]);
+        $year = $request->stage_year;
+        $title = '';
+
+        $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $KIBA1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB F')->where('status','active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
+        ->where('type', 'KIB F')->where('status','not active')
+        ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        $temp_data['KIBA1'] = array_fill(0, 12, 0);
+        $temp_data['KIBA2'] = array_fill(0, 12, 0);
+
+        foreach ($KIBA1 as $row) {
+            $temp_data['KIBA1'][$row->month-1] = $row->total_completed;
+        }
+
+
+        foreach ($KIBA2 as $row) {
+            $temp_data['KIBA2'][$row->month-1] = $row->total_not_completed;
+        }
+
+        return [
+            'title' => ['text' => $title],
+            'series' => [
+                [
+                    'name' => 'Aset KIB F Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA1'],
+                ],
+                [
+                    'name' => 'Aset KIB F Not Active',
+                    'type' => 'column',
+                    'data' => $temp_data['KIBA2'],
+                ],
+
+            ],
+            'xaxis' => ['categories' => $months],
+            'colors' => ['#28C76F', '#F64E60'],
+        ];
     }
 }

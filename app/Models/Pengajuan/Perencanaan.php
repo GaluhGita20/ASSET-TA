@@ -44,10 +44,10 @@ class Perencanaan extends Model
     /*******************************
      ** MUTATOR
      *******************************/
-    public function setDateAttribute($value)
-    {
-        $this->attributes['date'] = Carbon::createFromFormat('d/m/Y', $value);
-    }
+    // public function setDateAttribute($value)
+    // {
+    //     $this->attributes['date'] = Carbon::createFromFormat('d/m/Y', $value);
+    // }
 
     /*******************************
      ** ACCESSOR
@@ -83,26 +83,21 @@ class Perencanaan extends Model
     public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(
-            !in_array($user->position->location->id, [13]),
-           // !in_array($user->position->location->level,['departemen']),
-            function ($q) use ($user) {
-                $q->when(
-                    $user->position->imKepalaDeparetemen(),
+        return $query->when(!in_array($user->position->location->id, [13]), 
+            function ($q) use ($user) { 
+                $q->when($user->position->imKepalaDeparetemen(), 
                     function ($qq) use ($user) {
-                        $qq->whereIn('struct_id', $user->position->location->getIdsWithChild());
+                        $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
                     },
                     function ($qq) use ($user) {
-                        $qq->where('struct_id', $user->position->location->id);
+                        $qq->where('struct_id', $user->position->location->id); 
                     },
                 )->orWhereHas('approvals', function ($q) use ($user) {
                     $q->when($user->id, function ($qq) use ($user) {
-                        // If user_id is filled
-                        $qq->where('user_id', $user->id);
-                    }, function ($qq) use ($user) {
-                        // If user_id is not filled
+                         $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
+                    },function ($qq) use ($user) {
                         $qq->orWhereIn('role_id', $user->getRoleIds())
-                           ->orWhere('position_id', $user->position->id);
+                        ->orWhere('position_id', $user->position->id);
                     });
                 });
             }
@@ -118,7 +113,8 @@ class Perencanaan extends Model
 
     public function scopeFilters($query)
     {
-        return $query->latest();
+        return $query->filterBy(['code','procurement_year'])
+        ->filterBy(['struct_id'])->latest();
         // $position = auth()->user()->position_id;
         // $departemen = Position::with('location')->where('id',$position)->first();
         
@@ -204,22 +200,63 @@ class Perencanaan extends Model
     /*******************************
      ** SAVING
      *******************************/
+    public function handleStore($request,$statusOnly = false){
+        $this->beginTransaction();
+        try {
+            
+            if($request->procurement_year < now()->format('Y')){
+                return $this->rollback(
+                    [
+                        'message' => 'Tahun Usulan Sudah Lewat!'
+                    ]
+                );
+            }
+            $idMax = Perencanaan::where('struct_id',$request->struct_id)->count('id');
+            $dep = OrgStruct::where('id',$request->struct_id)->first('name');
+            $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 2, '0', STR_PAD_LEFT);
+            
+            $this->code = $format_angka.'/'.$dep->name;
+            
+            $this->status = 'draft';
+            $time = now()->format('Y-m-d');
+            $this->date =  $time;
+
+            
+            $data = $request->all();
+            $this->fill($data);
+            $this->save();
+            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+            // dd($this->struct);
+            // dd($data);
+            $this->saveLogNotify();
+
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
     public function handleStoreOrUpdate($request, $statusOnly = false)
     {
         $this->beginTransaction();
         try {
-            $data = $request->all();
-            $this->fill($data);
-            $this->status = 'draft';
-            $this->save();
-            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
-            $this->saveLogNotify();
-           // $this->cc()->sync($request->cc ?? []);
+            if($request->procurement_year < now()->format('Y')){
+                return $this->rollback(
+                    [
+                        'message' => 'Tahun Usulan Sudah Lewat!'
+                    ]
+                );
+            }
+            if($request->is_submit == 0 && $request->regarding != null){
+                $data = $request->all();
+                $this->fill($data);
+                $this->save();
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                $this->saveLogNotify();
+            }
 
-            // dd($request->is_submit);
             $data = PerencanaanDetail::Where('perencanaan_id',$this->id)->count();
-           // dd($data);
-            if ($request->is_submit) {
+            if ($request->is_submit == 1) {
                 if($data > 0){
                     $this->handleSubmitSave($request);
                 }else{
@@ -230,6 +267,7 @@ class Perencanaan extends Model
                     );
                 }
             }
+
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -237,11 +275,74 @@ class Perencanaan extends Model
         }
     }
 
+    public function handleDetailApproval($record){
+        $data = PerencanaanDetail::where('perencanaan_id',$record->id)->get();
+        $validasi = PerencanaanDetail::where('perencanaan_id',$record->id)->count('id');
+        
+        //perencanaan
+        $approval1 = $record->whereHas('approvals', function ($q) use ($record) {
+            $q->where('target_id',$record->id)->where('status','!=','approved')->where('role_id',5);
+        })->count(); //departemen belum approved maka nilai nya 1
+
+        $approval2 = $record->whereHas('approvals', function ($q) use ($record) {
+            $q->where('target_id',$record->id)->where('status','!=','approved')->where('role_id',3);
+        })->count(); //departemen suddah approved dan perencanaan belum approved
+
+        $approval3 = $record->whereHas('approvals', function ($q) use ($record) {
+            $q->where('target_id',$record->id)->where('status','!=','approved')->where('role_id',2);
+        })->count();
+
+        //$approval1 
+        $flag = 0;
+        $list_error[] =[];
+       // dd($data);
+        foreach($data as $datas){
+            if($datas->status == 'draf' && ($approval1 > 0)){ //data masih baru
+                $flag = $flag + 0;
+            }elseif($datas->status == 'waiting purchase' && ($approval1 > 0)){ //data baru di reject
+                $flag = $flag + 0;
+            }elseif($datas->status =='waiting purchase' && ($approval2 > 0) && ($approval1 == 0) ){
+               $flag = $flag + 0;
+            }elseif($datas->status =='waiting purchase' && ($approval3 > 0) && ($approval2 == 0) && ($approval1 == 0) ){
+                $flag = $flag + 0;
+            }else{
+                $flag = $flag + 1;
+                $list_error[] = ['text' => $datas->asetd->name];
+            }
+        }
+      
+        if($flag <= 0){
+        return $data = [
+                'status' => 'ok',
+                'message' => 'null',
+        ];
+        }else{
+            $datak = implode(', ', array_column($list_error, 'text'));
+            return $data = [
+                'status' => 'gagal',
+                'message' => $datak,
+            ];
+           // return response()->json(['message' => 'Silahkan Lengkapi Data Approval: '], 400);
+            // return $this->rollback([
+            //     'message' => 'Silahkan Lengkapi Data Approval:',
+            // ]);
+        }
+
+    }
+
     public function handleDetailStoreOrUpdate($request, PerencanaanDetail $detail)
     {
         $this->beginTransaction();
         try {
-
+            $flag = PerencanaanDetail::where('perencanaan_id', $this->id)->where('ref_aset_id',$request->ref_aset_id)->where('id','<>',$detail->id)->count();
+            if($flag > 0){
+                return $this->rollback(
+                    [
+                        'message' => 'Refrensi Aset Sudah Digunakan Untuk Perencanaan Ini!'
+                    ]
+                );
+            }
+            
             $detail->fill($request->all());
             $value1 = str_replace(['.', ','],'',$request->HPS_unit_cost);
             $detail->HPS_unit_cost = (int)$value1;
@@ -261,12 +362,57 @@ class Perencanaan extends Model
             $value6 = str_replace(['.', ','],'',$request->qty_agree);
             $detail->qty_agree = (int)$value6;
 
-            $this->details()->save($detail);
-            $this->status = 'draft';
-            $this->save();
-            $this->saveLogNotify();
+            
+            if($request->is_submit == 1){
+                if($value6 > 0 && $value6 != $value5 && $request->sumber_biaya_id == null){
+                    return $this->rollback(
+                        [
+                            'message' => 'Silahkan isi Sumber Pembiayaan !'
+                        ]
+                    );
+                }
+    
+                if($value6 == $value5 && $request->sumber_biaya_id == null){
+                    return $this->rollback(
+                        [
+                            'message' => 'Silahkan isi Sumber Pembiayaan !'
+                        ]
+                    );
+                }
+                if($value6 < $value5 && $request->reject_notes == null){
+                    return $this->rollback(
+                        [
+                            'message' => 'Silahkan Berikan Alasan Penolakan Untuk '.$value5-$value6.' Usulan Ditolak!'
+                        ]
+                    );
+                }else{
+                    $detail->status = 'waiting purchase';
+                    if($value6 == $value5){
+                        $detail->reject_notes = null;
+                    }else{
+                        $detail->reject_notes = $request->reject_notes;
+                    }
 
-            return $this->commitSaved();
+                    if($value6 == 0){
+                        $detail->sumber_biaya_id = null;
+                    }
+
+                    $this->details()->save($detail);
+                    $this->save();
+                    
+                    $this->saveLogNotify();
+                    return $this->commitSaved();
+                }
+            }else{
+                $detail->reject_notes = null;
+                $detail->sumber_biaya_id = null;
+                $this->details()->save($detail);
+                $this->save();
+                $this->saveLogNotify();
+    
+                return $this->commitSaved();
+            }
+
 
         } catch (\Exception $e) {
             return $this->rollbackSaved($e);
@@ -278,6 +424,8 @@ class Perencanaan extends Model
         $this->beginTransaction();
         try {
             // dd('tes');
+            $data = PerencanaanDetail::where('perencanaan_id', $this->id)->update(['status' => 'draf']);
+            // dd($data);
             $this->rejectApproval($request->module, $request->note);
             $this->update(['status' => 'rejected']);
             $this->saveLogNotify();
@@ -324,9 +472,10 @@ class Perencanaan extends Model
         try {
 
             $data = PerencanaanDetail::Where('perencanaan_id',$this->id)->count();
-           // dd($data);
+           
             if($data > 0){
                 $this->update(['status' => 'waiting.approval']);
+                //dd($request->module);
                 $this->generateApproval($request->module);
                 $this->saveLogNotify();
                 $redirect = route(request()->get('routes') . '.index');
@@ -362,36 +511,40 @@ class Perencanaan extends Model
     {
         $this->beginTransaction();
         try {
-            if ($this->status === 'waiting.approval.revisi') {
-                $this->approveApproval($request->module . '_upgrade');
-                if ($this->firstNewApproval($request->module . '_upgrade')) {
-                    $this->update(['status' => 'waiting.approval.revisi']);
-                    $this->saveLogNotify();
+            // dd($request);
+                if ($this->status === 'waiting.approval.revisi') {
+                    $this->approveApproval($request->module . '_upgrade');
+                    if ($this->firstNewApproval($request->module . '_upgrade')) {
+                        $this->update(['status' => 'waiting.approval.revisi']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(
+                            [
+                                'status' => 'draft',
+                                'version' => $this->version + 1,
+                            ]
+                        );
+                        $this->saveLogNotify();
+                    }
                 } else {
-                    $this->update(
-                        [
-                            'status' => 'draft',
-                            'version' => $this->version + 1,
-                        ]
-                    );
-                    $this->saveLogNotify();
+                    $this->approveApproval($request->module);
+                    if ($this->firstNewApproval($request->module)) {
+                        $this->update(['status' => 'waiting.approval']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(['status' => 'completed']);
+                        $this->saveLogNotify();
+                       // $this->_generateReport('completed');
+                    }
                 }
-            } else {
-                $this->approveApproval($request->module);
-                if ($this->firstNewApproval($request->module)) {
-                    $this->update(['status' => 'waiting.approval']);
-                    $this->saveLogNotify();
-                } else {
-                    $this->update(['status' => 'completed']);
-                    $this->saveLogNotify();
-                   // $this->_generateReport('completed');
-                }
-            }
-
-            $redirect = route(request()->get('routes') . '.index');
-            return $this->commitSaved(compact('redirect'));
+    
+                $redirect = route(request()->get('routes') . '.index');
+                return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
-            return $this->rollbackSaved($e);
+            $customMessage = 'This is a custom error message';
+            return $this->rollback($customMessage);
+          //  return $this->rollbackSaved($e);
+            
         }
     }
 
@@ -471,6 +624,9 @@ class Perencanaan extends Model
                         'url' => route($routes . '.show', $this->id),
                         'user_ids' => [$this->created_by],
                     ]);
+
+                    $pesan = 'Menolak Pengajuan ' . $data;
+                    $this->sendNotification($pesan);
                 } else {
                     $this->addLog('Menolak Revisi ' . $data . ' dengan alasan: ' . request()->get('note'));
 

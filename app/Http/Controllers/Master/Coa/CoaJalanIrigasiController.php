@@ -29,11 +29,11 @@ class CoaJalanIrigasiController extends Controller
                 'views' => $this->views,
                 'perms' => $this->perms,
                 'permission' => $this->perms . '.view',
-                'title' => 'Chart of Accounts Jalan dan Irigasi',
+                'title' => 'Chart of Accounts Jalan Irigasi Jaringan',
                 'breadcrumb' => [
                     'Data Master' => rut($this->routes . '.index'),
                     'Chart Of Accouts' => rut($this->routes . '.index'),
-                    'COA Jalan dan Irigasi' => rut($this->routes . '.index'),
+                    'COA Jalan Irigasi Jaringan' => rut($this->routes . '.index'),
                 ]
             ]
         );
@@ -42,7 +42,7 @@ class CoaJalanIrigasiController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Coa::grid()->where('tipe_akun','=','KIB E')->filters()->dtGet();
+        $records = Coa::grid()->where('tipe_akun','=','KIB D')->filters()->dtGet();
 
         return DataTables::of($records)
             ->addColumn(

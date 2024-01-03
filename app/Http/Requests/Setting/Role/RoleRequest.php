@@ -13,4 +13,11 @@ class RoleRequest extends FormRequest
             'name' => 'required|string|max:255|unique:sys_roles,name,'.$id,
         ];
     }
+
+    public function messages(){
+        return [
+            'name.required' => 'Nama Harus Diisi.',
+            'name.unique' => 'Nama Role Sudah Digunakan.',
+        ];
+    } 
 }

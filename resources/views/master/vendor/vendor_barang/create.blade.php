@@ -5,6 +5,7 @@
 @section('modal-body')
 	@method('POST')
     <div class="row">
+        <input type="hidden" name="status" value="waiting purchase">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                     <label class="col-sm-12 col-md-3 col-form-label">{{ __('Vendor') }}</label>
@@ -14,6 +15,7 @@
             </div>
         </div>
     </div>
+
     <div class="form-group row">  
         <label class="col-md-3 col-form-label">{{ __('Jenis Usaha') }}</label>
         <div class="col-md-9 parent-group">
@@ -27,34 +29,9 @@
 
                 placeholder="{{ __('Pilih Beberapa') }}" required>
                 <option value="">{{ __('Pilih Beberapa') }}</option>
-
             </select>
         </div>
     </div>
-
-    {{-- // Simpan data vendor
-    $vendor = Vendor::create([
-        'nama_vendor' => $request->input('vendor_name'),
-    ]);
-
-    // Simpan relasi jenis usaha
-    $vendor->jenisUsaha()->attach($request->input('jenis_usaha')); --}}
-
-    {{-- <div class="form-group row">
-        <label class="col-md-2 col-form-label">{{ __('Tembusan') }}</label>
-        <div class="col-md-10 parent-group">
-            <select name="cc[]" class="form-control base-plugin--select2-ajax"
-                data-url="{{ route('ajax.selectUser', ['search' => 'level_department']) }}" multiple
-                placeholder="{{ __('Pilih Beberapa') }}">
-                <option value="">{{ __('Pilih Beberapa') }}</option>
-                @foreach ($record->cc as $user)
-                    <option value="{{ $user->id }}" selected>
-                        {{ $user->name . ' (' . $user->position->name ?? '' . ')' }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-    </div> --}}
 
     <div class="row">
         <div class="col-sm-12 col-sm-12">
@@ -65,12 +42,6 @@
                 </div>
             </div>
 
-            {{-- <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Rekening') }}</label>
-                <div class="col-sm-12 col-md-9 parent-group">
-                    <input name="kode_rekening" type="text" class="form-control" placeholder="{{ __('Nomor Rekening') }}">
-                </div>
-            </div> --}}
 
             <div class="form-group row">
                 <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}</label>

@@ -33,4 +33,12 @@ class PengadaanRequest extends FormRequest
         return $rules;
     }
 
+    public function messages(){
+        return [
+            'name.required' => 'Nama Pengadaan Harus Diisi.',
+            'name.unique' => 'Nama Pengadaan Sudah Digunakan.',
+            'description.required' => 'Deskripsi Harus Diisi.',
+        ];
+    }
+
 }

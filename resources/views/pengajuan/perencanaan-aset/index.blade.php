@@ -11,7 +11,10 @@
                 data-placeholder="{{ __('Unit Kerja') }}" data-post="struct_id">
             </select>
         </div>
-        <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
+        <div class="col-4 col-sm-6 col-xl-3 pb-2 mr-n6">
+            <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Tahun Pengadaan') }}">
+        </div>
+        {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <div class="input-group">
                 <input name="date_start"
                     class="form-control base-plugin--datepicker date_start"
@@ -31,14 +34,17 @@
                     data-post="date_end"
                     >
             </div>
-        </div>
+        </div> --}}
     </div>
 @endsection
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
-		@include('layouts.forms.btnAdd')
-	@endif
+    @if(auth()->user()->roles[0]->name != 'Direksi')
+        @if (auth()->user()->checkPerms($perms.'.create'))
+            @include('layouts.forms.btnAdd')
+        @endif
+    @endif
 @endsection
+
 @section('buttons')
 @endsection
