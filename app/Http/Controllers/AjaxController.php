@@ -7,7 +7,9 @@ use App\Models\Auth\User;
 use App\Models\Globals\Notification;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Coa\COA;
-use App\Models\Master\Aset\Aset;
+use App\Models\Master\Aset\AsetRs;
+use App\Models\Pemeliharaan\PemeliharaanDetail;
+use App\Models\Inventaris\Aset;
 use App\Models\Master\Location\Location;
 use App\Models\Master\Pengadaan\Pengadaan;
 use App\Models\Pengajuan\PerencanaanDetail;
@@ -135,6 +137,25 @@ class AjaxController extends Controller
     public function selectLevelPosition($search, Request $request)
     {
         $items = LevelPosition::keywordBy('name')->orderBy('name');
+        switch ($search) {
+            case 'all':
+                $items = $items;
+                break;
+            case 'find':
+                return $items->find($request->id);
+            default:
+                $items = $items->whereNull('id');
+                break;
+        }
+
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'name', 'id');
+    }
+
+
+    public function selectRooms($search, Request $request)
+    {
+        $items = Location::keywordBy('name')->orderBy('name');
         switch ($search) {
             case 'all':
                 $items = $items;
@@ -422,6 +443,18 @@ class AjaxController extends Controller
                         );
                     }
                 );
+            case 'sarpras':
+                $items = $items->whereHas(
+                    'position',
+                    function ($q) {
+                        $q->whereHas(
+                            'location',
+                            function ($qq) {
+                                $qq->where('name', 'IPSRS');
+                            }
+                        );
+                    }
+                );
                 break;
             default:
                 $items = $items->whereNull('id');
@@ -493,7 +526,7 @@ class AjaxController extends Controller
 
 
     public function selectAsetRS($search, Request $request){
-        $items = Aset::keywordBy('name')->orderBy('jenis_aset');
+        $items = AsetRs::keywordBy('name')->orderBy('jenis_aset');
         switch ($search) {
             case 'all':
                 $items = $items;
@@ -525,6 +558,64 @@ class AjaxController extends Controller
         }
         return response()->json(compact('results', 'more'));
 
+    }
+
+    public function selectAsetKib($search, Request $request){
+        $pem = $request->input('pem');
+        $peliharaan = PemeliharaanDetail::with('pemeliharaan')->where('pemeliharaan_id', $pem)->orderBy('kib_id')->pluck('kib_id')->toArray();
+        //dd($peliharaan);
+        $excludedIds = $peliharaan; // ID aset yang tidak boleh tampil
+
+        $req = $request->input('lokasi');
+
+        $items = Aset::with('usulans')
+            ->where('condition', 'baik')
+            ->where('status', 'active')
+            ->whereNotIn('id',$peliharaan)
+            ->where(function ($query) use ($req) {
+                    $query->orWhere(function ($q) use ($req) {
+                        $q->whereHas('usulans', function ($qq) use ($req) {
+                            $qq->whereHas('perencanaan', function ($qqq) use ($req) {
+                                $qqq->where('struct_id', $req);
+                            });
+                        });
+                    })
+                    ->orWhere('location_hibah_aset', $req);
+            });
+
+
+
+
+        $items = $items->when(
+            $not = $request->not,
+            function ($q) use ($not) {
+                $q->where('id', '!=', $not);
+            }
+        )->get();
+
+        $results = [];
+        $more = false;
+
+        $jenis_asets = ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E','KIB F'];
+        $i = 0;
+        foreach ($jenis_asets  as $tipe_akun) {
+            if ($items->where('type', $tipe_akun)->count()) {
+                foreach ($items->where('type', $tipe_akun) as $item) {
+                    $results[$i]['text'] = strtoupper($item->type);
+                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->usulans->asetd->name];
+                }
+                $i++;
+            }
+        }
+
+        return response()->json(compact('results', 'more'));
+    }
+
+    public function  selectAsetItem($search, Request $request){
+        $req = $request->input('ids');
+        $items = Aset::where('id',$req);
+        $items = $items->paginate();
+        return $this->responseSelect2($items, 'merek_type_item', 'id');
     }
 
    

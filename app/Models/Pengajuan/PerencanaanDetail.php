@@ -4,7 +4,7 @@ namespace App\Models\Pengajuan;
 
 use App\Models\Model;
 use App\Models\Pengajuan\Perencanaan;
-use App\Models\Master\Aset\Aset;
+use App\Models\Master\Aset\AsetRs;
 use App\Models\Master\Dana\Dana;
 use App\Models\Transaksi\PembelianTransaksi;
 use Illuminate\Support\Facades\Validator;
@@ -16,12 +16,11 @@ use Illuminate\Support\Facades\DB;
 class PerencanaanDetail extends Model
 {
 
-    
-
     protected $table = 'trans_usulan_details';
 
     protected $fillable = [
         'perencanaan_id',
+        'trans_id',
         'ref_aset_id',
         'desc_spesification',
         'existing_amount',
@@ -83,7 +82,7 @@ class PerencanaanDetail extends Model
 
      public function asetd()
      {
-         return $this->belongsTo(Aset::class, 'ref_aset_id');
+         return $this->belongsTo(AsetRs::class, 'ref_aset_id');
      }
  
      public function danad()
@@ -111,6 +110,10 @@ class PerencanaanDetail extends Model
          return $this->belongsTo(Perencanaan::class, 'perencanaan_id');
      }
 
+     public function trans()
+     {
+         return $this->belongsTo(PembelianTransaksi::class, 'trans_id');
+     }
 
     /*******************************
      ** SCOPE
@@ -159,9 +162,6 @@ class PerencanaanDetail extends Model
             });
         })
         ->latest();
-
-        
-
     }
 
     /*******************************
@@ -204,7 +204,9 @@ class PerencanaanDetail extends Model
     {
         $this->beginTransaction();
         try { 
+
             $data = $request->all();
+          //  dd($data);
             $this->fill($data);
             $this->save();
 
@@ -296,69 +298,114 @@ class PerencanaanDetail extends Model
 
     }
 
+    // public function getDetailUsulan($id){ // ambil data detail usulan
+    //     $data = DB::table('trans_pivot_perencanaan_pengadaan')
+    //         ->where('detail_usulan_id', $id)
+    //         ->first();
+    //     if($data !=null){ //ambil data pembelian
+    //         $data1 = PembelianTransaksi::where('id',$data->pembelian_id)->pluck('id');
+    //         return $data1[0];
+    //     }else{
+    //         return 0;
+    //     }
+    // }
+
     public function getDetailUsulan($id){ // ambil data detail usulan
-        $data = DB::table('trans_pivot_perencanaan_pengadaan')
-            ->where('detail_usulan_id', $id)
-            ->first();
-        if($data !=null){ //ambil data pembelian
-            $data1 = PembelianTransaksi::where('id',$data->pembelian_id)->pluck('id');
-            return $data1[0];
-        }else{
-            return 0;
-        }
+        // $data = DB::table('trans_pivot_perencanaan_pengadaan')
+        //     ->where('detail_usulan_id', $id)
+        //     ->first();
+        $data = PerencanaanDetail::where('id',$id)->pluck('id');
+        // dd($data[0]);
+        return $data[0];
+        // if($data !=null){ //ambil data pembelian
+        //     $data1 = PembelianTransaksi::where('id',$data->pembelian_id)->pluck('id');
+        //     return $data1[0];
+        // }else{
+        //     return 0;
+        // }
     }
 
-    public function handleStoreEditListPembelian($idp){ // hadle edit detail transaksi data untuk hapus detail usulan
-       $this->beginTransaction();
-       try { 
-            if($idp != 0){ //hapus detail usulan pada data transaksi dalam kondisi edit
-                $flag = DB::table('trans_pivot_perencanaan_pengadaan')
-                   ->where('pembelian_id', $idp)
-                   ->count('pembelian_id');
+    // public function handleStoreEditListPembelian($idp){ // hadle edit detail transaksi data untuk hapus detail usulan
+    //    $this->beginTransaction();
+    //    try { 
+    //         if($idp != 0){ //hapus detail usulan pada data transaksi dalam kondisi edit
+    //             $flag = DB::table('trans_pivot_perencanaan_pengadaan')
+    //                ->where('pembelian_id', $idp)
+    //                ->count('pembelian_id');
    
-               if($flag > 1){
-                   DB::table('trans_pivot_perencanaan_pengadaan')
-                       ->where('detail_usulan_id', $this->id)
-                       ->where('pembelian_id',$idp)
-                       ->delete();
+    //            if($flag > 1){
+    //                DB::table('trans_pivot_perencanaan_pengadaan')
+    //                    ->where('detail_usulan_id', $this->id)
+    //                    ->where('pembelian_id',$idp)
+    //                    ->delete();
    
-                   $this->status = 'waiting purchase';
-                   $this->save();
+    //                $this->status = 'waiting purchase';
+    //                $this->save();
    
-                   return $this->commitDeleted([
-                       'redirect' => route('transaksi.pengadaan-aset' . '.edit', $idp)
-                   ]);
+    //                return $this->commitDeleted([
+    //                    'redirect' => route('transaksi.pengadaan-aset' . '.edit', $idp)
+    //                ]);
    
-               }else{
-                   return $this->rollback(
-                       [
-                           'message' => 'Data Detail Usulan Tidak Boleh Kosong!'
-                       ]
-                   );
-               }
-            }else{ //hapus detail usulan pada data transaksi dalam dalam kondisi create
+    //            }else{
+    //                return $this->rollback(
+    //                    [
+    //                        'message' => 'Data Detail Usulan Tidak Boleh Kosong!'
+    //                    ]
+    //                );
+    //            }
+    //         }else{ //hapus detail usulan pada data transaksi dalam dalam kondisi create
   
-                $sesi = session('usulan_id');
-                if(count($sesi) > 1){
+    //             $sesi = session('usulan_id');
+    //             if(count($sesi) > 1){
                 
-                    $sesi = array_diff($sesi, [$this->id]);
-                    session(['usulan_id' => $sesi]);
+    //                 $sesi = array_diff($sesi, [$this->id]);
+    //                 session(['usulan_id' => $sesi]);
 
-                    $allIds = collect($sesi)->flatten()->toArray();
-                    $pagu = PerencanaanDetail::whereIn('id', $allIds)
-                        ->sum('HPS_total_agree');
+    //                 $allIds = collect($sesi)->flatten()->toArray();
+    //                 $pagu = PerencanaanDetail::whereIn('id', $allIds)
+    //                     ->sum('HPS_total_agree');
     
-                    $jumlah_beli = PerencanaanDetail::whereIn('id', $allIds)
-                        ->sum('qty_agree');
+    //                 $jumlah_beli = PerencanaanDetail::whereIn('id', $allIds)
+    //                     ->sum('qty_agree');
     
-                    $data = [
-                        'id' => $allIds,
-                        'pagu' => $pagu,
-                        'jumlah_beli' => $jumlah_beli,
-                    ];
+    //                 $data = [
+    //                     'id' => $allIds,
+    //                     'pagu' => $pagu,
+    //                     'jumlah_beli' => $jumlah_beli,
+    //                 ];
                  
-                    $redirect = route(request()->get('routes') . '.create', $data);
-                    return $this->commitSaved(compact('redirect'));
+    //                 $redirect = route(request()->get('routes') . '.create', $data);
+    //                 return $this->commitSaved(compact('redirect'));
+    //             }else{
+    //                 return $this->rollback(
+    //                     [
+    //                         'message' => 'Data Detail Usulan Tidak Boleh Kosong!'
+    //                     ]
+    //                 );
+    //             }
+    //         }
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackSaved($e);
+    //     }
+
+    // }
+
+    public function handleStoreEditListPembelian($idp){ // hadle edit detail transaksi data untuk hapus detail usulan
+        $this->beginTransaction();
+        try { 
+            $trans_id = PerencanaanDetail::where('id', $idp)->pluck('trans_id');
+            // dd($trans_id[0]);
+            if($trans_id[0] != NULL){ //hapus detail usulan pada data transaksi dalam kondisi edit
+                 $flag = PerencanaanDetail::where('trans_id', $trans_id)->count('id');
+                    
+                if($flag > 1){
+
+                    PerencanaanDetail::where('id', $idp)->update(['trans_id' => NULL, 'status'=>'waiting purchase']);
+
+                    return $this->commitDeleted([
+                        'redirect' => route('transaksi.pengadaan-aset' . '.edit', $trans_id[0])
+                    ]);
+    
                 }else{
                     return $this->rollback(
                         [
@@ -366,14 +413,44 @@ class PerencanaanDetail extends Model
                         ]
                     );
                 }
-            }
-        } catch (\Exception $e) {
-            return $this->rollbackSaved($e);
-        }
+             }else{ //hapus detail usulan pada data transaksi dalam dalam kondisi create
+                // dd('tes');
+                 $sesi = session('usulan_id');
 
-    }
-
-
+                 if(count($sesi) > 1){
+                 
+                     $sesi = array_diff($sesi, [$this->id]);
+                     session(['usulan_id' => $sesi]);
+ 
+                     $allIds = collect($sesi)->flatten()->toArray();
+                     $pagu = PerencanaanDetail::whereIn('id', $allIds)
+                         ->sum('HPS_total_agree');
+     
+                     $jumlah_beli = PerencanaanDetail::whereIn('id', $allIds)
+                         ->sum('qty_agree');
+     
+                     $data = [
+                         'id' => $allIds,
+                         'pagu' => $pagu,
+                         'jumlah_beli' => $jumlah_beli,
+                     ];
+                  
+                     $redirect = route(request()->get('routes') . '.create', $data);
+                     return $this->commitSaved(compact('redirect'));
+                 }else{
+                     return $this->rollback(
+                         [
+                             'message' => 'Data Detail Usulan Tidak Boleh Kosong!'
+                         ]
+                     );
+                 }
+             }
+         } catch (\Exception $e) {
+             return $this->rollbackSaved($e);
+         }
+ 
+     }
+ 
     public function checkAction($action, $perms, $record = null)
     {
         $user = auth()->user();

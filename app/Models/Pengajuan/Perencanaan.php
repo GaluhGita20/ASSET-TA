@@ -80,31 +80,64 @@ class Perencanaan extends Model
     /*******************************
      ** SCOPE
      *******************************/
-    public function scopeGrid($query)
+
+     public function scopeGrid($query)
     {
         $user = auth()->user();
         return $query->when(!in_array($user->position->location->id, [13]), 
-            function ($q) use ($user) { 
-                $q->when($user->position->imKepalaDeparetemen(), 
-                    function ($qq) use ($user) {
-                        $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
-                    },
-                    function ($qq) use ($user) {
-                        $qq->where('struct_id', $user->position->location->id); 
-                    },
-                )->orWhereHas('approvals', function ($q) use ($user) {
-                    $q->when($user->id, function ($qq) use ($user) {
-                         $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
-                    },function ($qq) use ($user) {
-                        $qq->orWhereIn('role_id', $user->getRoleIds())
-                        ->orWhere('position_id', $user->position->id);
-                    });
-                });
+        function ($q) use ($user) { 
+        return $q->when($user->position->imKepalaDeparetemen(), 
+            function ($qq) use ($user) {
+                return $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+            },
+            function ($qq) use ($user) {
+                return $qq->where('struct_id', $user->position->location->id); 
             }
-        )
-        ->latest();
+        );
+    })->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+        $query->orWhereHas('approvals', function ($q) {
+            $q
+                ->where('order', 2)
+                ->where('status', 'approved');
+        });
+    });
         // return $query->latest();
     }
+    // public function scopeGrid($query)
+    // {
+    //     $user = auth()->user();
+    //     return $query->when(!in_array($user->position->location->id, [13]), 
+    //         function ($q) use ($user) { 
+    //             $q->when($user->position->imKepalaDeparetemen(), 
+    //                 function ($qq) use ($user) {
+    //                     $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+    //                 },
+    //                 function ($qq) use ($user) {
+    //                     $qq->where('struct_id', $user->position->location->id); 
+    //                 },
+    //             )
+
+    //             ->orWhereHas('approvals', function ($q) use ($user) {
+    //                 $q->when($user->id, function ($qq) use ($user) {
+    //                      $qq->WhereIn('user_id', $user)->where('status','new');
+    //                 },function ($qq) use ($user) {
+    //                     $qq->orWhereIn('role_id', $user->getRoleIds())
+    //                     ->orWhere('position_id', $user->position->id);
+    //                 });
+    //             });
+    //             // ->orWhereHas('approvals', function ($q) use ($user) {
+    //             //     $q->when($user->id, function ($qq) use ($user) {
+    //             //          $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
+    //             //     },function ($qq) use ($user) {
+    //             //         $qq->orWhereIn('role_id', $user->getRoleIds())
+    //             //         ->orWhere('position_id', $user->position->id);
+    //             //     });
+    //             // });
+    //         }
+    //     )
+    //     ->latest();
+    //     // return $query->latest();
+    // }
 
     public function scopeGridStatusCompleted($query)
     {
@@ -211,6 +244,7 @@ class Perencanaan extends Model
                     ]
                 );
             }
+            
             $idMax = Perencanaan::where('struct_id',$request->struct_id)->count('id');
             $dep = OrgStruct::where('id',$request->struct_id)->first('name');
             $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 2, '0', STR_PAD_LEFT);
@@ -220,7 +254,6 @@ class Perencanaan extends Model
             $this->status = 'draft';
             $time = now()->format('Y-m-d');
             $this->date =  $time;
-
             
             $data = $request->all();
             $this->fill($data);
@@ -236,6 +269,7 @@ class Perencanaan extends Model
             return $this->rollbackSaved($e);
         }
     }
+
     public function handleStoreOrUpdate($request, $statusOnly = false)
     {
         $this->beginTransaction();
@@ -322,10 +356,6 @@ class Perencanaan extends Model
                 'status' => 'gagal',
                 'message' => $datak,
             ];
-           // return response()->json(['message' => 'Silahkan Lengkapi Data Approval: '], 400);
-            // return $this->rollback([
-            //     'message' => 'Silahkan Lengkapi Data Approval:',
-            // ]);
         }
 
     }
@@ -550,21 +580,24 @@ class Perencanaan extends Model
 
     public function saveLogNotify()
     {
-        $data = 'Pengajuan Pembelian No Surat : ' . $this->code;
+        $user = auth()->user()->name;
+        $data = 'Pengajuan Pembelian Aset dengan No Surat : ' . $this->code;
         $routes = request()->get('routes');
         switch (request()->route()->getName()) {
             case $routes . '.store':
                 $this->addLog('Membuat ' . $data);
-                $pesan = 'Membuat ' . $data;
+                $pesan = $user.' Membuat ' . $data;
                 $this->sendNotification($pesan);
                 if (request()->is_submit) {
                     $this->addLog('Submit ' . $data);
+                    
                     $this->addNotify([
                         'message' => 'Waiting Verification ' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
                     ]);
-                    $pesan = 'Waiting Verification ' . $data;
+
+                    $pesan = $user.' Menunggu Verifikasi ' . $data;
                     $this->sendNotification($pesan);
                 }
                 break;
@@ -578,7 +611,7 @@ class Perencanaan extends Model
                         'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
                     ]);
 
-                    $pesan = 'Waiting Verification ' . $data;
+                    $pesan = $user.' Menunggu Verifikasi ' . $data;
                     $this->sendNotification($pesan);
                 }
                 break;
@@ -602,7 +635,7 @@ class Perencanaan extends Model
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
 
-                    $pesan = 'Waiting Approval Revisi ' . $data;
+                    $pesan = $user. ' Waiting Approval Revisi ' . $data;
                     $this->sendNotification($pesan);
 
                 } else {
@@ -613,6 +646,8 @@ class Perencanaan extends Model
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
+                    $pesan = $user. ' Menyetujui ' . $data;
+                    $this->sendNotification($pesan);
                 }
                 break;
             case $routes . '.reject':
@@ -625,7 +660,7 @@ class Perencanaan extends Model
                         'user_ids' => [$this->created_by],
                     ]);
 
-                    $pesan = 'Menolak Pengajuan ' . $data;
+                    $pesan = $user .' Menolak Pengajuan ' . $data;
                     $this->sendNotification($pesan);
                 } else {
                     $this->addLog('Menolak Revisi ' . $data . ' dengan alasan: ' . request()->get('note'));

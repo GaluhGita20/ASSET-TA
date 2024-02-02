@@ -71,7 +71,13 @@ class FlowController extends Controller
                 $orders = $record->flows()->get()->groupBy('order');
                 foreach ($orders as $i => $flows) {
                     foreach ($flows as $j => $flow) {
-                        $html .= '<span class="label label-light-'.$colors[$flow->type].' font-weight-bold label-inline text-nowrap" data-toggle="tooltip" title="'.$flow->show_type.'">'.$flow->role->name.'</span>';
+                        if($flow->role->name == 'Umum'){
+                            $flowd = 'Departemen';
+                        }else{
+                            $flowd = $flow->role->name;
+                        }
+
+                        $html .= '<span class="label label-light-'.$colors[$flow->type].' font-weight-bold label-inline text-nowrap" data-toggle="tooltip" title="'.$flow->show_type.'">'.$flowd.'</span>';
 
                         if(!($i === $orders->keys()->last() && $j === $flows->keys()->last())){
                             $html .= '<i class="mx-2 fas fa-angle-double-right text-muted"></i>';

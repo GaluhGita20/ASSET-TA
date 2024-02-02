@@ -58,14 +58,20 @@ return [
             [
                 'name' => 'transaksi_waiting-purchase',
                 'perms' => 'transaksi.pengadaan-aset',
-                'title' => 'Usulan Pembelian Aset',
+                'title' => 'Usulan Pembelian',
                 'url' => '/transaksi/waiting-purchase',
             ],
             [
                 'name' => 'transaksi_pengadaan-aset',
                 'perms' => 'transaksi.pengadaan-aset',
-                'title' => 'Penerimaan Aset',
+                'title' => 'Penerimaan Pembelian',
                 'url' => '/transaksi/pengadaan-aset',
+            ],
+            [
+                'name' => 'transaksi_non-pengadaan-aset',
+                'perms' => 'transaksi.pengadaan-aset',
+                'title' => 'Penerimaan Hibah',
+                'url' => '/transaksi/non-pengadaan-aset',
             ],
         ]
     ],
@@ -119,6 +125,38 @@ return [
                 'url' => '/inventaris/kib-f',
             ],
         ]
+    ],
+
+    [
+        'name' => 'pemeliharaan-aset',
+        'title' => 'Pemeliharaan Aset',
+        'perms' => 'pemeliharaan-aset',
+        'icon' => 'fa fa-road',
+        'url' => 'pemeliharaan/pemeliharaan-aset',
+    ],
+
+    [
+        'name' => 'perbaikan-aset',
+        'title' => 'Pengajuan Perbaikan',
+        'perms' => 'perbaikan-aset',
+        'icon' => 'fa fa-road',
+        'url' => '/pengajuan/perbaikan-aset',
+    ],
+
+    [
+        'name' => 'penghapusan-aset',
+        'title' => 'Pengajuan Penghapusan',
+        'perms' => 'penghapusan-aset',
+        'icon' => 'fa fa-road',
+        'url' => '/pengajuan/penghapusan-aset',
+    ],
+
+    [
+        'name' => 'pemutihan-aset',
+        'title' => 'Pemutihan Aset',
+        'perms' => 'pemutihan-aset',
+        'icon' => 'fa fa-road',
+        'url' => '/pemutihan-aset',
     ],
 
     [

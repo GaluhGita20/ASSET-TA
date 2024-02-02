@@ -97,7 +97,12 @@ class LaporanPerencanaanController extends Controller
             ->addColumn(
                 'status',
                 function ($detail) {
-                    return $detail->labelStatus();
+                    // return $detail->labelStatus();
+                    if ($detail->qty_agree > 0) {
+                        return '<span class="badge bg-success text-white">'.ucfirst('Disetujui').'</span>';
+                    }  else {
+                        return '<span class="badge bg-danger text-white">'.ucfirst('Ditolak').'</span>';
+                    }
                 }
             )
             ->addColumn(
@@ -135,6 +140,15 @@ class LaporanPerencanaanController extends Controller
                 }
             )
             ->addColumn(
+                'status',
+                function ($detail){
+                    return $detail->labelStatus($detail->status);
+                    // return $detail->status ? '<span class="label label-light-primary">'.$detail->status.'<span>' : '-';
+                    // return '<span class="label label-light-primary font-weight-bold label-inline text-nowrap" data-toggle="tooltip">'.$detail->status.'</span>';
+                }
+            )
+            // '<span class="label label-light-'
+            ->addColumn(
                 'updated_by',
                 function ($detail){
                     return $detail->perencanaan->createdByRaw();
@@ -152,7 +166,7 @@ class LaporanPerencanaanController extends Controller
                 }
             )
             
-            ->rawColumns(['action_show','updated_by','created_by'])
+            ->rawColumns(['status','action_show','updated_by','created_by','status'])
             ->make(true);
     }
 
@@ -166,7 +180,7 @@ class LaporanPerencanaanController extends Controller
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi|className:text-left|width:300px'),
                     $this->makeColumn('name:qty_req|label:Pengajuan|className:text-center|width:250px'),
                     $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center|width:250px'),
-                    //$this->makeColumn('name:status|label:Status|className:text-center|width:150px'),
+                    $this->makeColumn('name:status|label:Status|className:text-center|width:150px'),
                     $this->makeColumn('name:procurement_year|label:Tahun Pengadaaan|className:text-center|width:250px'),
                     $this->makeColumn('name:departement|label:Unit Kerja|className:text-center|width:250px'),
                     $this->makeColumn('name:updated_by|width:300px'),

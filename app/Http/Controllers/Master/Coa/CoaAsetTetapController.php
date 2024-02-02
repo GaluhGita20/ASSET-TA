@@ -90,9 +90,6 @@ class CoaAsetTetapController extends Controller
                         'attrs' => 'data-confirm-text="' . __('Hapus Parameter Chart of Accounts (COA) ') .$record->kode_akun . '?"',
                     ];
                 }
-                // if ($record->checkAction('show', $this->perms)) {
-                //     $actions[] = 'type:show|id:' . $record->id;
-                // }
                 return $this->makeButtonDropdown($actions, $record->id);
             })
             ->rawColumns(

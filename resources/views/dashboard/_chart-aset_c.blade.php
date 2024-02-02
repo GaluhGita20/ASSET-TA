@@ -53,11 +53,11 @@
 
 @push('styles')
 	<style>
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportSVG,
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportCSV {
+		.chart-pelaporan-wrapper3 .apexcharts-menu-item.exportSVG,
+		.chart-pelaporan-wrappe3 .apexcharts-menu-item.exportCSV {
 			display: none;
 		}
-		.chart-pelaporan-wrapper .apexcharts-title-text {
+		.chart-pelaporan-wrapper3 .apexcharts-title-text {
 			white-space: normal;
 		}
 	</style>
@@ -95,8 +95,8 @@
 				},
 				success: function (resp) {
 					// $('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan1').remove();
-					$('.chart-pelaporan-wrapper3 .chart-wrapper2').find('#chart-pelaporan3').remove();
-					$('.chart-pelaporan-wrapper3 .chart-wrapper2').html(`<div id="chart-pelaporan3"></div>`);
+					$('.chart-pelaporan-wrapper3 .chart-wrapper3').find('#chart-pelaporan3').remove();
+					$('.chart-pelaporan-wrapper3 .chart-wrapper3').html(`<div id="chart-pelaporan3"></div>`);
 					renderchartTerminu(resp);
 				},
 				error: function (resp) {

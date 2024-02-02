@@ -65,12 +65,12 @@
                 <button type="submit" class="btn btn-info btn-block my-3 py-3">
                  Masuk
                 </button>
-                {{-- @if (Route::has('password.request'))
+                @if (Route::has('password.request'))
                     <a href="{{ rut('password.request') }}"
                         class="w-100 text-center text-dark-50 text-hover-danger my-3 mr-2">
                         {{ \Base::trans('Lupa Password?') }}
                     </a>
-                @endif --}}
+                @endif
             </div>
         </form>
     </div>

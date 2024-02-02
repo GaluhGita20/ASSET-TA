@@ -95,8 +95,8 @@
 				},
 				success: function (resp) {
 					// $('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan1').remove();
-					$('.chart-pelaporan-wrapper2 .chart-wrapper2').find('#chart-pelaporan2').remove();
-					$('.chart-pelaporan-wrapper2 .chart-wrapper2').html(`<div id="chart-pelaporan2"></div>`);
+					$('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan2').remove();
+					$('.chart-pelaporan-wrapper .chart-wrapper').html(`<div id="chart-pelaporan2"></div>`);
 					renderchartTermind(resp);
 				},
 				error: function (resp) {
@@ -141,7 +141,7 @@
 	            plotOptions: {
 	                bar: {
 	                    horizontal: false,
-	                    columnWidth: ['30%'],
+	                    columnWidth: ['40%'],
 	                    endingShape: 'rounded'
 	                },
 	            },
@@ -221,8 +221,6 @@
 
 	        var chart = new ApexCharts(element, defaultsOptions);
 	        chart.render();
-
-			
 		}
 	</script>
 

@@ -8,7 +8,7 @@
 			</div>
 			<div class="card-toolbar" style="max-width: 500px;">
 				
-				<form id="filter-chart-pengaduan"
+				<form id="filter-chart-pengaduan5"
 					action="{{ route($routes.'.chartAsetKIBE') }}"
 					class="form-inline"
 					role="form">
@@ -86,7 +86,7 @@
 		}
 
 		var drawChartPengaduan = function () {
-			var filter = $('#filter-chart-pengaduan');
+			var filter = $('#filter-chart-pengaduan5');
 
 			$.ajax({
 				url: filter.attr('action'),
@@ -96,8 +96,8 @@
 					stage_year: filter.find('.stage_year').val(),
 				},
 				success: function (resp) {
-					$('.chart-pengaduan-wrapper .chart-wrapper').find('#chart-pengaduan').remove();
-					$('.chart-pengaduan-wrapper .chart-wrapper').html(`<div id="chart-pengaduan"></div>`);
+					$('.chart-pengaduan-wrapper .chart-wrapper').find('#chart-pengaduan5').remove();
+					$('.chart-pengaduan-wrapper .chart-wrapper').html(`<div id="chart-pengaduan5"></div>`);
 					renderChartPengaduan(resp);
 				},
 				error: function (resp) {
@@ -107,7 +107,7 @@
 		}
 
 		var renderChartPengaduan = function (options = {}) {
-			var element = document.getElementById('chart-pengaduan');
+			var element = document.getElementById('chart-pengaduan5');
 
 	        var defaultsOptions = {
 	        	title: {

@@ -19,7 +19,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ListPembelianController extends Controller
 {
-    protected $module ='transaksi_pengadaan-aset';
+    protected $module ='transaksi_waiting-purchase';
     protected $routes ='transaksi.waiting-purchase';
     protected $views = 'transaksi.waiting-purchase';
     protected $perms = 'transaksi.pengadaan-aset';
@@ -154,10 +154,10 @@ class ListPembelianController extends Controller
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:200px'),
                     $this->makeColumn('name:tahun_usulan|label:Tahun Usulan|className:text-center|width:200px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center|width:300px'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga|className:text-center|width:200px'),
-                    $this->makeColumn('name:jenis_usulan|label:Jenis Usulan|className:text-center|width:200px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga|className:text-center|width:200px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center|width:300px'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:200px'),
+                    $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
                     $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
                     // $this->makeColumn('name:actionDetail|label:action|className:text-center|width:50px'),

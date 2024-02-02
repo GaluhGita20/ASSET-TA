@@ -35,15 +35,44 @@ trait ResponseTrait
 		}
 
 		$data = array_merge($default, $params);
-
+		// dd($data);
 		if (!empty($data['errors']) && is_string($data['errors'])) {
 			if (strpos($data['errors'], 'MESSAGE--', 0) !== false) {
 				$data['message'] = trim(str_replace('MESSAGE--', '', $data['errors']));
 				$data['errors'] = [];
+				
 			}
 		}
 		return response()->json($data, $data['code']);
 	}
+
+// 	public function responseError($params = [])
+// {
+//     $default = [
+//         'code'    => 500,
+//         'status'  => false,
+//         'message' => 'Error',
+//         'errors'  => [] // Menambahkan default untuk 'errors'
+//     ];
+
+//     if (is_string($params)) {
+//         $default['message'] = $params;
+//         $params = [];
+//     }
+
+//     $data = array_merge($default, $params);
+
+//     // Mengatasi 'errors' jika berisi string dengan format 'MESSAGE--'
+//     if (!empty($data['errors']) && is_string($data['errors'])) {
+//         if (strpos($data['errors'], 'MESSAGE--') === 0) {
+//             $data['message'] = trim(str_replace('MESSAGE--', '', $data['errors']));
+//             $data['errors'] = [];
+//         }
+//     }
+
+//     return response()->json($data, $data['code']);
+// }
+
 
 	// Select2
 	public function responseSelect2($items, $text, $id = 'id')

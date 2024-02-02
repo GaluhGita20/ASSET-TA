@@ -65,6 +65,17 @@
                             </div>
                         </div>
 
+                        {{-- <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-4 pr-0">
+                                    <label class="col-form-label">{{ __('Nomor SP2D') }}</label>
+                                </div>
+                                <div class="col-8 parent-group">
+                                    <input type="text" class="form-control" name="sp2d_code" placeholder="{{ __('Nomor SP2D') }}">
+                                </div>
+                            </div>
+                        </div> --}}
+
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">

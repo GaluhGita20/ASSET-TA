@@ -63,6 +63,14 @@ class InventarisController extends Controller
             ->addColumn('struct', function ($detail) {
                 return $detail->perencanaan ? $detail->perencanaan->struct->name : '';
             })
+            ->addColumn('source_acq', function ($detail) {
+                if ($detail->trans->source_acq == 'Hibah' || $detail->trans->source_acq == 'Sumbangan' ) {
+                    return $detail->trans ? '<span class="badge bg-primary text-white">'.ucfirst($detail->trans->source_acq).'</span>' : '-';
+                } else {
+                    return $detail->trans ? '<span class="badge bg-success text-white">'.ucfirst($detail->trans->source_acq).'</span>' : '-';
+                }
+               // return $detail->trans ? $detail->trans->source_acq : '-';
+            })
             ->addColumn('qty_agree', function ($detail) {
                 $flag= Aset::where('usulan_id',$detail->id)->count();
                 if($flag > 0){
@@ -73,16 +81,18 @@ class InventarisController extends Controller
                 }
             })
             ->addColumn('tanggal_terima', function ($detail){
-                $data = $detail->perencanaanPembelian()->where('detail_usulan_id', $detail->id)->get(['pembelian_id']);
-                $pembelianIds = $data->pluck('pembelian_id')->toArray();
-                $receiptDates = PembelianTransaksi::where('id', $pembelianIds)->get('receipt_date');
-               return Carbon::parse($receiptDates[0]['receipt_date'])->format('Y/m/d');
+            //     $data = $detail->perencanaanPembelian()->where('detail_usulan_id', $detail->id)->get(['pembelian_id']);
+            //     $pembelianIds = $data->pluck('pembelian_id')->toArray();
+            //     $receiptDates = PembelianTransaksi::where('id', $pembelianIds)->get('receipt_date');
+            //    return Carbon::parse($receiptDates[0]['receipt_date'])->format('Y/m/d');
+                return Carbon::parse($detail->trans->receipt_date)->format('Y/m/d');
             })
             ->addColumn('HPS_unit_cost', function ($detail) {
-                $data = $detail->perencanaanPembelian()->where('detail_usulan_id', $detail->id)->get(['pembelian_id']);
-                $pembelianIds = $data->pluck('pembelian_id')->toArray();
-                $receiptDates = PembelianTransaksi::where('id', $pembelianIds)->get('unit_cost');
-                return number_format($receiptDates[0]['unit_cost'], 0, ',', ',');
+                // $data = $detail->perencanaanPembelian()->where('detail_usulan_id', $detail->id)->get(['pembelian_id']);
+                // $pembelianIds = $data->pluck('pembelian_id')->toArray();
+                // $receiptDates = PembelianTransaksi::where('id', $pembelianIds)->get('unit_cost');
+                // return number_format($receiptDates[0]['unit_cost'], 0, ',', ',');
+                return number_format($detail->trans->unit_cost, 0, ',', ',');
             })
             ->editColumn(
                 'checkbox',
@@ -93,7 +103,7 @@ class InventarisController extends Controller
                     </label>';
                 }
             )
-            ->rawColumns(['tahun_usulan','checkbox','action'])
+            ->rawColumns(['source_acq','tahun_usulan','checkbox','action'])
             ->make(true);
     }
     
@@ -106,10 +116,10 @@ class InventarisController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi|className:text-left|width:200px'),
-                    // $this->makeColumn('name:kategori_aset|label:Kategor Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center|width:200px'),
                     $this->makeColumn('name:tanggal_terima|label:Tanggal Terima|className:text-center|width:200px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah Belum Dicatat|className:text-center|width:300px'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Harga (Rupiah)|className:text-center|width:200px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah Belum Dicatat (Unit)|className:text-center|width:300px'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Harga Unit (Rupiah)|className:text-center|width:200px'),
                    // $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
                     $this->makeColumn('name:checkbox|label:check|class:usulan|className:text-center|width:50px'),
@@ -148,10 +158,35 @@ class InventarisController extends Controller
             if( count($request->usulan_id) > 1 ){
                 return $this->rollback(__('Pilih Satu Data Untuk Di Inventarisasikan'));
             }
+
             return $record->handleSubmitKib($request); //handle pertama kali data diambil
         }
     }
 
+
+    // public function create(Request $request)
+    // {
+    //     // dd($request->all());
+     
+       
+    //     // $usulan = PerencanaanDetail::where('id',$request->usulan_id)->first();
+    //     $trans = PembelianTransaksi::where('id',$request->trans_id)->first();
+        
+    //     $jumlah = $request->jumlah;
+    //     if($request->customValue == 'B'){
+    //         return $this->render($this->views.'.create-kib-b',compact('trans','usulan','jumlah'));
+    //     }elseif($request->customValue == 'A'){
+    //         return $this->render($this->views.'.create-kib-a',compact('trans','usulan','jumlah'));
+    //     }elseif($request->customValue == 'C'){
+    //         return $this->render($this->views.'.create-kib-c',compact('trans','usulan','jumlah'));
+    //     }elseif($request->customValue == 'D'){
+    //         return $this->render($this->views.'.create-kib-d',compact('trans','usulan','jumlah'));
+    //     }elseif($request->customValue == 'E'){
+    //         return $this->render($this->views.'.create-kib-e',compact('trans','usulan','jumlah'));
+    //     }else{
+    //         return $this->render($this->views.'.create-kib-f',compact('trans','usulan','jumlah'));
+    //     }
+    // }
 
     public function create(Request $request)
     {
@@ -159,22 +194,23 @@ class InventarisController extends Controller
      
        
         $usulan = PerencanaanDetail::where('id',$request->usulan_id)->first();
-        $trans = PembelianTransaksi::where('id',$request->trans_id)->first();
+        // $trans = PembelianTransaksi::where('id',$request->trans_id)->first();
         
         $jumlah = $request->jumlah;
         if($request->customValue == 'B'){
-            return $this->render($this->views.'.create-kib-b',compact('trans','usulan','jumlah'));
+            return $this->render($this->views.'.create-kib-b',compact('usulan','jumlah'));
         }elseif($request->customValue == 'A'){
-            return $this->render($this->views.'.create-kib-a',compact('trans','usulan','jumlah'));
+            return $this->render($this->views.'.create-kib-a',compact('usulan','jumlah'));
         }elseif($request->customValue == 'C'){
-            return $this->render($this->views.'.create-kib-c',compact('trans','usulan','jumlah'));
+            return $this->render($this->views.'.create-kib-c',compact('usulan','jumlah'));
         }elseif($request->customValue == 'D'){
-            return $this->render($this->views.'.create-kib-d',compact('trans','usulan','jumlah'));
+            return $this->render($this->views.'.create-kib-d',compact('usulan','jumlah'));
         }elseif($request->customValue == 'E'){
-            return $this->render($this->views.'.create-kib-e',compact('trans','usulan','jumlah'));
+            return $this->render($this->views.'.create-kib-e',compact('usulan','jumlah'));
         }else{
-            return $this->render($this->views.'.create-kib-f',compact('trans','usulan','jumlah'));
+            return $this->render($this->views.'.create-kib-f',compact('usulan','jumlah'));
         }
+        
     }
 
     public function storeDetailKibA(KibARequest $request)

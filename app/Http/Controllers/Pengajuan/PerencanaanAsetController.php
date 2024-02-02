@@ -97,15 +97,7 @@ class PerencanaanAsetController extends Controller
             ->addColumn('year_application', function ($record) {
                 return $record->procurement_year ?  $record->procurement_year : '-';
             })
-
-            // ->addColumn('is_repair', function ($record) {
-            //     if($record->is_repair == 'no'){
-            //         return 'Usulan Pengadaan Aset';
-            //     }elseif($record->is_repair == 'yes'){
-            //         return 'Usulan Perbaikan Aset';
-            //     }
-            // })
-
+            
             ->addColumn(
                 'version',
                 function ($record) use ($user) {
@@ -124,10 +116,6 @@ class PerencanaanAsetController extends Controller
                     return $record->createdByRaw();
                 }
             })
-
-            // ->addColumn('created_by', function ($record)  {
-            //     $detail->
-            // })
 
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [];
@@ -168,8 +156,20 @@ class PerencanaanAsetController extends Controller
                     ];
                 }
 
-                if ($record->checkAction('approval', $this->perms)) {
-                    if($user->position->location->level == 'department' || $user->position->location->id = 13 || $user->position->location->level == 'bod' ){
+                if(auth()->user()->position->location->level != 'subdepartment'){
+                    if(auth()->user()->position->location->level == 'department' || $user->position->location->id == 13 || $user->position->location->level == 'bod' ){
+                        if ($record->checkAction('approval', $this->perms)) {
+                                $actions[] = [
+                                    'type' => 'approval',
+                                    'label' => 'Approval',
+                                    'page' => true,
+                                    'id' => $record->id,
+                                    'url' => route($this->routes . '.approval', $record->id)
+                                ];
+                            }
+                    }
+                }elseif($user->position->location->id == 13){
+                    if ($record->checkAction('approval', $this->perms)) {
                         $actions[] = [
                             'type' => 'approval',
                             'label' => 'Approval',
@@ -482,6 +482,7 @@ class PerencanaanAsetController extends Controller
     public function detailUpdate(PerencanaanDetailCreateRequest $request,  PerencanaanDetail $detail)
     {
         $record = $detail->perencanaan;
+        // dd($record);
         return $record->handleDetailStoreOrUpdate($request,$detail);
     }
 

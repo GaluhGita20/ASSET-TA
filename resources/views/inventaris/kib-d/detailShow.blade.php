@@ -44,6 +44,17 @@
                             </div>
                         </div>
 
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <div class="col-2 pr-0">
+                                    <label class="col-form-label">{{ __('Nomor Register') }}</label>
+                                </div>
+                                <div class="col-10 parent-group">
+                                    <input type="text" class="form-control" name="no_regsiter" value="{{ str_pad($record->no_register, 3, '0', STR_PAD_LEFT) }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+
                         
                         <div class="col-sm-12">
                             <div class="form-group row">
@@ -54,8 +65,11 @@
                                     <select name="coa_id" class="form-control base-plugin--select2-ajax coa_id"
                                         data-url="{{ rut('ajax.selectCoa', ['d']) }}"
                                         data-url-origin="{{ rut('ajax.selectCoa', ['d']) }}"
-                                        placeholder="{{ __('Pilih Salah Satu') }}" required>
+                                        placeholder="{{ __('Pilih Salah Satu') }}" disabled>
                                         <option value="" required>{{ __('Pilih Salah Satu') }}</option>
+                                        @if (!empty($record->coa_id))
+                                            <option value="{{ $record->coa_id }}" selected>{{ $record->coad->nama_akun.' ( '.$record->coad->kode_akun.' )'  }}</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -147,8 +161,11 @@
                                     <select name="tanah_id" class="form-control base-plugin--select2-ajax coa_id"
                                         data-url="{{ rut('ajax.selectCoa', ['a']) }}"
                                         data-url-origin="{{ rut('ajax.selectCoa', ['a']) }}"
-                                        placeholder="{{ __('Pilih Salah Satu') }}" required>
+                                        placeholder="{{ __('Pilih Salah Satu') }}" disabled>
                                         <option value="" required>{{ __('Pilih Salah Satu') }}</option>
+                                        @if (!empty($record->tanah_id))
+                                            <option value="{{ $record->tanah_id }}" selected>{{ $record->coad->nama_akun.' ( '.$record->coad->kode_akun.' )'  }}</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -177,16 +194,18 @@
                             </div>
                         </div>
 
+                        @if (!empty($usulan->trans->spk_start_date))
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Tanggal Pembelian') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input class="form-control " name="receipt_date" value="{{ $record->trans->spk_start_date->format('Y/m/d') }}" readonly>
+                                    <input class="form-control " name="receipt_date" value="{{ $usulan->trans->spk_start_date->format('Y/m/d') }}" readonly>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -194,7 +213,7 @@
                                     <label class="col-form-label">{{ __('Tanggal Penerimaan') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input class="form-control " name="receipt_date" value="{{ $record->trans->receipt_date->format('Y/m/d') }}" readonly>
+                                    <input class="form-control " name="receipt_date" value="{{ $record->usulans->trans->receipt_date->format('Y/m/d') }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -216,27 +235,34 @@
                                     <label class="col-form-label">{{ __('Sumber Perolehan') }}</label>
                                 </div>
                                 <div class="col-md-8 parent-group">
-                                    <select name="source_acq" class="form-control">
-                                        <option value="pembelian">{{ __('Pembelian') }}</option>
-                                        <option value="hibah" >{{ __('Hibah') }}</option>
-                                        <option value="sumbangan" >{{ __('Sumbangan') }}</option>
+                                    <select name="source_acq" class="form-control" disabled>
+                                        <option value="pembelian" {{ $record->usulans->trans->source_acq == "pembelian" ? 'selected':'' }}>{{ __('Pembelian') }}</option>
+                                        <option value="hibah" {{ $record->usulans->trans->source_acq == "hibah" ? 'selected':'' }} >{{ __('Hibah') }}</option>
+                                        <option value="sumbangan" {{ $record->usulans->trans->source_acq == "sumbangan" ? 'selected':'' }}>{{ __('Sumbangan') }}</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
+
+                        @if(!empty($record->usulans->danad))
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
                                     <label class="col-form-label">{{ __('Asal Usul') }}</label>
                                 </div>
                                 <div class="col-md-8 parent-group">
-                                    <select name="jenis_pengadaan_id" class="form-control">
-                                        <option value="{{ $record->usulans->danad->id }}" placeholder="{{ __('Asal Usul Perolehan') }}">{{ $record->usulans->danad->name }}</option>
+                                    <select name="source" id="source" class="form-control base-plugin--select2-ajax">
+                                       
+                                            <option value="{{ $record->usulans->danad->name }}" selected>
+                                                {{ $record->usulans->danad->name }}
+                                            </option>
+                                     
                                     </select>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -246,9 +272,9 @@
                                 <div class="col-md-8 parent-group">
                                     <select name="vendor_id" class="form-control base-plugin--select2-ajax vendor_id" disabled>
                                         <option value="">{{ __('Pilih Salah Satu') }}</option>
-                                        @if ($record->trans->vendor_id)
-                                            <option value="{{ $record->trans->vendors->id }}" selected>
-                                                {{ $record->trans->vendors->name }}
+                                        @if ($record->usulans->trans->vendor_id)
+                                            <option value="{{ $record->usulans->trans->vendors->id }}" selected>
+                                                {{ $record->usulans->trans->vendors->name }}
                                             </option>
                                         @endif
                                     </select>
@@ -256,6 +282,7 @@
                             </div>
                         </div>
 
+                        @if($record->usulans->trans->source_acq == 'pembelian')
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
@@ -263,7 +290,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->trans->unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->trans->unit_cost }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -273,23 +300,65 @@
                                 </div>
                             </div>
                         </div>
+                        @else
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-4 pr-0">
+                                    <label class="col-form-label">{{ __('Harga') }}</label>
+                                </div>
+                                <div class="col-8 parent-group">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->usulans->HPS_unit_cost }}" readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                rupiah
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
+                        @if(!empty($record->usulans->perencanaan->struct))
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="col-form-label">{{ __('Unit Pengusul') }}</label>
+                                    </div>
+                                    <div class="col-md-8 parent-group">
+                                        <select name="departemen_id" id="departemen_id" class="form-control base-plugin--select2-ajax departemen_id">
+                                            @if ($record->usulans->perencanaan->struct->name)
+                                                <option value="{{ $record->usulans->perencanaan->struct->id }}" selected>
+                                                    {{ $record->usulans->perencanaan->struct->name }}
+                                                </option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Unit Pengusul') }}</label>
+                                    <label class="col-form-label">{{ __('Unit Lokasi Aset') }}</label>
                                 </div>
                                 <div class="col-md-8 parent-group">
-                                    <select name="departemen_id" id="departemen_id" class="form-control base-plugin--select2-ajax departemen_id" readonly>
-                                        @if ($record->usulans->perencanaan->struct->name)
-                                            <option value="{{ $record->usulans->perencanaan->struct->id }}" selected>
-                                                {{ $record->usulans->perencanaan->struct->name }}
+                                    <select name="departemen_id" id="departemen_id" class="form-control base-plugin--select2-ajax departemen_id">
+                                        @if (!empty($record->location_hibah_aset))
+                                            <option value="{{ $record->location_hibah_aset }}" selected>
+                                                {{ $record->deps->name }}
                                             </option>
+                                        @else
+                                        <option selected>
+                                           -
+                                        </option>
                                         @endif
                                     </select>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -297,10 +366,10 @@
                                     <label class="col-form-label">{{ __('Kondisi') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <select name="condition" class="form-control">
-                                        <option value="baik">{{ __('Baik') }}</option>
-                                        <option value="kurang baik">{{ __('Kurang Baik') }}</option>
-                                        <option value="rusak berat">{{ __('Rusak Berat') }}</option>
+                                    <select name="condition" class="form-control" disabled>
+                                        <option value="baik" {{ $record->condition == "baik" ? 'selected':'' }}>{{ __('Baik') }}</option>
+                                        <option value="kurang baik" {{ $record->condition == "kurang baik" ? 'selected':'' }}>{{ __('Kurang Baik') }}</option>
+                                        <option value="rusak berat" {{ $record->condition == "rusak berat" ? 'selected':'' }}>{{ __('Rusak Berat') }}</option>
                                     </select>
                                 </div>
                             </div>

@@ -10,7 +10,7 @@
     <div class="row">
 
         <div class="col-sm-12">
-            <input type="hidden" name="trans_id">
+            {{-- <input type="hidden" name="trans_id"> --}}
             <input type="hidden" name="usulan_id">
             
             <div class="form-group row">

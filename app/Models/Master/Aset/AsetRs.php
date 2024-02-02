@@ -10,7 +10,7 @@ use App\Models\Auth\User;
 use App\Support\Base;
 use App\Models\Model;
 
-class Aset extends Model
+class AsetRs extends Model
 {
     protected $table = 'ref_aset';
 

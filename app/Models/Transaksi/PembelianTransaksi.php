@@ -5,7 +5,7 @@ namespace App\Models\Transaksi;
 use App\Models\Model;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\PerencanaanDetail;
-use App\Models\Master\Aset\Aset;
+use App\Models\Master\Aset\AsetRs;
 use App\Models\Traits\HasApprovals;
 use App\Models\Traits\HasFiles;
 use App\Support\Base;
@@ -34,6 +34,7 @@ class PembelianTransaksi extends Model
     protected $fillable = [
         'trans_name',
         'vendor_id',
+        'source_acq',
         'jenis_pengadaan_id',
         'no_spk',
         'spk_start_date',
@@ -150,6 +151,16 @@ class PembelianTransaksi extends Model
         return $this->belongsTo(Pengadaan::class, 'jenis_pengadaan_id');
     }
 
+    public function usulans()
+    {
+        return $this->hasMany(PerencanaanDetail::class,'trans_id');
+    }
+
+    // public function details()
+    // {
+    //     return $this->hasMany(PerencanaanDetail::class, 'trans_id');
+    // }
+
      // public function cc()
     // {
     //     return $this->belongsToMany(User::class, 'trans_pengajuan_pembelian_cc', 'perencanaan_id', 'user_id');
@@ -183,7 +194,7 @@ class PembelianTransaksi extends Model
     public function scopeFilters($query)
     {
         // return $query;
-        return $query->filterBy(['no_spk','spk_start_date','spk_end_date'])->when(
+        return $query->filterBy(['no_spk','sp2d_code'])->when(
             $jenis_vendor = request()->vendor_id,
             function ($q) use ($jenis_vendor){
                 $q->whereHas('vendors', function ($qq) use ($jenis_vendor){
@@ -196,6 +207,193 @@ class PembelianTransaksi extends Model
     /*******************************
      ** SAVING
      *******************************/
+    // public function handleStoreOrUpdate($request)
+    // {
+    //     $this->beginTransaction();
+    //     try { 
+    //         if($request->unit_cost == 0){
+    //             return $this->rollback(
+    //                 [
+    //                     'message' => 'Harga Unit Masih 0 !'
+    //                 ]
+    //             );
+    //         }
+    //         if($request->total_cost == 0){
+    //             return $this->rollback(
+    //                 [
+    //                     'message' => 'Biaya Total Masih 0 !'
+    //                 ]
+    //             );
+    //         }
+    //         $data = $request->all();
+
+    //         $this->fill($data);
+
+    //         $value1 = str_replace(['.', ','],'',$request->unit_cost);
+    //         $this->unit_cost = (int)$value1;
+    //         $value2 = str_replace(['.', ','],'',$request->tax_cost);
+    //         $this->tax_cost = (int)$value2;
+
+    //         $value3 = str_replace(['.', ','],'',$request->shiping_cost);
+    //         $this->shiping_cost = (int)$value3;
+
+    //         $value4 = str_replace(['.', ','],'',$request->budget_limit);
+    //         $this->budget_limit = (int)$value4;
+
+    //         $value5 = str_replace(['.', ','],'',$request->total_cost);
+    //         $this->total_cost = (int)$value5;
+
+    //         $value6 = str_replace(['.', ','],'',$request->qty);
+    //         $this->qty = (int)$value6;
+            
+            
+    //         $start_time = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
+    //         $end_time = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
+    //         $selisih = $start_time->diffInDays($end_time);
+            
+    //         $this->spk_range_time = $selisih;
+            
+    //         $this->save();
+    //         $dataArray = json_decode($request->usulan_id, true);
+
+    //         $this->perencanaanPengadaan()->sync($dataArray ?? []);
+
+    //         //$this->jenisUsaha()->sync($request->user_id);
+    //         $this->pengujianPengadaan()->sync($request->user_id ?? []);
+            
+
+    //         if ($dataArray) {
+    //             PerencanaanDetail::whereIn('id', $dataArray)->update(['status' => 'waiting receipt']);
+    //         }
+
+    //         if ($request->is_submit == 1) {
+    //             $this->handleSubmitSave($request);
+    //         }
+            
+    //         $redirect = route('transaksi.pengadaan-aset' . '.index');
+    //         return $this->commitSaved(compact('redirect'));
+    //     } catch (\Exception $e) {
+    //       //  Log::error('Kesalahan: ' . $e->getMessage());
+    //         return $this->rollbackSaved($e->getMessage());
+    //     }
+    // }
+
+    public function handleStoreHibah($request){
+        $this->beginTransaction();
+        try {
+
+            if ($request->is_submit == 1) {
+                if($request->asset_test_results == null){
+                    return $this->rollback(
+                        [
+                            'message' => 'Silahkan Lengkapi Hasil Pengujian!'
+                        ]
+                    );
+                }
+
+                if($request->user_id == null){
+                    return $this->rollback(
+                        [
+                            'message' => 'Silahkan Lengkapi Data Penguji!'
+                        ]
+                    );
+                }
+                $data = $request->all();
+                $this->fill($data);
+                $this->save();
+                $this->pengujianPengadaan()->sync($request->user_id ?? []);
+                $this->saveLogNotify();
+                $this->handleSubmitSave($request);
+
+
+            }else{
+
+                $data = $request->all();
+                $this->fill($data);
+                $this->save();
+                if($request->user_id != null){
+                    $this->pengujianPengadaan()->sync($request->user_id ?? []);
+                }
+                $this->saveLogNotify();
+            }
+            
+
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
+    public function handleDetailStoreOrUpdateHibah($request, PerencanaanDetail $detail)
+    {
+        $this->beginTransaction();
+        try {
+           // dd($detail->id);
+            $flag = PerencanaanDetail::where('trans_id', $this->id)->where('ref_aset_id',$request->ref_aset_id)->where('id','!=',$detail->id)->count();
+            
+            // dd($flag);
+            if($flag > 0){
+                return $this->rollback(
+                    [
+                        'message' => 'Aset Sudah Dicatat Untuk Penerimaan Ini!'
+                    ]
+                );
+            }
+            
+            $detail->fill($request->all());
+
+            $value1 = str_replace(['.', ','],'',$request->HPS_unit_cost);
+            $detail->HPS_unit_cost = (int)$value1;
+
+
+            $value6 = str_replace(['.', ','],'',$request->qty_agree);
+            $detail->qty_agree = (int)$value6;
+
+            
+            if($request->is_submit == 1){
+
+                $detail->status = 'waiting receipt';
+
+                $this->usulans()->save($detail);
+                $this->save();
+
+                $this->pengujianPengadaan()->sync($request->user_id ?? []);
+                
+                return $this->commitSaved();
+                
+            }else{
+                // dd($request->all());
+                if($request->user_id != null){
+                    $this->pengujianPengadaan()->sync($request->user_id ?? []);
+                }
+
+                $this->usulans()->save($detail);
+                $this->save();
+                return $this->commitSaved();
+            }
+
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
+    public function handleDetailDestroy(PerencanaanDetail $detail)
+    {
+        $this->beginTransaction();
+        
+        try {
+            $this->saveLogNotify();
+            $detail->delete();
+            return $this->commitDeleted([
+                'redirect' => route(request()->routes . '.detail', $this->id)
+            ]);
+        } catch (\Exception $e) {
+            return $this->rollbackDeleted($e);
+        }
+    }
+
+
     public function handleStoreOrUpdate($request)
     {
         $this->beginTransaction();
@@ -220,6 +418,7 @@ class PembelianTransaksi extends Model
 
             $value1 = str_replace(['.', ','],'',$request->unit_cost);
             $this->unit_cost = (int)$value1;
+            
             $value2 = str_replace(['.', ','],'',$request->tax_cost);
             $this->tax_cost = (int)$value2;
 
@@ -243,14 +442,13 @@ class PembelianTransaksi extends Model
             $this->spk_range_time = $selisih;
             
             $this->save();
+
             $dataArray = json_decode($request->usulan_id, true);
 
-            $this->perencanaanPengadaan()->sync($dataArray ?? []);
+            PerencanaanDetail::whereIn('id',$dataArray)->update(['trans_id' => $this->id]);
 
-            //$this->jenisUsaha()->sync($request->user_id);
             $this->pengujianPengadaan()->sync($request->user_id ?? []);
             
-
             if ($dataArray) {
                 PerencanaanDetail::whereIn('id', $dataArray)->update(['status' => 'waiting receipt']);
             }
@@ -259,10 +457,13 @@ class PembelianTransaksi extends Model
                 $this->handleSubmitSave($request);
             }
             
+            $module='transaksi_waiting-purchase';
+            $this->addLog('Membuat ' . $request->trans_name);
+            $this->logs()->whereModule($module)->latest()->update(['module'=>'transaksi_pengadaan-aset']);
+            
             $redirect = route('transaksi.pengadaan-aset' . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
-          //  Log::error('Kesalahan: ' . $e->getMessage());
             return $this->rollbackSaved($e->getMessage());
         }
     }
@@ -285,16 +486,41 @@ class PembelianTransaksi extends Model
     }
 
 
+    // public function getPerencanaanPengadaan($record)
+    // {
+    //     $usulan = DB::table('trans_pivot_perencanaan_pengadaan')
+    //     ->where('pembelian_id', $record)
+    //     ->pluck('detail_usulan_id');
+
+    //     $usulan_id = collect($usulan)->flatten()->toArray();
+
+    //     $pagu = PerencanaanDetail::whereIn('id',$usulan_id)->sum('HPS_total_agree');
+    //     $jumlah_beli = PerencanaanDetail::whereIn('id',$usulan_id)->sum('qty_agree');
+
+    //     $data = [
+    //         'usulan_id' => $usulan_id,
+    //         'pagu' => $pagu,
+    //         'jumlah_beli' => $jumlah_beli
+    //     ];
+
+    //     $this->budget_limit = $pagu;
+    //     $this->qty= $jumlah_beli;
+    //     $this->total_cost = $this->qty * $this->unit_cost + $this->tax_cost + $this->shiping_cost;
+    //     $this->save();
+        
+    //     return $data;
+    // }
+
     public function getPerencanaanPengadaan($record)
     {
-        $usulan = DB::table('trans_pivot_perencanaan_pengadaan')
-        ->where('pembelian_id', $record)
-        ->pluck('detail_usulan_id');
+        // dd($record);
+        $usulan = PerencanaanDetail::where('trans_id', $record)
+        ->pluck('id');
 
         $usulan_id = collect($usulan)->flatten()->toArray();
 
-        $pagu = PerencanaanDetail::whereIn('id',$usulan_id)->sum('HPS_total_agree');
-        $jumlah_beli = PerencanaanDetail::whereIn('id',$usulan_id)->sum('qty_agree');
+        $pagu = PerencanaanDetail::where('trans_id',$record)->sum('HPS_total_agree');
+        $jumlah_beli = PerencanaanDetail::where('trans_id',$record)->sum('qty_agree');
 
         $data = [
             'usulan_id' => $usulan_id,
@@ -311,15 +537,34 @@ class PembelianTransaksi extends Model
     }
 
  
+    // public function handleDestroy()
+    // {
+    //     $this->beginTransaction();
+    //     try {
+    //         $pivotIds = $this->perencanaanPengadaan()->pluck('detail_usulan_id');
+    //         PerencanaanDetail::whereIn('id', $pivotIds)->update(['status' => 'waiting purchase']);
+
+    //         $this->pengujianPengadaan()->wherePivot('trans_id', '=', $this->id)->detach();
+    //         $this->perencanaanPengadaan()->wherePivot('pembelian_id', '=', $this->id)->detach();
+    //         $this->saveLogNotify();
+    //         $this->delete();
+
+    //         return $this->commitDeleted();
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackDeleted($e);
+    //     }
+    // }
+
     public function handleDestroy()
     {
         $this->beginTransaction();
         try {
-            $pivotIds = $this->perencanaanPengadaan()->pluck('detail_usulan_id');
-            PerencanaanDetail::whereIn('id', $pivotIds)->update(['status' => 'waiting purchase']);
 
-            $this->pengujianPengadaan()->wherePivot('trans_id', '=', $this->id)->detach();
-            $this->perencanaanPengadaan()->wherePivot('pembelian_id', '=', $this->id)->detach();
+            // $pivotIds = $this->perencanaanPengadaan()->pluck('detail_usulan_id');
+            PerencanaanDetail::where('trans_id', $this->id)->update(['status' => 'waiting purchase','trans_id' => NULL]);
+
+            // $this->pengujianPengadaan()->wherePivot('trans_id', '=', $this->id)->detach();
+            // $this->perencanaanPengadaan()->wherePivot('pembelian_id', '=', $this->id)->detach();
             $this->saveLogNotify();
             $this->delete();
 
@@ -328,8 +573,6 @@ class PembelianTransaksi extends Model
             return $this->rollbackDeleted($e);
         }
     }
-    
-
 
     public function handleApprove($request)
     {
@@ -369,9 +612,9 @@ class PembelianTransaksi extends Model
                 })->count();
                 
                 if($flag == 1){
-                    $data = $this->perencanaanPengadaan('detail_usulan_id');
-                    $detailUsulan = $this->perencanaanPengadaan()->where('pembelian_id', $this->id)->get()->pluck('pivot.detail_usulan_id')->toArray();
-                    PerencanaanDetail::whereIn('id',$detailUsulan)->update(['status' => 'waiting register']);
+                    // $data = $this->perencanaanPengadaan('detail_usulan_id');
+                    // $detailUsulan = $this->perencanaanPengadaan()->where('pembelian_id', $this->id)->get()->pluck('pivot.detail_usulan_id')->toArray();
+                    PerencanaanDetail::where('trans_id',$this->id)->update(['status' => 'waiting register']);
                 }
     
                 $redirect = route(request()->get('routes') . '.index');
@@ -419,7 +662,7 @@ class PembelianTransaksi extends Model
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
 
-                    $pesan = 'Mengajukan Approval '.$data;
+                    $pesan = $user.' Mengajukan Approval '.$data;
                     $this->sendNotification($pesan);
                 }
                 break;
@@ -433,7 +676,7 @@ class PembelianTransaksi extends Model
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
 
-                    $pesan = 'Menunggu Approval ' . $data;
+                    $pesan = $user.' Menunggu Approval ' . $data;
                     $this->sendNotification($pesan);
                 }
                 break;
@@ -468,6 +711,7 @@ class PembelianTransaksi extends Model
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
+                    
                     $pesan = $user.' Menyetujui ' . $data;
                     $this->sendNotification($pesan);
                 }

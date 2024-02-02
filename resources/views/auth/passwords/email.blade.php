@@ -9,10 +9,11 @@
 			</div>
 			<!--begin::Form-->
 			@if (session('status'))
-			<div class="alert alert-success" role="alert">
-				{{ session('status') }}
-			</div>
+				<div class="alert alert-success" role="alert">
+					{{ session('status') }}
+				</div>
 			@endif
+
 			<form method="POST" class="form" action="{{ rut('password.email') }}">
 				@csrf
 
@@ -30,6 +31,7 @@
 					<a href="{{ rut('login') }}" class="btn btn-light-primary font-weight-bold my-3 mx-4">Cancel</a>
 				</div>
 			</form>
+			
 			<!--end::Form-->
 		</div>
 		<!--end::Forgot-->

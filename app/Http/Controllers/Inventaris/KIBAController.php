@@ -46,7 +46,7 @@ class KIBAController extends Controller
             'tableStruct' => [
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
-                    $this->makeColumn('name:name|label:Nama Aset|className:text-center|width:400px'),
+                    $this->makeColumn('name:name|label:Nama Aset|className:text-left|width:400px'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     // $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-center|width:300px'),
@@ -56,12 +56,13 @@ class KIBAController extends Controller
                     $this->makeColumn('name:kota|label:Kota|className:text-center'),
                     $this->makeColumn('name:daerah|label:Daerah|className:text-center'),
                     $this->makeColumn('name:alamat|label:Alamat|className:text-center'),
+                    $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
                     $this->makeColumn('name:hak_tanah|label:Hak Tanah|className:text-center'),
                     $this->makeColumn('name:nomor_sertifikat|label:Nomor Sertifikat|className:text-center'),
                     $this->makeColumn('name:tgl_sertifikat|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:kegunaan_tanah|label:Kegunaan Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     // $this->makeColumn('name:created_by'),
@@ -116,7 +117,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'provinsi',
                 function ($record) {
-                   return $record->province_id ? $record->province->name : '-';
+                   return $record->province_id ? $record->provinsi->name : '-';
                 }
             )->addColumn(
                 'kota',
@@ -131,22 +132,32 @@ class KIBAController extends Controller
             )->addColumn(
                 'alamat',
                 function ($record) {
-                    return $record->address ? $record->address : '-';
+                    return $record->address ? ucwords($record->address) : '-';
+                }
+            )->addColumn(
+                'source_acq',
+                function ($record) {
+                    if ($record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ) {
+                        return $record->usulans ? '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' : '-';
+                    } else {
+                        return $record->usulans ? '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' : '-';
+                    }
+                   // return $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-';
                 }
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->trans ? $record->trans->spk_start_date->format('Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
                 }
             )->addColumn(
                 'hak_tanah',
                 function ($record) {
-                    return $record->land_rights ? $record->land_rights : '-';
+                    return $record->land_rights ? ucwords($record->land_rights) : '-';
                 }
             )->addColumn(
                 'kegunaan_tanah',
                 function ($record) {
-                    return $record->land_use ? $record->land_use : '-';
+                    return $record->land_use ? ucwords($record->land_use) : '-';
                 }
             )->addColumn(
                 'nomor_sertifikat',
@@ -161,17 +172,23 @@ class KIBAController extends Controller
             )->addColumn(
                 'asal_usul',
                 function ($record) {
-                    return $record->usulans ? $record->usulans->danad->name : '-';
+                    return $record->usulans->danad ? $record->usulans->danad->name : '-';
                 }
             )->addColumn(
                 'nilai_beli',
                 function ($record) {
-                   return $record->trans ? number_format($record->trans->unit_cost, 0, ',', ',') : '-';
+                   return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',');
                 }
             )->addColumn(
                 'status',
                 function ($record) {
-                    return $record->status ? $record->status : '-';
+                    if ($record->status == 'actives') {
+                        return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
+                    } elseif ($record->status == 'notactive') {
+                        return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } else {
+                        return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
+                    }
                 }
             )->addColumn(
                 'keterangan',
@@ -185,17 +202,18 @@ class KIBAController extends Controller
                 }
             )
             ->addColumn('action',function ($record) use ($user) {
-                    $actions = [
-                        'type:show|id:' . $record->id,
-                        // 'type:edit|id:' . $record->id,
-                    ];
+                $actions[] = [
+                    'type' => 'show',
+                    'page' => true,
+                    'id' => $record->id,
+                    'url' => route($this->routes . '.show', $record->id),
+                ];
                     return $this->makeButtonDropdown($actions);
                 }
             )
-            ->rawColumns(['action','name','jenis_aset','updated_by'])
+            ->rawColumns(['source_acq','status','action','name','jenis_aset','updated_by'])
             ->make(true);
     }
-
 
     public function create(){
         $baseContentReplace = "base-modal--render";
@@ -204,7 +222,7 @@ class KIBAController extends Controller
    
     public function show(Aset $record){
         $type ='show';
-        return $this->render($this->views . '.show',compact('record','type'));
+        return $this->render($this->views . '.detailShow',compact('record','type'));
     }
 
     public function store(AsetRequest $request){

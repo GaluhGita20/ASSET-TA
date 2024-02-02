@@ -3,9 +3,12 @@
 namespace App\Models\Inventaris;
 
 use App\Imports\Master\OrgStructImport;
+
 use App\Models\Globals\TempFiles;
 use App\Models\Pengajuan\PerencanaanDetail;
+use App\Models\Pengajuan\Penghapusan;
 use App\Models\Transaksi\PembelianTransaksi;
+use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Location\Location;
 use App\Models\Auth\User;
 use App\Models\Master\Geografis\City;
@@ -29,7 +32,6 @@ class Aset extends Model
     'trans_id',
     'usulan_id',
     'coa_id',
-    'source_acq',
     'type',
     'no_register',
     'wide',
@@ -69,6 +71,7 @@ class Aset extends Model
     'accumulated_depreciation', //nlai penyusutan //dicari
     'book_value',   //nilai saat ini //dicari
     'tanah_id',
+    'location_hibah_aset',
     'book_date',
     ];
 
@@ -88,6 +91,11 @@ class Aset extends Model
         return $this->belongsTo(PerencanaanDetail::class, 'usulan_id');
     }
 
+    public function asets()
+    {
+        return $this->hasMany(Penghapusan::class, 'kib_id');
+    }
+
     public function trans()
     {
         return $this->belongsTo(PembelianTransaksi::class, 'trans_id');
@@ -98,13 +106,12 @@ class Aset extends Model
         return $this->belongsTo(Location::class, 'room_location');
     }
 
-    // public function users()
-    // {
-    //     return $this->belongsTo(User::class, 'created_by');
-    // }
+    public function deps()
+    {
+        return $this->belongsTo(OrgStruct::class, 'location_hibah_aset');
+    }
 
-
-    public function province()
+    public function provinsi()
     {
         return $this->belongsTo(Province::class, 'province_id');
     }
@@ -152,16 +159,47 @@ class Aset extends Model
 
     public function scopeFilters($query)
     {
+        // room_location
+        // return $query
+        // ->when($jenis_jenis_aset = request()->jenis_aset,
+        //        $loc = request()->location_id,
+        //     function ($q) use ($jenis_jenis_aset, $loc){
+        //         $q->whereHas('usulans', function ($qq) use ($jenis_jenis_aset, $loc){
+        //             $qq->whereHas('asetd',function ($qqq) use ($jenis_jenis_aset){
+        //                 $qqq->where('name','LIKE', '%' . $jenis_jenis_aset . '%');
+        //             })->orWhereHas('perencanaan',function ($qqq) use ($loc){
+        //                 $qqq->where('struct_id',$loc);
+        //             });
+        //         });
+        //     }
+        // )->latest();
+
         return $query
-        ->when($jenis_jenis_aset = request()->jenis_aset,
+        ->when(
+            $jenis_jenis_aset = request()->jenis_aset,
             function ($q) use ($jenis_jenis_aset){
-                $q->whereHas('usulans', function ($qq) use ($jenis_jenis_aset){
-                    $qq->whereHas('asetd',function ($qqq) use ($jenis_jenis_aset){
-                        $qqq->where('name','LIKE', '%' . $jenis_jenis_aset . '%');
-                    });
+            $q->whereHas('usulans', function ($qq) use ($jenis_jenis_aset) {
+                $qq->whereHas('asetd', function ($qqq) use ($jenis_jenis_aset) {
+                    $qqq->where('name', 'LIKE', '%' . $jenis_jenis_aset . '%');
                 });
-            }
-        )->latest();
+            });
+        })
+        ->when(
+            $loc = request()->location_id,
+            function ($q) use ($loc){
+            $q->whereHas('usulans', function ($qq) use ($loc) {
+                $qq->whereHas('perencanaan', function ($qqq) use ($loc) {
+                    $qqq->where('struct_id', $loc);
+                });
+            });
+        })->when(
+            $loc = request()->room_location,
+            function ($q) use ($loc){
+            $q->where('room_location', $loc);
+        })->filterBy(['status','condition'])
+        ->latest();
+      //room location
+        
     }
 
     public function handleSubmitKib($request){
@@ -189,17 +227,18 @@ class Aset extends Model
             }
 
             $usulan = $usulan->first();
-            $trans = $trans->first();
+            // $trans = $trans->first();
             $aset = Aset::where('usulan_id',$usulan_id)->count(); //jumlah terdaptar
             $jumlah_item= abs($usulan->qty_agree - $aset); //jumlah saat ini = jumlah rill - jumlah terdaptar
     
             if($jumlah_item != 0){
                 $data = [
                     'usulan_id' => $usulan->id,
-                    'trans_id' => $trans->id,
+                    // 'trans_id' => $trans->id,
                     'jumlah' => $jumlah_item,
                     'customValue'=> $customValue,
                 ];
+
                 $redirect = route(request()->get('routes') . '.create', $data );
                 return $this->commitSaved(compact('redirect'));
             }else{
@@ -242,7 +281,12 @@ class Aset extends Model
                 for ($i = 0 ; $i < $request->qty ; $i++) {
                     $aset = new Aset();
                     $aset->fill($data);
+                    $aset->material = strtolower($request->material);
+                    $aset->merek_type_item = strtolower($request->merek_type_item);
                     $aset->type = 'KIB B';
+                    if($request->location_hibah_aset != null){
+                        $aset->location_hibah_aset = $request->location_hibah_aset;
+                    }
                     $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
                     $aset->no_register = $no_inventaris + 1;
                     $aset->accumulated_depreciation = 0;
@@ -250,7 +294,7 @@ class Aset extends Model
                     // $aset->residual_depresi = ($cost - $residu) / $request->useful;
                     $aset->book_value = $cost; ///nilai saat ini
                     $aset->residual_value= $value6;
-                    $aset->status = 'active';
+                    $aset->status = 'actives';
                     $aset->save();
                     // tanggal akhir masa manfaat
                     // $tanggalDuaTahunKemudian = date('Y-m-d', strtotime($tanggalSaatIni . ' +2 years'));
@@ -260,13 +304,18 @@ class Aset extends Model
             // $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
             $this->fill($data);
             $this->type='KIB B';
+            if($request->location_hibah_aset != null){
+                $this->location_hibah_aset = $request->location_hibah_aset;
+            }
             $this->residual_value= $value6;
+            $this->material = strtolower($request->material);
+            $this->merek_type_item = strtolower($request->merek_type_item);
             $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
             $this->no_register = $no_inventaris + 1;
             $this->accumulated_depreciation =0;
             // $this->residual_depresi = ($cost - $residu) / $request->useful;
             $this->book_value = $cost;
-            $this->status = 'active';
+            $this->status = 'actives';
             $this->save();
         }
 
@@ -313,6 +362,13 @@ class Aset extends Model
                         $aset = new Aset();
                         $aset->fill($data);
                         $aset->type = 'KIB E';
+                        if($request->location_hibah_aset != null){
+                            $aset->location_hibah_aset = $request->location_hibah_aset;
+                        }
+                        $aset->material = strtolower($request->material);
+                        $aset->creators = strtolower($request->creators);
+                        $aset->title = strtolower($request->title);
+                        // $aset->merek_type_item = strtolower($request->merek_type_item);
                         $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
                         $aset->no_register = $no_inventaris + 1;
                         $aset->accumulated_depreciation = 0;
@@ -320,7 +376,7 @@ class Aset extends Model
                         // $aset->residual_depresi = ($cost - $residu) / $request->useful;
                         $aset->book_value = $cost; ///nilai saat ini
                         $aset->residual_value= $value6;
-                        $aset->status = 'active';
+                        $aset->status = 'actives';
                         $aset->save();
                         // $aset->saveLogNotify();
                         // tanggal akhir masa manfaat
@@ -333,12 +389,19 @@ class Aset extends Model
                 $this->fill($data);
                 $this->type='KIB E';
                 $this->residual_value= $value6;
+                $this->material = strtolower($request->material);
+                if($request->location_hibah_aset != null){
+                    $this->location_hibah_aset = $request->location_hibah_aset;
+                }
+                // $this->merek_type_item = strtolower($request->merek_type_item);
+                $this->creators = strtolower($request->creators);
+                $this->title = strtolower($request->title);
                 $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
                 $this->no_register = $no_inventaris + 1;
                 $this->accumulated_depreciation =0;
                 // $this->residual_depresi = ($cost - $residu) / $request->useful;
                 $this->book_value = $cost;
-                $this->status = 'active';
+                $this->status = 'actives';
                 $this->save();
             }
     
@@ -380,9 +443,11 @@ class Aset extends Model
         $this->type='KIB A';
         $this->book_value = $cost;
         $this->wide= $wide;
+        $this->land_rights = strtolower($request->land_rights);
+        $this->land_use = strtolower($request->land_use);
         $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
         $this->no_register = $no_inventaris + 1;
-        $this->status = 'active';
+        $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
          
@@ -425,6 +490,8 @@ class Aset extends Model
  
         // $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
         $this->fill($data);
+        $this->land_status = strtolower($request->land_status);
+        // $this->land_use = strtolower($request->land_use);
         $this->residual_value= $residu;
         $this->sertificate_date = $sertif_date;
         // $this->type='KIB C';
@@ -441,7 +508,7 @@ class Aset extends Model
         $this->no_register = $no_inventaris + 1;
         $this->accumulated_depreciation = 0;
         $this->book_value = $cost;
-        $this->status = 'active';
+        $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
         if($flagInv == 0){
@@ -486,6 +553,8 @@ class Aset extends Model
         $this->sertificate_date = $sertif_date;
         $this->residual_value= $residu;
         $this->type='KIB D';
+        $this->land_status = strtolower($request->land_status);
+        // $this->land_use = strtolower($request->land_use);
         $this->wide= $wide;
         $this->long_JJR= $long_JJR;
         $this->width_JJR= $width_JJR;
@@ -494,7 +563,7 @@ class Aset extends Model
         $this->accumulated_depreciation = 0;
         // $this->residual_depresi = ($cost - $residu) / $request->useful;
         $this->book_value = $cost;
-        $this->status = 'active';
+        $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
 

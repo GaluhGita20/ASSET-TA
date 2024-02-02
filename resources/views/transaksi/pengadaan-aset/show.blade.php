@@ -331,7 +331,7 @@
                                     <label class="col-form-label">{{ __('Hasil Uji Fungsi Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" readonly>{{ $record->asset_test_results }}</textarea>
+                                    <textarea class="base-plugin--summernote" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" readonly data-height="200" disabled>{{ $record->asset_test_results }}</textarea>
                                 </div>
                             </div>
                         </div> 
@@ -366,7 +366,7 @@
                     <div class="row mb-3">
                         <div class="col-sm-12">
                             <div class="card card-custom">
-                                <div class="card-body p-8">
+                                <div class="card-body p-2">
                                     <div class="table-responsive">
                                         @if (isset($tableStruct['datatable_1']))
                                             <table id="datatable_1" class="table-bordered is-datatable table" style="width: 100%;"
@@ -386,7 +386,6 @@
                                                         @endforeach
                                                     </tr>
                                                 </thead>
-                                                
                                                 <tbody>
                                                 </tbody>
                                             </table>

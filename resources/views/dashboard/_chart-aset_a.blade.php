@@ -53,11 +53,11 @@
 
 @push('styles')
 	<style>
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportSVG,
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportCSV {
+		.chart-pelaporan-wrapper1 .apexcharts-menu-item.exportSVG,
+		.chart-pelaporan-wrapper1 .apexcharts-menu-item.exportCSV {
 			display: none;
 		}
-		.chart-pelaporan-wrapper .apexcharts-title-text {
+		.chart-pelaporan-wrapper1 .apexcharts-title-text {
 			white-space: normal;
 		}
 	</style>
@@ -95,15 +95,14 @@
 				},
 				success: function (resp) {
 					// $('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan1').remove();
-					$('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan1').remove();
-					$('.chart-pelaporan-wrapper .chart-wrapper').html(`<div id="chart-pelaporan1"></div>`);
+					$('.chart-pelaporan-wrapper1 .chart-wrapper').find('#chart-pelaporan1').remove();
+					$('.chart-pelaporan-wrapper1 .chart-wrapper').html(`<div id="chart-pelaporan1"></div>`);
 					renderchartTermine(resp);
 				},
 				error: function (resp) {
 					console.log(resp)
 				}
-			})
-			;
+			});
 		}
 
 		var renderchartTermine = function (options = {}) {
@@ -140,7 +139,7 @@
 	            plotOptions: {
 	                bar: {
 	                    horizontal: false,
-	                    columnWidth: ['30%'],
+	                    columnWidth: ['10%'],
 	                    endingShape: 'rounded'
 	                },
 	            },
@@ -177,7 +176,7 @@
 	                }
 	            },
 	            fill: {
-	                opacity: [1, 1, 1, 1, 1, 1],
+	                opacity: [1, 0, 1, 0, 1, 1],
 					gradient: {
 						inverseColors: false,
 						shade: 'light',

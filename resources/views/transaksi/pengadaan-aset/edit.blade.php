@@ -148,15 +148,14 @@
                                     <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" id="qty" name="qty" value="{{ $record->qty }}" oninput="updateTotal()"readonly>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">
-                                                    Unit
-                                                </span>
-                                            </div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="qty" name="qty" value="{{ $record->qty }}" oninput="updateTotal()"readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                Unit
+                                            </span>
                                         </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -342,10 +341,21 @@
                                     <label class="col-form-label">{{ __('Hasil Uji Fungsi Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}">{{ $record->asset_test_results }}</textarea>
+                                    <textarea class="base-plugin--summernote" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" data-height="200">{{ $record->asset_test_results }}</textarea>
                                 </div>
                             </div>
                         </div> 
+
+                        {{-- <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-2 pr-0">{{ __('Hasil Pengujian Aset') }}</label>
+                                <div class="col-sm-10 col-form-label">
+                                    <textarea name="asset_test_results" class="base-plugin--summernote" placeholder="{{ __('Hasil Pengujian Aset') }}" data-height="200">{!! $record->asset_test_results  !!}</textarea>
+                                    {{-- <input type="text" class="form-control" value={{ $record->source_acq }} placeholder="{{ __('Tahun Pengadaan') }}" readonly> --}}
+                                {{-- </div>
+                            </div>
+                        </div>  --}}
+                        
                         <div class="col-sm-12">
                             <div class="form-group row">  
                                 <label class="col-md-2 col-form-label">{{ __('Penguji Aset') }}</label>

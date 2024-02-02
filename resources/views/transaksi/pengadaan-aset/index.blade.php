@@ -6,12 +6,15 @@
             <input type="text" class="form-control filter-control" data-post="no_spk" placeholder="{{ __('No SPK') }}">
         </div>
         <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
+            <input type="text" class="form-control filter-control" data-post="sp2d_code" placeholder="{{ __('No SP2D') }}">
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <select class="form-control filter-control base-plugin--select2-ajax" name="vendor_id" data-url="{{ route('ajax.selectVendor', 'all') }}"
                 data-placeholder="{{ __('Nama Vendor') }}" data-post="vendor_id">
             </select>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
+        {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <div class="input-group">
                 <input name="spk_start_date"
                     class="form-control base-plugin--datepicker spk_start_date"
@@ -32,7 +35,7 @@
                     data-post="spk_end_date"
                     >
             </div>
-        </div>
+        </div> --}}
     </div>
 @endsection
 @section('buttons')

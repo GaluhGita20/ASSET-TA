@@ -3,7 +3,7 @@
 		<div class="card-header h-auto py-3">
 			<div class="card-title">
 				<h3 class="card-label">
-					<span class="d-block text-dark font-weight-bolder">{{ __('Jalan Jaringan Irigasi') }}</span>
+					<span class="d-block text-dark font-weight-bolder">{{ __('Aset Kontruksi pembangunan') }}</span>
 				</h3>
 			</div>
 			<div class="card-toolbar" style="max-width: 500px;">
@@ -53,11 +53,11 @@
 
 @push('styles')
 	<style>
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportSVG,
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportCSV {
+		.chart-pelaporan-wrapper6 .apexcharts-menu-item.exportSVG,
+		.chart-pelaporan-wrapper6 .apexcharts-menu-item.exportCSV {
 			display: none;
 		}
-		.chart-pelaporan-wrapper .apexcharts-title-text {
+		.chart-pelaporan-wrapper6 .apexcharts-title-text {
 			white-space: normal;
 		}
 	</style>
@@ -95,8 +95,8 @@
 				},
 				success: function (resp) {
 					// $('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan1').remove();
-					$('.chart-pelaporan-wrapper6 .chart-wrapper2').find('#chart-pelaporan6').remove();
-					$('.chart-pelaporan-wrapper6 .chart-wrapper2').html(`<div id="chart-pelaporan6"></div>`);
+					$('.chart-pelaporan-wrapper6 .chart-wrapper6').find('#chart-pelaporan6').remove();
+					$('.chart-pelaporan-wrapper6 .chart-wrapper6').html(`<div id="chart-pelaporan6"></div>`);
 					renderchartTerminr(resp);
 				},
 				error: function (resp) {

@@ -42,12 +42,11 @@ class PengadaanAsetController extends Controller
         ]);
     }
 
-
     public function grid(Request $request)
     {
         $user = auth()->user();
       
-        $records = PembelianTransaksi::grid()->filters()->dtGet();
+        $records = PembelianTransaksi::grid()->where('source_acq','pembelian')->filters()->dtGet();
         
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {
@@ -194,18 +193,13 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:trans_name|label:Transaksi Aset|className:text-left|width:200px'),
                     $this->makeColumn('name:vendor_id|label:Suplier|className:text-center|width:300px'),
-                    $this->makeColumn('name:no_spk|label:Nomor SPK|className:text-center|width:200px'),
-                    // $this->makeColumn('name:spk_start_date|label:Tanggal Mulai SPK|className:text-center|width:250px'),
-                    // $this->makeColumn('name:spk_end_date|label:Tanggal Selesai SPK|className:text-center|width:250px'),
-                  //  $this->makeColumn('name:spk_range_time|label:Lama Kontrak|className:text-center|width:200px'),
-                  //  $this->makeColumn('name:jenis_pengadaan_id|label:Jenis Pengadaan|className:text-left|width:300px'),
-                    $this->makeColumn('name:qty|label:Jumlah Pembelian|className:text-center|width:100px'),
-                    $this->makeColumn('name:unit_cost|label:Harga Unit|width:200px'),
-                    $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman|className:text-center|width:200px'),
-                    $this->makeColumn('name:tax_cost|label:Biaya Pajak|className:text-center|width:200px'),
-                    $this->makeColumn('name:total_cost|label:Total|width:200px'),
+                    $this->makeColumn('name:no_spk|label:Nomor SPK/Tanggal SPK|className:text-center|width:200px'),
+                    $this->makeColumn('name:qty|label:Jumlah Pembelian (Unit)|className:text-center|width:100px'),
+                    $this->makeColumn('name:unit_cost|label:Harga Unit (Rupiah)|width:200px'),
+                    $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman (Rupiah)|className:text-center|width:200px'),
+                    $this->makeColumn('name:tax_cost|label:Biaya Pajak (Rupiah)|className:text-center|width:200px'),
+                    $this->makeColumn('name:total_cost|label:Total (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:status'),
-                  //  $this->makeColumn('name:updated_by|label:Diperbarui|className:text-left|width:200px'),
                     $this->makeColumn('name:action|label:Aksi|width:200px'),
                 ],
             ],
@@ -223,12 +217,12 @@ class PengadaanAsetController extends Controller
                 'url' => route('transaksi.waiting-purchase'. ".grid", compact('data')),
                 'datatable_1' => [
                     $this->makeColumn('name:num|label:#'),
-                    $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:150px'),
-                    $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui|className:text-center,label-info'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
-                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-left|width:150px'),
+                    $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
+                    $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
                     $this->makeColumn('name:action|label:action|width:150px'),
                 ],
             ],
@@ -247,9 +241,9 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center,label-info'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
                 ],
             ],
@@ -269,10 +263,10 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui|className:text-center,label-info'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
-                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-left|width:150px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
                     $this->makeColumn('name:action|label:action|width:150px'),
                 ],
             ],
@@ -304,9 +298,9 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center,label-info'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
                 ],
             ],
@@ -332,6 +326,7 @@ class PengadaanAsetController extends Controller
 
     public function destroy(PembelianTransaksi $record)
     {
+        // dd($record);
         return $record->handleDestroy();
     }
 

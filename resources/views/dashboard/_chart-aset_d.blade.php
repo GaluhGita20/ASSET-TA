@@ -7,7 +7,7 @@
 				</h3>
 			</div>
 			<div class="card-toolbar" style="max-width: 500px;">
-				<form id="filter-chart-pelaporan5"
+				<form id="filter-chart-pelaporan4"
 					action="{{ route($routes.'.chartAsetKIBD') }}"
 					class="form-inline"
 					role="form">
@@ -53,11 +53,11 @@
 
 @push('styles')
 	<style>
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportSVG,
-		.chart-pelaporan-wrapper .apexcharts-menu-item.exportCSV {
+		.chart-pelaporan-wrapper4 .apexcharts-menu-item.exportSVG,
+		.chart-pelaporan-wrapper4 .apexcharts-menu-item.exportCSV {
 			display: none;
 		}
-		.chart-pelaporan-wrapper .apexcharts-title-text {
+		.chart-pelaporan-wrapper4 .apexcharts-title-text {
 			white-space: normal;
 		}
 	</style>
@@ -84,7 +84,7 @@
 		}
 
 		var drawchartTermink = function () {
-			var filter = $('#filter-chart-pelaporan5');
+			var filter = $('#filter-chart-pelaporan4');
 
 			$.ajax({
 				url: filter.attr('action'),
@@ -95,8 +95,8 @@
 				},
 				success: function (resp) {
 					// $('.chart-pelaporan-wrapper .chart-wrapper').find('#chart-pelaporan1').remove();
-					$('.chart-pelaporan-wrapper5 .chart-wrapper2').find('#chart-pelaporan5').remove();
-					$('.chart-pelaporan-wrapper5 .chart-wrapper2').html(`<div id="chart-pelaporan5"></div>`);
+					$('.chart-pelaporan-wrapper4 .chart-wrapper4').find('#chart-pelaporan4').remove();
+					$('.chart-pelaporan-wrapper4 .chart-wrapper4').html(`<div id="chart-pelaporan4"></div>`);
 					renderchartTermink(resp);
 				},
 				error: function (resp) {
@@ -108,7 +108,7 @@
 
 
 		var renderchartTermink = function (options = {}) {
-			var element = document.getElementById('chart-pelaporan5');
+			var element = document.getElementById('chart-pelaporan4');
 
 	        var defaultsOptions = {
 	        	title: {

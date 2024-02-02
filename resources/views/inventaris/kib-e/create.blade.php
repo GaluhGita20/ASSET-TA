@@ -51,7 +51,6 @@
                 </div>
             </div>
 
-
             <div class="form-group row">
                 <div class="col-2 pr-0">
                     <label class="col-form-label">{{ __('Tgl Pengajuan') }}</label>
@@ -61,7 +60,6 @@
                         placeholder="{{ __('Tgl Surat') }}" value="{{ now()->format('Y-m-d') }}" data-date-end-date="{{ now() }}" disabled>
                 </div>
             </div>
-
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
@@ -133,7 +131,6 @@
     });
 </script>
 	
-
 <script>
 	$('.modal-dialog-right-bottom').removeClass('modal-md').addClass('modal-lg');
 </script>

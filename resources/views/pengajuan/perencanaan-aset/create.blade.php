@@ -84,7 +84,7 @@
                 </div>
             </div> --}}
 
-            {{-- <div class="form-group row">
+            <div class="form-group row">
                 <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
                 <div class="col-10 parent-group">
                     <div class="custom-file">
@@ -103,7 +103,7 @@
                     </div>
                     <div class="form-text text-muted">*Maksimal 20MB</div>
                 </div>
-            </div> --}}
+            </div>
 
         </div>
     </div>

@@ -21,7 +21,13 @@
                 <span class="timeline-badge bg-{{ $val->show_color }} mt-5px"></span>
                 <div class="timeline-content d-flex align-items-start justify-content-between">
                     <span class="mr-3">
-                        {{ $val->role->name }} <span class="text-{{ $val->show_color }}">({{ $val->show_type }})</span>
+
+                        @if($val->role->name == 'Umum')
+                            Departemen
+                        @else
+                            {{ $val->role->name }}
+                        @endif
+                         <span class="text-{{ $val->show_color }}">({{ $val->show_type }})</span>
                         @if ($val->status == 'approved' && $val->user)
                             <div class="text-muted font-italic">
                                 <div>{{ __('Approved by:') }} {{ $val->user->name }}</div>

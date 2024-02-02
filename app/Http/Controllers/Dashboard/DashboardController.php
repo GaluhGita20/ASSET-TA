@@ -176,8 +176,8 @@ class DashboardController extends Controller
     public function progressAset(Request $request)
     {
 
-        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB A')->count();
-        $active = Aset::where('status', 'not active')->where('type','KIB A')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::where('status','notactive')->where('type','KIB A')->count();
+        $active = Aset::where('status', 'active')->where('type','KIB A')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Tanah',
@@ -186,8 +186,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB B')->count();
-        $active = Aset::where('status', 'not active')->where('type','KIB B')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::where('status','notactive')->where('type','KIB B')->count();
+        $active = Aset::where('status', 'active')->where('type','KIB B')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Peralatan Mesin',
@@ -196,8 +196,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB C')->count();
-        $active = Aset::where('status', 'not active')->where('type','KIB C')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::where('status','notactive')->where('type','KIB C')->count();
+        $active = Aset::where('status', 'active')->where('type','KIB C')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Gedung Bangunan',
@@ -206,8 +206,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB D')->count();
-        $active = Aset::where('status', 'not active')->where('type','KIB D')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::where('status', 'notactive')->where('type','KIB D')->count();
+        $active = Aset::where('status', 'active')->where('type','KIB D')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Jalan Irigasi Jaringan',
@@ -216,8 +216,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB E')->count();
-        $active = Aset::where('status', 'not active')->where('type','KIB E')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::where('status', 'notactive')->where('type','KIB E')->count();
+        $active = Aset::where('status', 'active')->where('type','KIB E')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Tetap Lainya',
@@ -226,8 +226,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', '!=', 'active')->where('type','KIB F')->count();
-        $active = Aset::where('status', 'not active')->where('type','KIB F')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::where('status', 'notactive')->where('type','KIB F')->count();
+        $active = Aset::where('status', 'active')->where('type','KIB F')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Kontruksi Pembangunan',
@@ -607,18 +607,28 @@ class DashboardController extends Controller
 
         $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         $KIBA1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB A')->where('status','active')
+        ->where('type', 'KIB B')->where('status','actives')
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
         ->get();
 
-        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB A')->where('status','not active')
-        ->whereYear('book_date', $year)
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        ->where('type', 'KIB B')
+        ->where('status', 'notactive')
+        ->whereHas('asets', function ($q) use ($year) {
+            $q->whereYear('updated_at', $year);
+        })
         ->groupBy('month')
         ->orderBy('month')
         ->get();
+
+        // $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        // ->where('type', 'KIB B')->where('status','notactive')
+        // ->whereYear('book_date', $year)
+        // ->groupBy('month')
+        // ->orderBy('month')
+        // ->get();
 
         $temp_data['KIBA1'] = array_fill(0, 12, 0);
         $temp_data['KIBA2'] = array_fill(0, 12, 0);
@@ -626,7 +636,6 @@ class DashboardController extends Controller
         foreach ($KIBA1 as $row) {
             $temp_data['KIBA1'][$row->month-1] = $row->total_completed;
         }
-
 
         foreach ($KIBA2 as $row) {
             $temp_data['KIBA2'][$row->month-1] = $row->total_not_completed;
@@ -661,18 +670,22 @@ class DashboardController extends Controller
 
         $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         $KIBB1 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB B')->where('status','active')
+        ->where('type', 'KIB B')->where('status','actives')
         ->whereYear('book_date', $year)
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+        
+        $KIBB2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        ->where('type', 'KIB B')
+        ->where('status', 'notactive')
+        ->whereHas('asets', function ($q) use ($year) {
+            $q->whereYear('updated_at', $year);
+        })
         ->groupBy('month')
         ->orderBy('month')
         ->get();
 
-        $KIBB2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB B')->where('status','not active')
-        ->whereYear('book_date', $year)
-        ->groupBy('month')
-        ->orderBy('month')
-        ->get();
 
         $temp_data['KIBB1'] = array_fill(0, 12, 0);
         $temp_data['KIBB2'] = array_fill(0, 12, 0);
@@ -720,8 +733,8 @@ class DashboardController extends Controller
         ->orderBy('month')
         ->get();
 
-        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB C')->where('status','not active')
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        ->where('type', 'KIB C')->where('status','notactive')
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -774,8 +787,8 @@ class DashboardController extends Controller
         ->orderBy('month')
         ->get();
 
-        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB D')->where('status','not active')
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        ->where('type', 'KIB D')->where('status','notactive')
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -828,8 +841,8 @@ class DashboardController extends Controller
         ->orderBy('month')
         ->get();
 
-        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB E')->where('status','not active')
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        ->where('type', 'KIB E')->where('status','notactive')
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -881,8 +894,8 @@ class DashboardController extends Controller
         ->orderBy('month')
         ->get();
 
-        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
-        ->where('type', 'KIB F')->where('status','not active')
+        $KIBA2 = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_not_completed')
+        ->where('type', 'KIB F')->where('status','notactive')
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')

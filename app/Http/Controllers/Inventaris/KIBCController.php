@@ -46,7 +46,7 @@ class KIBCController extends Controller
             'tableStruct' => [
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
-                    $this->makeColumn('name:name|label:Nama Aset|className:text-center'),
+                    $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
@@ -55,16 +55,17 @@ class KIBCController extends Controller
                     $this->makeColumn('name:luas_lantai|label:Luas Lantai (m2)|className:text-center'),
                     $this->makeColumn('name:luas_bangunan|label:Luas Bangunan (m2)|className:text-center'),
                     $this->makeColumn('name:alamat|label:Alamat|className:text-center'),
+                    $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
                     $this->makeColumn('name:status_tanah|label:Hak Tanah|className:text-center'),
                     $this->makeColumn('name:nomor_dokumen|label:Nomor Sertifikat|className:text-center'),
                     $this->makeColumn('name:tgl_dokumen|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:tanah_id|label:Kode Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Biaya Pembangunan|className:text-center'),
-                    $this->makeColumn('name:masa_manfaat|label:Masa Manfaat|className:text-center'),
-                    $this->makeColumn('name:nilai_residu|label:Nilai Residu|className:text-center'),
-                    $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan|className:text-center'),
-                    $this->makeColumn('name:nilai_buku|label:Nilai Buku|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Biaya Pembangunan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
+                    $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     // $this->makeColumn('name:created_by'),
@@ -107,9 +108,6 @@ class KIBCController extends Controller
                 'nomor_register',
                 function ($record) {
                 return $record->no_register ? str_pad($record->no_register, 3, '0', STR_PAD_LEFT) : '-';
-                // $max_no = $record->where('coa_id',$record->coa_id)->max('no_register');
-                // $panjang_target = max(3, ceil(log10($max_no + 1)));
-                // return $record->no_register ? str_pad($record->no_register, $panjang_target, '0', STR_PAD_LEFT) : '-';
                 }
             )->addColumn(
                 'bertingkat',
@@ -139,12 +137,12 @@ class KIBCController extends Controller
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->trans ? $record->trans->spk_start_date->format('Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
                 }
             )->addColumn(
                 'status_tanah',
                 function ($record) {
-                    return $record->land_status ? $record->land_status : '-';
+                    return $record->land_status ? ucwords($record->land_status) : '-';
                 }
             )->addColumn(
                 'nomor_dokumen',
@@ -159,7 +157,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'asal_usul',
                 function ($record) {
-                    return $record->usulans ? $record->usulans->danad->name : '-';
+                    return $record->usulans->danad ? $record->usulans->danad->name : '-';
                 }
             )->addColumn(
                 'nilai_residu',
@@ -169,7 +167,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'nilai_beli',
                 function ($record) {
-                   return $record->trans ? number_format($record->trans->unit_cost, 0, ',', ',') : '-';
+                   return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',') ;
                 }
             )->addColumn(
                 'nilai_buku',
@@ -179,7 +177,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'masa_manfaat',
                 function ($record) {
-                    return $record->useful ? $record->useful.' Tahun' : '-';
+                    return $record->useful ? $record->useful: '-';
                 }
             )->addColumn(
                 'akumulasi',
@@ -189,7 +187,14 @@ class KIBCController extends Controller
             )->addColumn(
                 'status',
                 function ($record) {
-                    return $record->status ? $record->status : '-';
+                    // return $record->status ? ucfirst($record->status) : '-';
+                    if ($record->status == 'actives') {
+                        return $record->status ? '<span class="badge bg-success text-white">'.ucwords('active').'</span>' : '-';
+                    } elseif ($record->status == 'notactive') {
+                        return $record->status ? '<span class="badge bg-danger text-white">'.ucwords($record->status).'</span>' : '-';
+                    } else {
+                        return $record->status ? '<span class="badge bg-light">'.ucwords($record->status).'</span>' : '-';
+                    }
                 }
             )->addColumn(
                 'tanah_id',
@@ -199,12 +204,29 @@ class KIBCController extends Controller
             )->addColumn(
                 'kondisi',
                 function ($record) {
-                    return $record->condition ? $record->condition : '-';
+                    if ($record->condition == 'baik') {
+                        return $record->condition ? '<span class="badge bg-success text-white">'.ucwords($record->condition).'</span>' : '-';
+                    } elseif ($record->condition == 'rusak berat') {
+                        return $record->condition ? '<span class="badge bg-danger text-white">'.ucwords($record->condition).'</span>' : '-';
+                    } else {
+                        return $record->condition ? '<span class="badge bg-warning text-white">'.ucwords($record->condition).'</span>' : '-';
+                    }
+                    // return $record->condition ? ucfirst($record->condition) : '-';
                 }
             )->addColumn(
                 'keterangan',
                 function ($record) {
                     return $record->description ? $record->description : '-';
+                }
+            )->addColumn(
+                'source_acq',
+                function ($record) {
+                    if ($record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ) {
+                        return $record->usulans ? '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' : '-';
+                    } else {
+                        return $record->usulans ? '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' : '-';
+                    }
+                  //  return $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-';
                 }
             )->addColumn(
                 'updated_by',
@@ -213,15 +235,49 @@ class KIBCController extends Controller
                 }
             )
             ->addColumn('action',function ($record) use ($user) {
-                    $actions = [
-                        'type:show|id:' . $record->id,
-                        // 'type:edit|id:' . $record->id,
-                    ];
+                $actions[] = [
+                    'type' => 'show',
+                    'page' => true,
+                    'id' => $record->id,
+                    'url' => route($this->routes . '.show', $record->id),
+                ];
+
+                if($record->condition =='baik'){
+                    if (auth()->user()->checkPerms('perbaikan-aset.create')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Perbaikan',
+                            'icon' => 'fa fa-wrench text-success',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.repair', $record->id),
+                        ];
+                    }
+                }
+
+                if($record->condition =='rusak berat'){
+                    if (auth()->user()->checkPerms('penghapusan-aset.create')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Perbaikan',
+                            'icon' => 'fa fa-trash-o text-danger',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.repair', $record->id),
+                        ];
+                    }
+                }
                     return $this->makeButtonDropdown($actions);
                 }
             )
-            ->rawColumns(['action','name','jenis_aset','updated_by'])
+            ->rawColumns(['source_acq','status','kondisi','action','name','jenis_aset','updated_by'])
             ->make(true);
+    }
+
+    public function storeDetail(TransaksiRequest $request)
+    {
+        $record = new PembelianTransaksi;
+        return $record->handleStoreOrUpdate($request); //handle simpan data
     }
 
 
@@ -232,7 +288,7 @@ class KIBCController extends Controller
    
     public function show(Aset $record){
         $type ='show';
-        return $this->render($this->views . '.show',compact('record','type'));
+        return $this->render($this->views . '.detailShow',compact('record','type'));
     }
 
     public function store(AsetRequest $request){
@@ -245,23 +301,10 @@ class KIBCController extends Controller
         return $this->render($this->views.'.edit',compact('record'));
     }
 
-
-    // public function update(Aset $record, AsetRequest $request){
-    //     return $record->handleStoreOrUpdate($request);
-    // }
-
-    // public function destroy(Aset $record){
-    //     return $record->handleDestroy();
-    // }
-
-    // public function getDetailAset(AsetRequest $request){
-    //     $id_akun = $request->id;
-    //     $aset = Aset::where('id', $id)->first();
-    //     return response()->json([
-    //         'name' => $aset->name,
-    //        /// 'jenis_pengadaan' => $aset->jenis_pengadaan,
-    //         'description' => $aset->description,
-    //     ]);
-    // }
+    public function repair(Aset $record)
+    {
+        // dd($record);
+        return $this->render('pengajuan.perbaikan-aset.create',compact('record'));
+    }
 
 }

@@ -1,4 +1,11 @@
 <table id="dataFilters" class="width-full">
+    <div class="alert alert-custom alert-light-primary fade show py-4" role="alert">
+        <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+        <div class="alert-text text-primary">
+            <div class="text-bold">{{ __('Informasi') }}:</div>
+            <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Checklist Aset Sejenis Untuk Dibuatkan Transaksi Pembelian, Gunakan Filter Untuk Memudahkan Menemukan Aset Sejenis</div>
+        </div>
+    </div>
     <tbody>
         <tr>
             <td class="pb-2 valign-top td-filter-reset width-80px">

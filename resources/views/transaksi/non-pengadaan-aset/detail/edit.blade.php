@@ -1,0 +1,114 @@
+@extends('layouts.modal')
+
+@section('action', route($routes . '.detailUpdate', $detail->id))
+
+@section('modal-body')
+    @method('POST')
+    <input type="hidden" name="is_submit" value="0">
+    <input type="hidden" name="detail_id" value="{{ $detail->id }}">
+    <input type="hidden" name="trans_id" value="{{ $detail->trans_id }}">
+    {{-- <input type="hidden" name="pembelian_id" value="{{ $detail->id }}"> --}}
+    <div class="row">
+        <div class="col-sm-12 col-sm-12">
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
+                        data-url="{{ route('ajax.selectAsetRS', 'all') }}"
+                        placeholder="{{ __('Pilih Salah Satu') }}">
+                        <option value="">{{ __('Pilih Salah Satu') }}</option>
+
+                        @if (isset($detail) && ($asetd = $detail->asetd))
+                            <option value="{{ $asetd->id }}" selected>{{ $asetd->name }}</option>
+                        @endif
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-sm-12">
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    <textarea class="form-control" name="desc_spesification" placeholder="{{ __('Spesifikasi Aset') }}" value ="{{ $detail->desc_spesification }}">{{ $detail->desc_spesification }}</textarea>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12 col-sm-12">
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Jumlah Diterima') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    <div class="input-group">
+                        <input type="text" min=1 id ="qty_agree" name="qty_agree" class="form-control base-plugin--inputmask_currency text-right"
+                            placeholder="{{ __('Jumlah Pengajuan') }}" value="{{ $detail->qty_agree }}" >
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                Unit
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-sm-12" >
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-5 pr-0">
+                    <label class="col-form-label">{{ __('Harga Unit') }}</label>
+                </div>
+                <div class="col-sm-12 col-md-7 parent-group">
+                    <div class="input-group">
+                        <input type="text" min=0 id ="HPS_unit_cost" name="HPS_unit_cost" class="form-control base-plugin--inputmask_currency text-right"
+                            placeholder="{{ __('Harga Unit') }}" value="{{ $detail->HPS_unit_cost }}" >
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                Rupiah
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        
+    
+    </div>
+@endsection
+
+@push('scripts')
+
+    <script>
+
+        function updateTotal() {
+            var quantity = document.getElementById('qty_req').value;
+            var price = document.getElementById('HPS_unit_cost').value;
+
+            quantity= quantity.replace(/[^0-9]/g, '');
+            price= price.replace(/[^0-9]/g, '');
+
+            quantity = parseInt(quantity);
+            price = parseInt(price);
+            
+            if(quantity > 0 && price > 0)
+                
+                var total = parseInt(quantity) * parseInt(price);
+
+                console.log(total)
+                document.getElementById('HPS_total_cost').value = parseInt(total);
+                document.getElementById('HPS_unit_cost').value = parseInt(price)
+        }
+    </script>
+
+    <script src="{{ '/assets/js/global.js' }}"></script>
+    <script>
+	    $('.modal-dialog-right-bottom').removeClass('modal-lg').addClass('modal-md');
+    </script>
+@endpush
