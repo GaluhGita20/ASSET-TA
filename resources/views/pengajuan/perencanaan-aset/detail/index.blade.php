@@ -33,6 +33,18 @@
     </tbody>
 </table>
 
+@if(auth()->user()->hasRole('Sub Bagian Program Perencanaan'))
+    <div class="alert alert-custom alert-light-primary fade show py-4" role="alert">
+        <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+        <div class="alert-text text-primary">
+            <div class="text-bold">{{ __('Informasi') }}:</div>
+            <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Memberikan Approve Pada Detail Aset Yang Diusulkan</div>
+        </div>
+    </div>
+@endif
+
+
+
 <div class="table-responsive">
     @if (isset($tableStruct['datatable_1']))
         <table id="datatable_1" class="table table-bordered is-datatable" style="width: 100%;"

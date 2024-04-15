@@ -3,7 +3,7 @@
 @section('modal-body')
 @method('POST')
 <div class="form-group row">
-	<label class="col-md-12 col-form-label">{{ __('Province') }}</label>
+	<label class="col-md-12 col-form-label">{{ __('Province') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 	<div class="col-md-12 parent-group">
 		<select name="province_id" class="form-control base-plugin--select2-ajax"
 			data-url="{{ rut('ajax.selectProvince', [

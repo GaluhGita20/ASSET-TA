@@ -49,6 +49,71 @@
 	</div>
 </div>
 
+<div class="modal fade modal-loading" id="modalApprove"
+	data-keyboard="false"
+	data-backdrop="static"
+	aria-hidden="true">
+	<div class="modal-dialog modal-md modal-dialog-centered">
+		<div class="modal-content">
+			
+			<form action="{{ rut($routes.'.approve', $record->id) }}" method="POST" autocomplete="off">
+				@csrf
+				{{-- {{ dd($record) }} --}}
+				@method('POST')
+				
+				<div class="modal-header">
+					<h4 class="modal-title">Input Data SP2D (Surat Perintah Pencairan Dana)</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<i aria-hidden="true" class="ki ki-close"></i>
+					</button>
+				</div>
+				<div class="modal-body text-left">
+					<div class="form-group">
+						<label>{{ __('SP2D Code') }}</label>
+						<div class="parent-group">
+							@if($record->sp2d_code == null)
+								<input type="text" name="sp2d_code" class="form-control" placeholder="{{ __('Kode SP2D') }}">
+							@else
+								<input type="text" name="sp2d_code" class="form-control" value="{{$record->sp2d_code}}" placeholder="{{ __('Kode SP2D') }}">
+							@endif
+						</div>
+					</div>
+				</div>
+
+                <div class="modal-body text-left">
+					<div class="form-group">
+						<label>{{ __('SP2D Date') }}</label>
+						<div class="parent-group">
+							@if($record->sp2d_date == null)
+								<input class="form-control base-plugin--datepicker" name="sp2d_date" placeholder="{{ __('Tanggal SP2D') }}">
+							@else
+								<input class="form-control base-plugin--datepicker" name="sp2d_date" value="{{$record->sp2d_date}}" placeholder="{{ __('Tanggal SP2D') }}" data-date-end-date="{{ now()}}">
+							@endif
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary base-form--submit-modal"
+						data-swal-confirm="true"
+						data-swal-text="{{ __('base.confirm.save.text') }}"
+						{{-- data-swal-ok="{{ __('base.confirm.reject.ok') }}" --}}
+						>
+						<i class="fa fa-check mr-1"></i>
+						{{ __('Approve') }}
+					</button>
+				</div>
+			</form>
+			<div class="modal-loader pt-6" style="display: none;">
+				<span class="spinner spinner-primary"></span>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
 
 
 

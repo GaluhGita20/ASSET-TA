@@ -1,6 +1,5 @@
 @extends('layouts.lists')
 
-
 @section('filters')
 	<div class="row">
         <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
@@ -14,6 +13,17 @@
         <div class="col-4 col-sm-6 col-xl-3 pb-2 mr-n6">
             <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Tahun Pengadaan') }}">
         </div>
+        <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
+			<select class="form-control base-plugin--select2-ajax filter-control"
+				data-post="status"
+				data-placeholder="{{ __('Status') }}">
+				<option value="" selected>{{ __('Status') }}</option>
+				<option value="Draft">Draft</option>
+				<option value="waiting.approval">Waiting Approval</option>
+                <option value="completed">Completed</option>
+                <option value="rejected">Rejected</option>
+			</select>
+		</div>
         {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <div class="input-group">
                 <input name="date_start"

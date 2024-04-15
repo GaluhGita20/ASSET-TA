@@ -88,13 +88,8 @@ Route::middleware('auth')->group(function () {
 
                     }
                 );
+                
                 Route::grid('perencanaan-aset', 'PerencanaanAsetController', [
-                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
-                ]);
-
-                Route::post('perbaikan-aset/{record}/updateSummary', 'PerbaikanAsetController@updateSummary')->name('perbaikan-aset.updateSummary');
-
-                Route::grid('perbaikan-aset', 'PerbaikanAsetController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
 
@@ -104,9 +99,78 @@ Route::middleware('auth')->group(function () {
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
 
+                //pemutihan
+                // Route::post('pemutihan-aset/{record}/updateSummary', 'PemutihanAsetController@updateSummary')->name('pemutihan-aset.updateSummary');
+                Route::post('pemutihan-aset/{record}/updateSummary', 'PemutihanAsetController@updateSummary')->name('pemutihan-aset.updateSummary');
+                Route::get('pemutihan-aset/detail/{record}', 'PemutihanAsetController@detail')->name('pemutihan-aset.detail');
+                Route::get('pemutihan-aset/{record}/show', 'PemutihanAsetController@show')->name('pemutihan-aset.show');
+                Route::post('store', 'PemutihanAsetControlle@submitSave')->name('pemutihan-aset.store');
+                Route::post('pemutihan-aset/rejected/{id}', 'PemutihanAsetController@rejected')->name('pemutihan-aset.rejected');
+                Route::grid('pemutihan-aset', 'PemutihanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+
 
             }
         );
+
+        Route::namespace('Perbaikan')
+        ->prefix('perbaikan')
+        ->name('perbaikan.')
+        ->group(
+            function () {
+                Route::post('perbaikan-aset/{record}/updateSummary', 'PerbaikanAsetController@updateSummary')->name('perbaikan-aset.updateSummary');
+                Route::grid('perbaikan-aset', 'PerbaikanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+
+                Route::grid('pj-perbaikan', 'PjPerbaikanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+                Route::post('pj-perbaikan/{record}/detailGrid', 'PjPerbaikanAsetController@detailGrid')->name('pj-perbaikan.detailGrid');
+                Route::get('pj-perbaikan/detail/{record}', 'PjPerbaikanAsetController@detail')->name('pj-perbaikan.detail');
+                Route::get('pj-perbaikan/detailShow/{detail}', 'PjPerbaikanAsetController@detailShow')->name('pj-perbaikan.detailShow');
+
+                //trans
+                Route::grid('trans-sperpat', 'TransPerbaikanDisposisiController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+
+                Route::get('trans-sperpat/detail/{record}', 'TransPerbaikanDisposisiController@detail')->name('trans-sperpat.detail');
+                Route::post('trans-sperpat/{record}/detailGrid', 'TransPerbaikanDisposisiController@detailGrid')->name('trans-sperpat.detailGrid');
+                Route::get('trans-sperpat/detailShow/{detail}', 'TransPerbaikanDisposisiController@detailShow')->name('trans-sperpat.detailShow');
+                // =======================================
+
+
+                Route::post('detailStore', 'PerbaikanDisposisiController@detailStore')->name('detailStore');
+                Route::post('perbaikan-aset/{record}/updateSummary', 'PerbaikanAsetController@updateSummary')->name('perbaikan-aset.updateSummary');
+                Route::grid('perbaikan-aset', 'PerbaikanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+
+                Route::post('usulan-sperpat/detailStore', 'PerbaikanDisposisiController@detailStore')->name('usulan-sperpat.detailStore');
+                
+                Route::post('usulan-sperpat/detailUpdate/{detail}', 'PerbaikanDisposisiController@detailUpdate')->name('usulan-sperpat.detailUpdate');
+                Route::get('usulan-sperpat/detailEdit/{detail}', 'PerbaikanDisposisiController@detailEdit')->name('usulan-sperpat.detailEdit');
+
+                Route::delete('usulan-sperpat/detailDestroy/{detail}', 'PerbaikanDisposisiController@detailDestroy')->name('usulan-sperpat.detailDestroy');
+                // Route::post('usulan-sperpat/detailStore', 'PerbaikanDisposisiController@detailStore')->name('usulan-sperpat.detailStore');
+                
+                Route::get('usulan-sperpat/detailCreate/{record}', 'PerbaikanDisposisiController@detailCreate')->name('usulan-sperpat.detailCreate');
+                Route::get('usulan-sperpat/detailShow/{detail}', 'PerbaikanDisposisiController@detailShow')->name('usulan-sperpat.detailShow');
+                // Route::get('usulan-sperpat/detailEdit/{detail}', 'PerbaikanDisposisiController@detailEdit')->name('usulan-sperpat.detailEdit');
+
+                Route::delete('usulan-sperpat/detailDestroy/{detail}', 'PerbaikanDisposisiController@detailDestroy')->name('usulan-sperpat.detailDestroy');
+                Route::get('usulan-sperpat/detail/{record}', 'PerbaikanDisposisiController@detail')->name('usulan-sperpat.detail');
+                Route::post('usulan-sperpat/{record}/detailGrid', 'PerbaikanDisposisiController@detailGrid')->name('usulan-sperpat.detailGrid');
+                Route::post('usulan-sperpat/{record}/updateSummary', 'PerbaikanDisposisiController@updateSummary')->name('usulan-sperpat.updateSummary');
+                Route::grid('usulan-sperpat', 'PerbaikanDisposisiController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+        });
+
+
+
 
         Route::namespace('Pemeliharaan')
         ->prefix('pemeliharaan')
@@ -116,6 +180,7 @@ Route::middleware('auth')->group(function () {
                 Route::grid('pemeliharaan-aset', 'PemeliharaanAsetController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
+                Route::post('pemeliharaan-aset/rejected/{id}', 'PemeliharaanAsetController@rejected')->name('pemeliharaan-aset.rejected');
                 Route::post('pemeliharaan-aset/{record}/updateSummary', 'PemeliharaanAsetController@updateSummary')->name('pemeliharaan-aset.updateSummary');
                 Route::post('pemeliharaan-aset/detailUpdate/{detail}', 'PemeliharaanAsetController@detailUpdate')->name('pemeliharaan-aset.detailUpdate');
                 // Route::post('pemeliharaan/{record}/updateSummary', 'PemeliharaanAsetController@updateSummary')->name('updateSummary');
@@ -129,18 +194,6 @@ Route::middleware('auth')->group(function () {
                 Route::post('pemeliharaan-aset/detailStore', 'PemeliharaanAsetController@detailStore')->name('pemeliharaan-aset.detailStore');
                 
         });
-
-        // Route::namespace('Pemutihan')
-        // ->prefix('pemutihan')
-        // ->name('pemutihan.')
-        // ->group(
-        // function () {
-        //     Route::grid('pemutihan-aset', 'PenghapusanAsetController', [
-        //         'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
-        //     ]);
-                
-        // });
-
     
         Route::namespace('Transaksi')
         ->prefix('transaksi')
@@ -158,7 +211,6 @@ Route::middleware('auth')->group(function () {
                         Route::get('EditDetail/{detail}', 'ListPembelianController@editDetail')->name('editDetail');
                         Route::post('detailUpdate/{detail}', 'ListPembelianController@detailUpdate')->name('detailUpdate');
                         Route::delete('destroyDetail/{detail}', 'ListPembelianController@destroyDetail')->name('destroyDetail');
-
                     }
                 );
                 Route::delete('waiting-purchase/detailDestroy/{detail}', 'ListPembelianController@detailDestroy')->name('waiting-purchase.detailDestroy');
@@ -168,7 +220,6 @@ Route::middleware('auth')->group(function () {
                 Route::grid('pengadaan-aset', 'PengadaanAsetController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
-
                 Route::get('pengadaan-aset/editUpdate/{id}', 'PengadaanAsetController@editUpdate')->name('pengadaan-aset.editUpdate');
                 Route::post('pengadaan-aset/rejected/{id}', 'PengadaanAsetController@rejected')->name('pengadaan-aset.rejected');
                 
@@ -186,7 +237,6 @@ Route::middleware('auth')->group(function () {
                 Route::grid('non-pengadaan-aset', 'HibahAsetController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
-
             }
         );
 
@@ -218,6 +268,12 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('city-options', 'AjaxController@cityOptions')->name('cityOptions');
                 Route::post('penilaian-category', 'AjaxController@penilaianCategoryOptions')->name('penilaianCategoryOptions');
+                Route::post('selectKib', 'AjaxController@selectKib')->name('selectKib');
+                Route::post('selectPerbaikan', 'AjaxController@selectPerbaikan')->name('selectPerbaikan');
+                Route::post('getKibById', 'AjaxController@getKibById')->name('getKibById');
+                Route::post('cekSperpat', 'AjaxController@cekSperpat')->name('cekSperpat');
+                Route::post('checkAset', 'AjaxController@checkAset')->name('checkAset');
+
                 //Route::post('{search}/cityOptionsRoot', 'AjaxController@cityOptionsRoot')->name('cityOptionsRoot');
                 Route::get('jabatan-options', 'AjaxController@jabatanOptions')->name('jabatan-options');
                 Route::get('jabatan-options-with-nonpkpt', 'AjaxController@jabatanWithNonPKPTOptions')->name('jabatan-options-with-nonpkpt');
@@ -225,6 +281,8 @@ Route::middleware('auth')->group(function () {
                 Route::post('selectObject', 'AjaxController@selectObject')->name('selectObject');
                 Route::post('{search}/selectRole', 'AjaxController@selectRole')->name('selectRole');
                 Route::post('{search}/selectStruct', 'AjaxController@selectStruct')->name('selectStruct');
+                Route::post('selectPemeliharaan', 'AjaxController@selectPemeliharaan')->name('selectPemeliharaan');
+
                 Route::get('child-struct-options', 'AjaxController@childStructOptions')->name('child-struct-options');
                 Route::post('{search}/selectPosition', 'AjaxController@selectPosition')->name('selectPosition');
                 Route::post('{search}/selectUser', 'AjaxController@selectUser')->name('selectUser');
@@ -238,7 +296,13 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectAsetKib','AjaxController@selectAsetKib')->name('selectAsetKib');
 
                 Route::post('{search}/selectJenisUsaha', 'AjaxController@selectJenisUsaha')->name('selectJenisUsaha');
+                Route::post('{search}/selectStatusTanah', 'AjaxController@selectStatusTanah')->name('selectStatusTanah');
+                Route::post('{search}/selectHakTanah', 'AjaxController@selectHakTanah')->name('selectHakTanah');
+                Route::post('{search}/selectBahanAset', 'AjaxController@selectBahanAset')->name('selectBahanAset');
+
+
                 Route::post('{search}/selectJenisPengadaan', 'AjaxController@selectJenisPengadaan')->name('selectJenisPengadaan');
+                Route::post('{search}/selectJenisPemutihan', 'AjaxController@selectJenisPemutihan')->name('selectJenisPemutihan');
                 Route::post('{search}/selectRoom', 'AjaxController@selectRoom')->name('selectRoom');
                 Route::post('{search}/selectVendor', 'AjaxController@selectVendor')->name('selectVendor');
                 Route::post('{search}/selectSSBiaya', 'AjaxController@selectSSBiaya')->name('selectSSBiaya');
@@ -259,10 +323,71 @@ Route::middleware('auth')->group(function () {
         ->name('laporan.')
         ->group(
             function () {
+                Route::post('{record}/detailGrid','AsetController@detailGrid')->name('detailGrid');
+                Route::get('detail/{record}', 'AsetController@detail')->name('detail');
+                // Route::grid('AsetController');
                 Route::grid('perencanaan-aset', 'LaporanPerencanaanController');
                 Route::grid('penerimaan-aset', 'LaporanPenerimaanController');
+                Route::grid('hibah-aset', 'LaporanHibahAsetController');
+
+                //Route::get('hibah-aset/detailShow/{detail}', 'LaporanHibahAsetController@detailShow')->name('hibah-aset.detailShow');
                 Route::get('perencanaan-aset/detailShow/{detail}', 'LaporanPerencanaanController@detailShow')->name('perencanaan-aset.detailShow');
                 // Route::get('penerimaan-aset/detailShow/{detail}', 'LaporanPenerimaanController@detailShow')->name('penerimaan-aset.detailShow');
+
+                Route::namespace('Inventaris')
+                ->prefix('inventaris')
+                ->name('inventaris.')
+                ->group( function() {
+
+                            Route::grid('kib-a','KIBAController');
+                            Route::post('kib-a/{record}/detailsGrid','KIBAController@detailsGrid')->name('kib-a.detailsGrid');
+                            Route::get('kib-a/details/{record}', 'KIBAController@details')->name('kib-a.details');
+
+                            Route::post('kib-a/{record}/detailpGrid','KIBAController@detailpGrid')->name('kib-a.detailpGrid');
+                            Route::get('kib-a/detailp/{record}', 'KIBAController@detailp')->name('kib-a.detailp');
+
+
+                            Route::grid('kib-b','KIBBController');
+                            Route::post('kib-b/{record}/detailsGrid','KIBBController@detailsGrid')->name('kib-b.detailsGrid');
+                            Route::get('kib-b/details/{record}', 'KIBBController@details')->name('kib-b.details');
+
+                            Route::post('kib-b/{record}/detailpGrid','KIBBController@detailpGrid')->name('kib-b.detailpGrid');
+                            Route::get('kib-b/detailp/{record}', 'KIBBController@detailp')->name('kib-b.detailp');
+
+
+                            Route::grid('kib-c','KIBCController');
+                            Route::post('kib-c/{record}/detailsGrid','KIBCController@detailsGrid')->name('kib-c.detailsGrid');
+                            Route::get('kib-c/details/{record}', 'KIBCController@details')->name('kib-c.details');
+
+                            Route::post('kib-c/{record}/detailpGrid','KIBCController@detailpGrid')->name('kib-c.detailpGrid');
+                            Route::get('kib-c/detailp/{record}', 'KIBCController@detailp')->name('kib-c.detailp');
+
+
+                            Route::grid('kib-d','KIBDController');
+                            Route::post('kib-d/{record}/detailsGrid','KIBDController@detailsGrid')->name('kib-d.detailsGrid');
+                            Route::get('kib-d/details/{record}', 'KIBDController@details')->name('kib-d.details');
+
+                            Route::post('kib-d/{record}/detailpGrid','KIBDController@detailpGrid')->name('kib-d.detailpGrid');
+                            Route::get('kib-d/detailp/{record}', 'KIBDController@detailp')->name('kib-d.detailp');
+
+                            Route::grid('kib-e','KIBEController');
+                            Route::post('kib-e/{record}/detailsGrid','KIBEController@detailsGrid')->name('kib-e.detailsGrid');
+                            Route::get('kib-e/details/{record}', 'KIBEController@details')->name('kib-e.details');
+
+                            Route::post('kib-e/{record}/detailpGrid','KIBEController@detailpGrid')->name('kib-e.detailpGrid');
+                            Route::get('kib-e/detailp/{record}', 'KIBEController@detailp')->name('kib-e.detailp');
+
+                            Route::grid('kib-f','KIBFController');
+                            Route::post('kib-f/{record}/detailsGrid','KIBFController@detailsGrid')->name('kib-f.detailsGrid');
+                            Route::get('kib-f/details/{record}', 'KIBFController@details')->name('kib-f.details');
+
+                            Route::post('kib-f/{record}/detailpGrid','KIBFController@detailpGrid')->name('kib-f.detailpGrid');
+                            Route::get('kib-f/detailp/{record}', 'KIBFController@detailp')->name('kib-f.detailp');
+                        }
+                    );
+
+                //inventaris 
+
         });
 
     Route::namespace('Inventaris')
@@ -310,12 +435,21 @@ Route::middleware('auth')->group(function () {
                 Route::get('kib-e/deletes/{record}', 'KIBEController@deletes')->name('kib-e.deletes');
                 Route::get('kib-f/deletes/{record}', 'KIBFController@deletes')->name('kib-f.deletes');
 
+                //pemutihan
+                // Route::post('trans-sperpat/{record}/detailGrid', 'TransPerbaikanDisposisiController@detailGrid')->name('trans-sperpat.detailGrid');
+                // Route::get('trans-sperpat/detailShow/{detail}', 'TransPerbaikanDisposisiController@detailShow')->name('trans-sperpat.detailShow');
+                Route::post('kib-b/{record}/detailsGrid','KIBBController@detailsGrid')->name('kib-b.detailsGrid');
+                Route::get('kib-b/details/{record}', 'KIBBController@details')->name('kib-b.details');
 
+                Route::post('kib-b/{record}/detailpGrid','KIBBController@detailpGrid')->name('kib-b.detailpGrid');
+                Route::get('kib-b/detailp/{record}', 'KIBBController@detailp')->name('kib-b.detailp');
+                // Route::get('kib-a/pemutihan/{record}', 'KIBAController@pemutihan')->name('kib-a.pemutihan');
+                // Route::get('kib-b/pemutihan/{record}', 'KIBBController@pemutihan')->name('kib-b.pemutihan');
+                // Route::get('kib-c/pemutihan/{record}', 'KIBCController@pemutihan')->name('kib-c.pemutihan');
+                // Route::get('kib-d/pemutihan/{record}', 'KIBDController@pemutihan')->name('kib-d.pemutihan');
+                // Route::get('kib-e/pemutihan/{record}', 'KIBEController@pemutihan')->name('kib-e.pemutihan');
+                // Route::get('kib-f/pemutihan/{record}', 'KIBFController@pemutihan')->name('kib-f.pemutihan');
             });
-
-
-
-
 
     // Setting
     Route::namespace('Setting')
@@ -466,6 +600,24 @@ Route::middleware('auth')->group(function () {
                             Route::grid('dana', 'SumberDanaController');
                         }
                     );
+                Route::namespace('BahanAset')
+                ->group(
+                    function () {
+                        Route::grid('bahanAset', 'BahanAsetController');
+                    }
+                );
+                Route::namespace('HakTanah')
+                ->group(
+                    function () {
+                        Route::grid('hakTanah', 'HakTanahController');
+                    }
+                );
+                Route::namespace('StatusTanah')
+                ->group(
+                    function () {
+                        Route::grid('statusTanah', 'StatusTanahController');
+                    }
+                );
                 Route::namespace('Location')
                     ->group(
                         function () {
@@ -494,6 +646,9 @@ Route::middleware('auth')->group(function () {
         );
 
     // Web Transaction Modules
+    // foreach (\File::allFiles(__DIR__ . '/webs') as $file) {
+    //     require $file->getPathname();
+    // }
     foreach (FacadesFile::allFiles(__DIR__ . '/webs') as $file) {
         require $file->getPathname();
     }
@@ -511,12 +666,27 @@ Route::get(
     }
 );
 
-
-
 Route::get(
     'dev/tes-email',
     function (Request $request) {
-        \Mail::to(['rusman.pragma@gmail.com'])->send(new \App\Mail\TesMail());
+        \Mail::to(['teguharthana@gmail.com'])->send(new \App\Mail\TesMail());
         return $request->all();
     }
 );
+
+//test user sistem
+// sri (staf)
+// umam (kepala) IGD
+// encu (kepala) pelayanan medik
+// hengki (program perencanaan dan pelaporan)
+// sumardi (keuangan)
+// suasa (direktur)
+
+// master data
+// hak tanah
+// status tanah
+// bahan
+
+
+//aset yang ditaruh di tempat halaman parkir
+// data double Kepala Seksi Sarana dan Prasarana Logistik belum ada

@@ -48,6 +48,7 @@ class PerencanaanRequest extends FormRequest
 
     public function messages()
     {
+        //dd($errors->all());
         return [
             'procurement_year.required' => 'Tahun pengadaan wajib diisi.',
             'procurement_year.integer' => 'Tahun pengadaan harus berupa angka.',

@@ -6,6 +6,7 @@
             <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Checklist Aset Sejenis Untuk Dibuatkan Transaksi Pembelian, Gunakan Filter Untuk Memudahkan Menemukan Aset Sejenis</div>
         </div>
     </div>
+
     <tbody>
         <tr>
             <td class="pb-2 valign-top td-filter-reset width-80px">
@@ -59,7 +60,6 @@
                     @endforeach
                 </tr>
             </thead>
-            
             <tbody>
             </tbody>
         </table>

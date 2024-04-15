@@ -92,7 +92,7 @@ class KIBFController extends Controller
             ->addColumn(
                 'name',
                 function ($record) {
-                   return $record->usulans ? $record->usulans->asetd->name : '-';
+                    return $record->usulans ? $record->usulans->asetd->name : '-';
                 }
             
             )->addColumn(
@@ -121,7 +121,7 @@ class KIBFController extends Controller
             )->addColumn(
                 'berbeton',
                 function ($record) {
-                   return $record->is_concreate_bld ? $record->is_concreate_bld : '-';
+                    return $record->is_concreate_bld ? $record->is_concreate_bld : '-';
                 }
             )->addColumn(
                 'luas',
@@ -197,13 +197,17 @@ class KIBFController extends Controller
                 'status',
                 function ($record) {
                     if ($record->status == 'actives') {
-                        return $record->status ? '<span class="badge bg-success text-white">'.ucwords('active').'</span>' : '-';
+                        return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
                     } elseif ($record->status == 'notactive') {
-                        return $record->status ? '<span class="badge bg-danger text-white">'.ucwords($record->status).'</span>' : '-';
-                    } else {
-                        return $record->status ? '<span class="badge bg-light">'.ucwords($record->status).'</span>' : '-';
+                        return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in repair') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in deletion') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } 
+                    else {
+                        return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
-                    //return $record->status ? ucfirst($record->status) : '-';
                 }
             )->addColumn(
                 'tanah_id',
@@ -241,31 +245,18 @@ class KIBFController extends Controller
                         'url' => route($this->routes . '.show', $record->id),
                     ];
 
-                    if($record->condition =='baik'){
-                        if (auth()->user()->checkPerms('perbaikan-aset.create')) {
-                            $actions[] = [
-                                'type' => 'edit',
-                                'page' => true,
-                                'label' => 'Perbaikan',
-                                'icon' => 'fa fa-wrench text-success',
-                                'id' => $record->id,
-                                'url' => route($this->routes . '.repair', $record->id),
-                            ];
-                        }
+                    if (auth()->user()->checkPerms('penghapusan-aset.create')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Hapus',
+                            'icon' => 'fas fa-trash text-danger',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.deletes', $record->id),
+                        ];
                     }
-    
-                    if($record->condition =='rusak berat'){
-                        if (auth()->user()->checkPerms('penghapusan-aset.create')) {
-                            $actions[] = [
-                                'type' => 'edit',
-                                'page' => true,
-                                'label' => 'Perbaikan',
-                                'icon' => 'fa fa-trash-o text-danger',
-                                'id' => $record->id,
-                                'url' => route($this->routes . '.repair', $record->id),
-                            ];
-                        }
-                    }
+
+
                     return $this->makeButtonDropdown($actions);
                 }
             )
@@ -283,7 +274,7 @@ class KIBFController extends Controller
         $baseContentReplace = "base-modal--render";
         return $this->render($this->views . '.create');
     }
-   
+
     // public function show(Aset $record){
     //     $type ='show';
     //     return $this->render($this->views . '.show',compact('record','type'));
@@ -303,6 +294,11 @@ class KIBFController extends Controller
     {
         // dd($record);
         return $this->render('pengajuan.perbaikan-aset.create',compact('record'));
+    }
+
+    public function deletes(Aset $record)
+    {
+        return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
     }
 
 }

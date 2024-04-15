@@ -80,49 +80,49 @@ class PerencanaanDetail extends Model
      ** RELATION
      *******************************/
 
-     public function asetd()
-     {
-         return $this->belongsTo(AsetRs::class, 'ref_aset_id');
-     }
- 
-     public function danad()
-     {
-         return $this->belongsTo(Dana::class, 'sumber_biaya_id');
-     }
-     public function users()
-     {
-         return $this->belongsTo(User::class, 'created_by');
-     }
- 
-     public function perencanaanPembelian()
-     {
-         return $this->belongsToMany(PembelianTransaksi::class, 'trans_pivot_perencanaan_pengadaan','detail_usulan_id' ,'pembelian_id');
-     }
- 
-     public function perencanaanPembelianDetail()
-     {
-         return $this->belongsToMany(PembelianTransaksi::class, 'trans_pivot_perencanaan_pengadaan', 'detail_usulan_id', 'pembelian_id')
-        ->withPivot('pembelian_id', 'detail_usulan_id');
-     }
- 
-     public function perencanaan()
-     {
-         return $this->belongsTo(Perencanaan::class, 'perencanaan_id');
-     }
+    public function asetd()
+    {
+        return $this->belongsTo(AsetRs::class, 'ref_aset_id');
+    }
 
-     public function trans()
-     {
-         return $this->belongsTo(PembelianTransaksi::class, 'trans_id');
-     }
+    public function danad()
+    {
+        return $this->belongsTo(Dana::class, 'sumber_biaya_id');
+    }
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
-    /*******************************
-     ** SCOPE
-     *******************************/
+    public function perencanaanPembelian()
+    {
+        return $this->belongsToMany(PembelianTransaksi::class, 'trans_pivot_perencanaan_pengadaan','detail_usulan_id' ,'pembelian_id');
+    }
 
-     public function scopeGrid($query)
-     {
-         return $query->where('status','draf');
-     }
+    public function perencanaanPembelianDetail()
+    {
+        return $this->belongsToMany(PembelianTransaksi::class, 'trans_pivot_perencanaan_pengadaan', 'detail_usulan_id', 'pembelian_id')
+    ->withPivot('pembelian_id', 'detail_usulan_id');
+    }
+
+    public function perencanaan()
+    {
+        return $this->belongsTo(Perencanaan::class, 'perencanaan_id');
+    }
+
+    public function trans()
+    {
+        return $this->belongsTo(PembelianTransaksi::class, 'trans_id');
+    }
+
+/*******************************
+ ** SCOPE
+    *******************************/
+
+    public function scopeGrid($query)
+    {
+        return $query->where('status','draf');
+    }
 
 
     public function scopeFilters($query)

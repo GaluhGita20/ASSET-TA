@@ -236,8 +236,16 @@ class ProfileController extends Controller
         ];
         $request->validate(
             [
-                'old_password'              => 'required|password',
-                'new_password'              => [
+                'old_password'              =>  [
+                    'required',
+                   // 'min:8',
+                    function ($attribute, $value, $fail) {
+                        if (!\Hash::check($value, auth()->user()->password)) {
+                            $fail('Kata sandi lama tidak cocok.');
+                        }
+                    },
+                ],//'required|min:8', //'required|password',
+                'new_password' => [
                     'required',
                     'confirmed',
                     ...$password_rules,

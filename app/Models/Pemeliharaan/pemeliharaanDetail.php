@@ -40,29 +40,29 @@ class PemeliharaanDetail extends Model
      ** RELATION
      *******************************/
 
-     public function asetd()
-     {
-         return $this->belongsTo(Aset::class,'kib_id');
-     }
+    public function asetd()
+    {
+        return $this->belongsTo(Aset::class,'kib_id');
+    }
 
-     public function petugas()
-     {
-         return $this->belongsTo(User::class, 'repair_officer');
-     }
+    public function petugas()
+    {
+        return $this->belongsTo(User::class, 'repair_officer');
+    }
 
-     public function pemeliharaan()
-     {
-         return $this->belongsTo(Pemeliharaan::class, 'pemeliharaan_id');
-     }
+    public function pemeliharaan()
+    {
+        return $this->belongsTo(Pemeliharaan::class, 'pemeliharaan_id');
+    }
 
     /*******************************
      ** SCOPE
      *******************************/
 
-     public function scopeGrid($query)
-     {
+    public function scopeGrid($query)
+    {
         return $query->where('status','draf');
-     }
+    }
 
 
     public function scopeFilters($query)

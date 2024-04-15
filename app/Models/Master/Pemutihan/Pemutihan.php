@@ -132,7 +132,4 @@ class Pemutihan extends Model
         // if ($this->positions()->exists()) return false;
         return true;
     }
-
-   
-
 }

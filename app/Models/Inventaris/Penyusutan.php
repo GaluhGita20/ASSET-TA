@@ -15,7 +15,7 @@ class Aset extends Model
     protected $table = 'sys_penyusutan_aset';
 
     protected $fillable = [
-         'kib_id'
+        'kib_id'
         ,'acquisition_val'
         ,'residual_val'
         ,'depreciation_rate'
@@ -59,8 +59,7 @@ class Aset extends Model
                     $qq->where('jenis_aset', $jenis_jenis_aset);
                 });
             }
-        )
-         ->latest();
+        )->latest();
     }
 
     /** SAVE DATA **/

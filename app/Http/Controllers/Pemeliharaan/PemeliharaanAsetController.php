@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class PemeliharaanAsetController extends Controller
 {
@@ -79,7 +80,7 @@ class PemeliharaanAsetController extends Controller
             })
 
             ->addColumn('tanggal_pemeliharaan', function ($record) {
-                return $record->dates->format('d/m/Y');
+                return Carbon::parse($record->maintenance_date)->format('Y-m-d');
             })
 
             ->addColumn('status', function ($record) {
@@ -96,6 +97,7 @@ class PemeliharaanAsetController extends Controller
 
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [];
+
                 if ($record->checkAction('show', $this->perms)) {
                     $actions[] = [
                         'type' => 'show',
@@ -109,19 +111,44 @@ class PemeliharaanAsetController extends Controller
                     $actions[] = 'type:history';
                 }
 
-                // if ($record->checkAction('edit', $this->perms)) {
-                $actions[] = [
-                    'type' => 'edit',
-                    'page' => true,
-                    'label' => 'Detail',
-                    'icon' => 'fa fa-plus text-info',
-                    'id' => $record->id,
-                    'url' => route($this->routes . '.detail', $record->id),
-                ];
-                // }
+                if(auth()->user()->position->level == 'kepala' && $user->position->location->id == 8){
+                    if ($record->checkAction('approval', $this->perms)) {
+                            $actions[] = [
+                                'type' => 'approval',
+                                'label' => 'Approval',
+                                'page' => true,
+                                'id' => $record->id,
+                                'url' => route($this->routes . '.approval', $record->id)
+                            ];
+                    }
+                }
+
+                if(auth()->user()->hasRole('Sarpras') && auth()->user()->checkPerms('pemeliharaan-aset.edit')){
+                    if($record->status == 'draft' ||  $record->status == 'rejected'){
+                        $actions[] = [
+                            'type' => 'edit',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.edit', $record->id),
+                        ];
+
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Detail',
+                            'icon' => 'fa fa-plus text-info',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.detail', $record->id),
+                        ];
+                    }
+
+                }
+
+                if ($record->checkAction('tracking', $this->perms)) {
+                    $actions[] = 'type:tracking';
+                }
 
                 if(auth()->user()->hasRole('Sarpras') && auth()->user()->checkPerms('pemeliharaan-aset.delete')){
-                    if($record->status != 'completed'){
+                    if($record->status == 'draft' ||  $record->status == 'rejected'){
                         $actions[] = [
                             'type' => 'delete',
                             'id' => $record->id,
@@ -131,7 +158,6 @@ class PemeliharaanAsetController extends Controller
                     }
                 
                 }
-           
                 return $this->makeButtonDropdown($actions, $record->id);
             })
             ->rawColumns([
@@ -154,6 +180,10 @@ class PemeliharaanAsetController extends Controller
         return $record->handleStore($request);
     }
 
+    public function updateSummary(PemeliharaanRequest $request, Pemeliharaan $record)
+    {
+        return $record->handleStoreOrUpdate($request);
+    }
 
     public function detailGrid(Pemeliharaan $record)
     {        
@@ -180,6 +210,18 @@ class PemeliharaanAsetController extends Controller
                     return $detail->asetd ? $detail->asetd->usulans->asetd->name : '-';
                 }
             )
+            // ->addColumn(
+            //     'kib_id',
+            //     function ($detail) {
+            //         return $detail->asetd ? $detail->asetd->usulans->asetd->name : '-';
+            //     }
+            // )
+            ->addColumn(
+                'type',
+                function ($detail) {
+                    return $detail->asetd->type ? $detail->asetd->type : '-';
+                }
+            )
             ->addColumn(
                 'merek',
                 function ($detail) {
@@ -203,7 +245,7 @@ class PemeliharaanAsetController extends Controller
                 }
             )
             ->addColumn(
-                'petugass',
+                'petugas',
                 function ($detail) {
                     return $detail->petugas ? $detail->petugas->name : '-' ;
                 }
@@ -217,30 +259,28 @@ class PemeliharaanAsetController extends Controller
             ->addColumn(
                 'action',
                 function ($detail) use ($user, $record) {
+                    if($detail->pemeliharaan->status == 'draft' || $detail->pemeliharaan->status == 'rejected'){
+                        $actions[] = [
+                            'type' => 'edit',
+                            'label' => 'Perbarui Pemeliharaan',
+                            'icon' => 'fa fa-wrench text-success',
+                            // 'id' => $record->id,
+                            'url' => route($this->routes . '.detailEdit', $detail->id),
+                        ];
+                        $actions[] = [
+                            'type' => 'delete',
+                            'url' => route($this->routes . '.detailDestroy', $detail->id),
+                        ];
+                    }
                     $actions = [];
-
                     $actions[] = [
                         'type' => 'show',
                         'url' => route($this->routes . '.detailShow', $detail->id),
                     ];
-
-                    $actions[] = [
-                        'type' => 'edit',
-                        'label' => 'Update Maintenance',
-                        'icon' => 'fa fa-wrench text-success',
-                        // 'id' => $record->id,
-                        'url' => route($this->routes . '.detailEdit', $detail->id),
-                    ];
-
-                    $actions[] = [
-                        'type' => 'delete',
-                        'url' => route($this->routes . '.detailDestroy', $detail->id),
-                    ];
-
                     return $this->makeButtonDropdown($actions, $detail->id);
                 }
             )
-            ->rawColumns(['merek','status','action','updated_by','created_by'])
+            ->rawColumns(['merek','type','status','action','updated_by','created_by'])
             ->make(true);
     }
 
@@ -254,10 +294,11 @@ class PemeliharaanAsetController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:kib_id|label:Nama Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:type|label:Tipe Aset|className:text-center|width:200px'),
                     $this->makeColumn('name:merek|label:Merek Aset|className:text-center|width:200px'),
                     $this->makeColumn('name:lokasi|label:Lokasi Aset|className:text-center|width:200px'),
                     $this->makeColumn('name:status|label:Status Pemeliharaan|className:text-center|width:250px'),
-                    $this->makeColumn('name:petugass|label:Petugas|className:text-center|width:250px'),
+                    $this->makeColumn('name:petugas|label:Penaggung Jawab Pemeliharaan|className:text-center|width:250px'),
                     $this->makeColumn('name:updated_by|width:300px'),
                     $this->makeColumn('name:action|label:Aksi'),
                 ],
@@ -321,7 +362,24 @@ class PemeliharaanAsetController extends Controller
 
     public function show(Pemeliharaan $record)
     {
+        $this->prepare([
+            'tableStruct' => [
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:kib_id|label:Nama Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:type|label:Tipe Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:merek|label:Merek Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:lokasi|label:Lokasi Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:status|label:Status Pemeliharaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:petugas|label:Penanggung Jawab Pemeliharaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:updated_by|width:300px'),
+                    $this->makeColumn('name:action|label:Aksi'),
+                ],
+                'url' => route($this->routes . '.detailGrid', $record->id),
+            ],
+        ]);
         return $this->render($this->views . '.show', compact('record'));
+        // return $this->render($this->views . '.detail', compact('record'));
     }
 
     public function tracking(Pemeliharaan $record)
@@ -333,9 +391,57 @@ class PemeliharaanAsetController extends Controller
         return $this->render('globals.tracking', compact('record', 'module'));
     }
 
+    public function edit(Pemeliharaan $record)
+    {
+        $type ='edit';
+        return $this->render($this->views . '.edit',compact('record'));
+    }
+
+    public function update(Request $request, Pemeliharaan $record)
+    {
+        return $record->handleStoreOrUpdate($request);
+    }
+
     public function print(Pemeliharaan $record, $title = '')
     {
 
+    }
+
+    public function approval(Pemeliharaan $record)
+    {
+        $this->prepare([
+            'tableStruct' => [
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:kib_id|label:Nama Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:type|label:Tipe Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:merek|label:Merek Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:lokasi|label:Lokasi Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:status|label:Status Pemeliharaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:petugas|label:Penanggung Jawab Pemeliharaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:updated_by|width:300px'),
+                    $this->makeColumn('name:action|label:Aksi'),
+                ],
+                'url' => route($this->routes . '.detailGrid', $record->id),
+            ],
+        ]);
+        return $this->render($this->views . '.show', compact('record'));
+    }
+
+
+    public function approve(Pemeliharaan $record, Request $request)
+    {
+        return $record->handleApprove($request);  
+    }
+
+    public function reject(Pemeliharaan $record, Request $request)
+    {
+        $request->validate(
+            [
+                'note'  => 'required',
+            ]
+        );
+        return $record->handleReject($request);
     }
 
 }

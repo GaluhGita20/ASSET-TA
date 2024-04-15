@@ -47,7 +47,7 @@
                                     <label class="col-form-label">{{ __('Keterangan Tambahan') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea name="note_disposisi" class="base-plugin--summernote" placeholder="{{ __('Keeterangan Tambahan') }}" data-height="200" disabled>{!! $record->note  !!}</textarea>
+                                    <textarea name="note" class="base-plugin--summernote" placeholder="{{ __('Keeterangan Tambahan') }}" value={{$record->note}} data-height="200" disabled>{!! $record->note  !!}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -136,21 +136,20 @@
                                     <textarea name="sentence_end" value="{{ $record->sentence_end }}" class="base-plugin--summernote" placeholder="{{ __('Penutupan') }}" data-height="200" disabled>{!! $record->sentence_end !!}</textarea>
                                 </div>
                             </div> --}}
-
                         </div>
                     </div>
                 </div>
 
                 @if (request()->route()->getName() == $routes.'.approval')
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between">
-                        @if ($record->checkAction('approval', $perms) || auth()->user()->position->level == "kepala" &&  auth()->user()->position->location->level == "department" )
-                            @include('layouts.forms.btnBack')
-                            @include('layouts.forms.btnDropdownApproval')
-                            @include('layouts.forms.modalReject')
-                        @endif
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            @if ($record->checkAction('approval', $perms) || auth()->user()->position->level == "kepala" &&  auth()->user()->position->location->level == "department" )
+                                @include('layouts.forms.btnBack')
+                                @include('layouts.forms.btnDropdownApproval')
+                                @include('layouts.forms.modalReject')
+                            @endif
+                        </div>
                     </div>
-                </div>
                 @endif
             </div>
         </div>

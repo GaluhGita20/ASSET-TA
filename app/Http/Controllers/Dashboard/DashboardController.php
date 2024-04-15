@@ -38,16 +38,40 @@ class DashboardController extends Controller
 
         $progress = [
             [
-                'name' => 'reporting',
-                'title' => 'Pelaporan Audit',
+                'name' => 'Aset Tanah',
+                'title' => 'Aset Tanah',
                 'color' => 'success',
-                'icon' => 'fas fa-bookmark',
+                'icon' => 'fa fa-globe',
             ],
             [
-                'name' => 'followup',
-                'title' => 'Tindak Lanjut Audit',
+                'name' => 'Aset Peralatan Mesin',
+                'title' => 'Aset Peralatan Mesin',
                 'color' => 'warning',
-                'icon' => 'fas fa-id-card',
+                'icon' => 'fas fa-tools',
+            ],
+            [
+                'name' => 'Aset Gedung Bangunan',
+                'title' => 'Aset Gedung Bangunan',
+                'color' => 'success',
+                'icon' => 'fas fa-building',
+            ],
+            [
+                'name' => 'Aset Jalan Irigasi Jaringan',
+                'title' => 'Aset Jalan Irigasi Jaringan',
+                'color' => 'warning',
+                'icon' => 'fas fa-road',
+            ],
+            [
+                'name' => 'Aset Tetap Lainya',
+                'title' => 'Aset Tetap Lainya',
+                'color' => 'success',
+                'icon' => 'fas fa-box',
+            ],
+            [
+                'name' => 'Aset Kontruksi Pembangunan',
+                'title' => 'Aset Kontruksi Pembangunan',
+                'color' => 'warning',
+                'icon' => 'fas fa-landmark',
             ],
         ];
 
@@ -176,8 +200,8 @@ class DashboardController extends Controller
     public function progressAset(Request $request)
     {
 
-        $not_active = Aset::where('status','notactive')->where('type','KIB A')->count();
-        $active = Aset::where('status', 'active')->where('type','KIB A')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::whereIn('status',['notactive','clean','in cleaned'])->where('type','KIB A')->count();
+        $active = Aset::whereNotIn('status', ['clean', 'in cleaned', 'notactive'])->where('type','KIB A')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Tanah',
@@ -186,8 +210,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status','notactive')->where('type','KIB B')->count();
-        $active = Aset::where('status', 'active')->where('type','KIB B')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::whereIn('status',['notactive','clean','in cleaned'])->where('type','KIB B')->count();
+        $active = Aset::whereNotIn('status', ['clean', 'in cleaned', 'notactive'])->where('type','KIB B')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Peralatan Mesin',
@@ -196,8 +220,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status','notactive')->where('type','KIB C')->count();
-        $active = Aset::where('status', 'active')->where('type','KIB C')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::whereIn('status',['notactive','clean','in cleaned'])->where('type','KIB C')->count();
+        $active = Aset::whereNotIn('status', ['clean', 'in cleaned', 'notactive'])->where('type','KIB C')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Gedung Bangunan',
@@ -206,8 +230,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', 'notactive')->where('type','KIB D')->count();
-        $active = Aset::where('status', 'active')->where('type','KIB D')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::whereIn('status',['notactive','clean','in cleaned'])->where('type','KIB D')->count();
+        $active = Aset::whereNotIn('status', ['clean', 'in cleaned', 'notactive'])->where('type','KIB D')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Jalan Irigasi Jaringan',
@@ -216,8 +240,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', 'notactive')->where('type','KIB E')->count();
-        $active = Aset::where('status', 'active')->where('type','KIB E')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::whereIn('status',['notactive','clean','in cleaned'])->where('type','KIB E')->count();
+        $active = Aset::whereNotIn('status', ['clean', 'in cleaned', 'notactive'])->where('type','KIB E')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Tetap Lainya',
@@ -226,8 +250,8 @@ class DashboardController extends Controller
             // 'percent' => $pembelian_percent,
         ];
 
-        $not_active = Aset::where('status', 'notactive')->where('type','KIB F')->count();
-        $active = Aset::where('status', 'active')->where('type','KIB F')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
+        $not_active = Aset::whereIn('status',['notactive','clean','in cleaned'])->where('type','KIB F')->count();
+        $active = Aset::whereNotIn('status', ['clean', 'in cleaned', 'notactive'])->where('type','KIB F')->count();              //dibulatkan dan mengambil 2 angka di belakang koma
 
         $cards[] = [
             'name' => 'Aset Kontruksi Pembangunan',
@@ -484,6 +508,7 @@ class DashboardController extends Controller
         $months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         $KIBA = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
         ->where('type', 'KIB A')
+        // ->whereNotIn('status', ['clean', 'in cleaned', 'notactive']) // Menggunakan whereNotIn untuk mengecualikan beberapa nilai status
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -491,6 +516,7 @@ class DashboardController extends Controller
 
         $KIBB = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
         ->where('type', 'KIB B')
+        // ->whereNotIn('status', ['clean', 'in cleaned', 'notactive']) // Menggunakan whereNotIn untuk mengecualikan beberapa nilai status
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -498,6 +524,7 @@ class DashboardController extends Controller
 
         $KIBC = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
         ->where('type', 'KIB C')
+        // ->whereNotIn('status', ['clean', 'in cleaned', 'notactive']) // Menggunakan whereNotIn untuk mengecualikan beberapa nilai status
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -505,6 +532,7 @@ class DashboardController extends Controller
 
         $KIBD = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
         ->where('type', 'KIB D')
+        // ->whereNotIn('status', ['clean', 'in cleaned', 'notactive']) // Menggunakan whereNotIn untuk mengecualikan beberapa nilai status
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -512,6 +540,7 @@ class DashboardController extends Controller
 
         $KIBE = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
         ->where('type', 'KIB E')
+        // ->whereNotIn('status', ['clean', 'in cleaned', 'notactive']) // Menggunakan whereNotIn untuk mengecualikan beberapa nilai status
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -519,6 +548,7 @@ class DashboardController extends Controller
 
         $KIBF = Aset::selectRaw('MONTH(book_date) as month, COUNT(*) as total_completed')
         ->where('type', 'KIB F')
+        // ->whereNotIn('status', ['clean', 'in cleaned', 'notactive']) // Menggunakan whereNotIn untuk mengecualikan beberapa nilai status
         ->whereYear('book_date', $year)
         ->groupBy('month')
         ->orderBy('month')
@@ -537,7 +567,7 @@ class DashboardController extends Controller
 
 
         foreach ($KIBB as $row) {
-            $temp_data['KIBB'][$row->month-1] = $row->total_not_completed;
+            $temp_data['KIBB'][$row->month-1] = $row->total_completed;
         }
 
         foreach ($KIBC as $row) {
@@ -546,7 +576,7 @@ class DashboardController extends Controller
 
 
         foreach ($KIBD as $row) {
-            $temp_data['KIBD'][$row->month-1] = $row->total_not_completed;
+            $temp_data['KIBD'][$row->month-1] = $row->total_completed;
         }
 
         foreach ($KIBE as $row) {
@@ -555,7 +585,7 @@ class DashboardController extends Controller
 
 
         foreach ($KIBF as $row) {
-            $temp_data['KIBF'][$row->month-1] = $row->total_not_completed;
+            $temp_data['KIBF'][$row->month-1] = $row->total_completed;
         }
 
 
@@ -594,7 +624,7 @@ class DashboardController extends Controller
                 ],
             ],
             'xaxis' => ['categories' => $months],
-            'colors' => ['#28C76F', '#F64E60','#28A58F','#91176F','#12789F','#A8C720'],
+            'colors' => ['#0000FF', '#FFA500','#FFFF00','#000080','#008000','#800080'],
         ];
     }
 

@@ -41,7 +41,7 @@ class PembelianTransaksi extends Model
     ];
 
     protected $casts = [
-        'receipt_date'          => 'date',
+        'receipt_date'     => 'date',
     ];
 
  
@@ -79,7 +79,7 @@ class PembelianTransaksi extends Model
             function ($q) use ($user) { 
                 $q->WhereHas('approvals', function ($q) use ($user) {
                     $q->when($user->id, function ($qq) use ($user) {
-                         $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
+                        $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
                     },function ($qq) use ($user) {
                         $qq->orWhereIn('role_id', $user->getRoleIds())
                         ->orWhere('position_id', $user->position->id);
@@ -88,18 +88,25 @@ class PembelianTransaksi extends Model
             }
         )
         ->latest();
-     }
+    }
 
     public function scopeFilters($query)
     {
         // return $query;
-        return $query->filterBy(['vendor_id','receipt_date'])->when(
+        // return dd(request()->receipt_date);
+        return $query->filterBy(['vendor_id','status'])->when(
             $jenis_vendor = request()->vendor_id,
             function ($q) use ($jenis_vendor){
                 $q->whereHas('vendors', function ($qq) use ($jenis_vendor){
                         $qq->where('id',$jenis_vendor);
             });
-        })->latest();
+        })->when(request()->receipt_date, function ($q) {
+            $date = request()->receipt_date;
+            $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
+            dd($formatted_date);
+            $q->where('receipt_date',$formatted_date)->where('jenis_pengadaan_id',null);
+        })
+        ->where('trans_name','LIKE','%'.request()->trans_name.'%')->latest();
     }
 
 
@@ -340,7 +347,8 @@ class PembelianTransaksi extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
+        //  -4161016242
 
         Telegram::sendMessage([
             'chat_id' => $chatId,

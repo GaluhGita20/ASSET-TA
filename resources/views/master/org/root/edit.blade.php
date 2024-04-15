@@ -5,37 +5,37 @@
 @section('modal-body')
 	@method('PATCH')
 	<div class="form-group row">
-		<label class="col-sm-3 col-form-label">{{ __('Nama') }}</label>
+		<label class="col-sm-3 col-form-label">{{ __('Nama') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-9 parent-group">
 			<input type="text" name="name" value="{{ $record->name }}" class="form-control" placeholder="{{ __('Nama') }}">
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-sm-3 col-form-label">{{ __('Email') }}</label>
+		<label class="col-sm-3 col-form-label">{{ __('Email') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-9 parent-group">
 			<input type="text" name="email" value="{{ $record->email }}" class="form-control" placeholder="{{ __('Email') }}">
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-sm-3 col-form-label">{{ __('Website') }}</label>
+		<label class="col-sm-3 col-form-label">{{ __('Website') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-9 parent-group">
 			<input type="text" name="website" value="{{ $record->website }}" class="form-control" placeholder="{{ __('Website') }}">
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-sm-3 col-form-label">{{ __('Telepon') }}</label>
+		<label class="col-sm-3 col-form-label">{{ __('Telepon') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-9 parent-group">
 			<input type="text" name="phone" value="{{ $record->phone }}" class="form-control" placeholder="{{ __('Telepon') }}">
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-sm-3 col-form-label">{{ __('Alamat') }}</label>
+		<label class="col-sm-3 col-form-label">{{ __('Alamat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-9 parent-group">
 			<textarea type="text" name="address" class="form-control" placeholder="{{ __('Address') }}">{{ $record->address }}</textarea>
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-md-3 col-form-label">{{ __('Provinsi') }}</label>
+		<label class="col-md-3 col-form-label">{{ __('Provinsi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-md-9 parent-group">
 			<select name="province_id" class="form-control base-plugin--select2-ajax province_id"
 				data-url="{{ rut('ajax.selectProvince', [
@@ -53,7 +53,7 @@
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-md-3 col-form-label">{{ __('Kota') }}</label>
+		<label class="col-md-3 col-form-label">{{ __('Kota') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-md-9 parent-group">
 			<select name="city_id" class="form-control base-plugin--select2-ajax city_id"
 				data-url="{{ rut('ajax.selectCity', ['province_id']) }}"
@@ -67,7 +67,7 @@
 		</div>
 	</div>
 	<div class="form-group row">
-		<label class="col-md-3 col-form-label">{{ __('Daerah') }}</label>
+		<label class="col-md-3 col-form-label">{{ __('Daerah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-md-9 parent-group">
 			<select name="district_id" class="form-control base-plugin--select2-ajax district_id"
 				data-url="{{ rut('ajax.selectDistrict', ['city_id']) }}"

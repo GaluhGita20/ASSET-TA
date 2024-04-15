@@ -5,6 +5,17 @@
 @section('modal-body')
     @method('POST')
     {{-- @csrf --}}
+    {{-- @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Failed!</strong> Terdapat beberapa kesalahan saat memproses formulir:<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif --}}
+
     <input type="hidden" name="is_submit" value="0">
     {{-- @dump($errors) --}}
     <div class="row">
@@ -12,7 +23,7 @@
         <div class="col-sm-12">
             <div class="form-group row">
                 <div class="col-2">
-                    <label class="col-form-label">{{ __('Unit Kerja') }}</label>
+                    <label class="col-form-label">{{ __('Unit Kerja') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     @if($departemen->location->level == 'department')
@@ -41,17 +52,22 @@
 
             <div class="form-group row">
                 <div class="col-2 pr-0 mt-2">
-                    <label class="col-form-label">{{ __('Perihal') }}</label>
+                    <label class="col-form-label">{{ __('Perihal') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
-                    <input class="form-control" name="regarding" placeholder="{{ __('Perihal') }}">
+                    <input class="form-control @error('regarding') is-invalid @enderror" name="regarding" placeholder="{{ __('Perihal') }}">
+                    @error('regarding')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
                 </div>
             </div>
 
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Tgl Pengajuan') }}</label>
+                    <label class="col-form-label">{{ __('Tgl Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"
@@ -62,27 +78,12 @@
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Tahun Perencanaan') }}</label>
+                    <label class="col-form-label">{{ __('Tahun Perencanaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     <input class="form-control" type="number" min="{{ now()->format('Y') }}" max="2100" name="procurement_year" placeholder="{{ __('Tahun Perencanaan') }}">
                 </div>
             </div>
-
-            {{-- <div class="form-group row">
-                <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Jenis Usulan') }}</label>
-                </div>
-                <div class="col-10 parent-group">
-                    <select class="form-control" name="is_repair" data-placeholder="is_repair" placeholder="{{ __('Pilih Salah Satu') }}" required>
-                        <option value="">{{ __('Pilih Jenis Pengajuan') }}</option>
-                        <option value="no">Pengajuan Pembelian Aset</option>
-                        @if(auth()->user()->hasRole('Sarpras'))
-                            <option value="yes">Pengajuan Perbaikan Aset</option>
-                        @endif
-                    </select>
-                </div>
-            </div> --}}
 
             <div class="form-group row">
                 <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>

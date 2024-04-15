@@ -43,8 +43,8 @@ class TransaksiPenerimaanRequest extends FormRequest
             'receipt_date'=> 'required',
             'faktur_code' => 'required',
             'location_receipt' => 'required',
-            'sp2d_code'=> 'required',
-            'sp2d_date' => 'required',
+            // 'sp2d_code'=> 'required',
+            // 'sp2d_date' => 'required',
             'asset_test_results' => 'required',
             'user_id' => 'required',
         ];
@@ -69,8 +69,8 @@ class TransaksiPenerimaanRequest extends FormRequest
             'receipt_date.required' => 'Tanggal Terima wajib diisi.' ,
             'faktur_code.required' => 'Kode Faktur wajib diisi.',
             'location_receipt.required' => 'Lokasi Penerimaan wajib diisi.',
-            'sp2d_code.required' => 'Kode SP2D wajib diisi.',
-            'sp2d_date.required' => 'Tanggal SP2D wajib diisi.',
+            // 'sp2d_code.required' => 'Kode SP2D wajib diisi.',
+            // 'sp2d_date.required' => 'Tanggal SP2D wajib diisi.',
             'asset_test_results.required' => 'Hasil Test wajib diisi.',
             'user_id.required' => 'User Penguji wajib diisi.',
         ];

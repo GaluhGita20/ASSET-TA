@@ -45,7 +45,7 @@ class PengadaanAsetController extends Controller
     public function grid(Request $request)
     {
         $user = auth()->user();
-      
+
         $records = PembelianTransaksi::grid()->where('source_acq','pembelian')->filters()->dtGet();
         
         return DataTables::of($records)
@@ -158,7 +158,6 @@ class PengadaanAsetController extends Controller
                 if ($record->checkAction('history', $this->perms)) {
                     $actions[] = 'type:history';
                 }
-                
 
                 return $this->makeButtonDropdown($actions, $record->id);
 
@@ -219,11 +218,11 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui (Unit)|className:text-center'),
                     $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
-                    $this->makeColumn('name:action|label:action|width:150px'),
+                    $this->makeColumn('name:action_shows|label:action|width:150px'),
                 ],
             ],
         ]);
@@ -263,7 +262,7 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah Disetujui (Unit)|className:text-center'),
                     $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
@@ -274,7 +273,6 @@ class PengadaanAsetController extends Controller
         return $this->render($this->views . '.edit', compact('record','data'));
     }
 
- 
     public function store(TransaksiRequest $request)
     {
         $record = new PembelianTransaksi;
@@ -298,7 +296,7 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center,label-info'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center'),
                     $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:150px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
@@ -335,11 +333,6 @@ class PengadaanAsetController extends Controller
         $this->prepare(['title' => 'History Aktivitas']);
         return $this->render('globals.history', compact('record'));
     }
-
-    // public function revisi(PembelianTransaksi $record, Request $request)
-    // {
-    //     return $record->handleRevisi($request);
-    // }
 
     public function tracking(PembelianTransaksi $record)
     {

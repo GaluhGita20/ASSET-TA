@@ -29,8 +29,9 @@ class HasilPerbaikanRequest extends FormRequest
 
         $rules= [
             // 'kib_id'=>'required',
-            'action_repair' => 'required',
-            'user_id' => 'required'
+            'check_up_result' => 'required',
+            'is_disposisi' => 'required',
+            // 'user_id' => 'required'
         ];
 
         return $rules;
@@ -41,8 +42,9 @@ class HasilPerbaikanRequest extends FormRequest
     {
         return [
             // 'kib_id.required' => 'Nama Aset Wajib Diisi.',
-            'action_repair.required' => 'Tindakan Perbaikan wajib diisi.',
-            'user_id.required' => 'Petugas Perbaikan wajib diisi.',
+            'check_up_result.required' => 'Hasil Pemeriksaan Awal wajib diisi.',
+            'is_disposisi.required' => 'Status Pengajuan Disposisi Perlu diisi.',
+            // 'user_id.required' => 'Petugas Perbaikan wajib diisi.',
         ];
     }
 }

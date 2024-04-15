@@ -51,13 +51,13 @@ class LaporanPenerimaanController extends Controller
                 return request()->start;
             })
             ->addColumn('trans_name', function ($detail) {
-                return $detail->trans_name ? $detail->trans_name : '';
+                return $detail->trans_name ? $detail->trans_name : '-';
             })
             ->addColumn('vendor_id', function ($detail) {
-                return $detail->vendors->name ? $detail->vendors->name : '';
+                return $detail->vendors->name ? $detail->vendors->name : '-';
             })
             ->addColumn('no_spk', function ($detail) {
-                return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->format('Y-m-d').'/'.Carbon::parse($detail->spk_end_date)->format('Y-m-d') : '';
+                return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->format('Y-m-d').'/'.Carbon::parse($detail->spk_end_date)->format('Y-m-d') : '-';
             })
             ->addColumn('spk_start_date', function ($detail) {
                 return  Carbon::parse($detail->spk_start_date)->format('Y-m-d');
@@ -66,16 +66,16 @@ class LaporanPenerimaanController extends Controller
                 return  Carbon::parse($detail->spk_end_date)->format('Y-m-d');
             })
             ->addColumn('spk_range_time', function ($detail) {
-                return $detail->spk_range_time ? $detail->spk_range_time .' Hari': '';
+                return $detail->spk_range_time ? $detail->spk_range_time .' Hari': '-';
             })
             ->addColumn('jenis_pengadaan_id', function ($detail) {
-                return $detail->pengadaans->name ? $detail->pengadaans->name : '';
+                return $detail->pengadaans ? $detail->pengadaans->name : '-';
             })
             ->addColumn('budget_limit', function ($detail) {
                 return number_format($detail->budget_limit, 0, ',', ',');
             })
             ->addColumn('qty', function ($detail) {
-                return $detail->qty ? $detail->qty : '';
+                return $detail->qty ? $detail->qty : '-';
             })
             ->addColumn('unit_cost', function ($detail) {
                 return number_format($detail->unit_cost, 0, ',', ',');

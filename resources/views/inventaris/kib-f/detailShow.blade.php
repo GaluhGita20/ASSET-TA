@@ -40,7 +40,7 @@
                                     <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="spesifikasi" value="{{ $record->usulans->desc_spesification }}" readonly>{{ $record->usulans->desc_spesification }}"</textarea>
+                                    <textarea class="form-control" name="spesifikasi" value="{{ $record->usulans->desc_spesification }}" readonly>{{ $record->usulans->desc_spesification }}</textarea>
                                 </div>
                             </div>
                         </div>

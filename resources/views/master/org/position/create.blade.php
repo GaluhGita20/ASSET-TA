@@ -6,7 +6,7 @@
 	@method('POST')
 
 	<div class="form-group row">
-        <label class="col-sm-12 col-form-label">{{ __('Level Tingkatan Organisasi') }}</label>
+        <label class="col-sm-12 col-form-label">{{ __('Level Tingkatan Organisasi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 parent-group">
         <select class="form-control base-plugin--select2-ajax level_id" name="level" data-placeholder="Level Organisasi">
             <option value="kepala">Kepala</option>
@@ -17,7 +17,7 @@
     </div>
 	
 	<div class="form-group row">
-		<label class="col-sm-12 col-form-label">{{ __('Struktur') }}</label>
+		<label class="col-sm-12 col-form-label">{{ __('Struktur') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-12 parent-group">
 			<select name="location_id" class="form-control base-plugin--select2-ajax location_id"
 				data-url="{{ route('ajax.selectStruct', ['all']) }}"
@@ -28,7 +28,7 @@
 	</div>
 	
 	<div class="form-group row">
-		<label class="col-sm-12 col-form-label">{{ __('Nama Jabatan') }}</label>
+		<label class="col-sm-12 col-form-label">{{ __('Nama Jabatan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-sm-12 parent-group">
 			<input type="text" name="name" class="form-control" placeholder="{{ __('Nama') }}">
 		</div>

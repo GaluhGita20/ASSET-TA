@@ -16,7 +16,6 @@ class PermissionSeeder extends Seeder
             //     'name'          => 'settings.reportex',
             //     'action'        => ['view', 'create', 'edit', 'approve'],
             // ],
-
             /** DASHBOARD **/
             [
                 'name'          => 'dashboard',
@@ -46,12 +45,22 @@ class PermissionSeeder extends Seeder
 
             [
                 'name'          => 'pemeliharaan-aset',
-                'action'        => ['view', 'create', 'edit','delete'],
+                'action'        => ['view', 'create', 'edit','delete','approve'],
             ],
 
             [
                 'name'          => 'perbaikan-aset',
-                'action'        => ['view', 'create', 'edit','delete'],
+                'action'        => ['view', 'create', 'edit','delete','approve'],
+            ],
+
+            [
+                'name'          => 'usulan_pembelian-sperpat',
+                'action'        => ['view', 'create', 'edit','delete','approve'],
+            ],
+
+            [
+                'name'          => 'trans-sperpat',
+                'action'        => ['view', 'create', 'edit','delete','approve'],
             ],
 
             [
@@ -61,7 +70,7 @@ class PermissionSeeder extends Seeder
 
             [
                 'name'          => 'pemutihan-aset',
-                'action'        => ['view', 'create', 'edit','delete'],
+                'action'        => ['view', 'create', 'edit','delete','approve'],
             ],
 
             
@@ -102,6 +111,8 @@ class PermissionSeeder extends Seeder
                     'registrasi.inventaris-aset'   => ['view'],
                     'pemeliharaan-aset'            => ['view'],
                     'perbaikan-aset'               => ['view'],
+                    'usulan_pembelian-sperpat'     => ['view','approve'],
+                    'trans-sperpat'                => ['view','approve'],
                     'penghapusan-aset'             => ['view','edit','delete'],
                     'pemutihan-aset'               => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
@@ -117,6 +128,8 @@ class PermissionSeeder extends Seeder
                     'registrasi.inventaris-aset'   => ['view','edit','delete'],
                     'pemeliharaan-aset'            => ['view'],
                     'perbaikan-aset'               => ['view','edit','delete'],
+                    'usulan_pembelian-sperpat'     => ['view','approve'],
+                    // 'trans-sperpat'                => ['view','approve'],
                     'penghapusan-aset'             => ['view','edit','delete'],
                     'pemutihan-aset'               => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
@@ -132,6 +145,7 @@ class PermissionSeeder extends Seeder
                     'registrasi.inventaris-aset'   => ['view','edit','delete'],
                     'pemeliharaan-aset'            => ['view'],
                     'perbaikan-aset'               => ['view','edit','delete'],
+                    'trans-sperpat'                => ['view','approve'],
                     'penghapusan-aset'             => ['view','edit','delete'],
                     'pemutihan-aset'               => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
@@ -157,11 +171,13 @@ class PermissionSeeder extends Seeder
                     'perencanaan-aset'       => ['view', 'create', 'edit', 'delete', 'approve'],
                     'transaksi.pengadaan-aset'     => ['view'],
                     'registrasi.inventaris-aset'   => ['view','create','edit','delete'],
-                    'pemeliharaan-aset'            => ['view','edit','delete'],
-                    'perbaikan-aset'               => ['view','edit','delete'],
-                    'penghapusan-aset'             => ['view','edit','delete','approve'],
-                    'pemutihan-aset'               => ['view'],
-                    'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'pemeliharaan-aset'            => ['view','create','edit','delete','approve'],
+                    'perbaikan-aset'               => ['view','create','edit','delete','approve'],
+                    'usulan-sperpat'               => ['view','create','edit','delete'],
+                    'trans-sperpat'                => ['view','create','edit','delete'],
+                    'penghapusan-aset'             => ['view','create','edit','delete','approve'],
+                    'pemutihan-aset'               => ['view','create','edit','delete','approve'],
+                    'master'                       => ['view', 'create', 'edit', 'delete'],
                 ],
             ],
             [

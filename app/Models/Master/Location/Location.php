@@ -59,7 +59,7 @@ class Location extends Model
     public function scopeGrid($query)
     {
         //return $query->latest();
-        return $query->orderBy('space_code');
+        return $query->orderBy('space_code','DESC');
     }
 
     /** SAVE DATA **/

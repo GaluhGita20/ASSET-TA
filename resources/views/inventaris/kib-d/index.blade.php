@@ -44,6 +44,14 @@
     </div>
 
 </div>
+<div class="alert alert-custom alert-light-primary fade show py-4 col-12 col-sm-12 mr-4" style="left:-30pt; margin-right:35px;" role="alert">
+    <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+    <div class="alert-text text-primary">
+        <div class="text-bold">{{ __('Informasi') }}:</div>
+        <div class="mb-10px" style="white-space: pre-wrap;">Penghapusan Aset dapat dilakukan Ketika Kondisi Aset Rusak Berat dan Status Aset Actives</div>
+        {{-- <div class="mb-3px" style="white-space: pre-wrap;">Perbaikan Aset dapat dilakukan Ketika Kondisi Awal Aset Baik dan Status Aset Actives</div> --}}
+    </div>
+</div>
 @endsection
 
 {{-- @section('buttons')

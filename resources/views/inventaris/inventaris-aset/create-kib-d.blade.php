@@ -28,7 +28,7 @@
                       
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <input type="text" class="form-control" name="nama_aset" placeholder="{{ __('Nama Aset') }}" value="{{ $usulan->asetd->name }}" readonly>
@@ -39,7 +39,7 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <textarea class="form-control" name="spesifikasi" value="{{ $usulan->desc_spesification }}">{{ $usulan->desc_spesification }}"</textarea>
@@ -51,7 +51,7 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Kode Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Kode Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <select name="coa_id" class="form-control base-plugin--select2-ajax coa_id"
@@ -67,7 +67,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Luas') }}</label>
+                                    <label class="col-form-label">{{ __('Luas') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -85,7 +85,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Panjang') }}</label>
+                                    <label class="col-form-label">{{ __('Panjang') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -103,7 +103,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Lebar') }}</label>
+                                    <label class="col-form-label">{{ __('Lebar') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -121,7 +121,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Lokasi Alamat') }}</label>
+                                    <label class="col-form-label">{{ __('Lokasi Alamat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input type="text" name="address" class="form-control"
@@ -133,7 +133,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Status Tanah') }}</label>
+                                    <label class="col-form-label">{{ __('Status Tanah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input type="text" class="form-control"  placeholder="{{ __('Status Tanah') }}" name="land_status">
@@ -144,7 +144,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Sumber Perolehan') }}</label>
+                                    <label class="col-form-label">{{ __('Sumber Perolehan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source_acq" class="form-control" disabled>
@@ -159,7 +159,7 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Kode Tanah') }}</label>
+                                    <label class="col-form-label">{{ __('Kode Tanah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <select name="tanah_id" class="form-control base-plugin--select2-ajax coa_id"
@@ -175,7 +175,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Nomor Dokumen') }}</label>
+                                    <label class="col-form-label">{{ __('Nomor Dokumen') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="no_sertificate" placeholder="{{ __('Nomor Document') }}">
@@ -186,7 +186,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Dokumen') }}</label>
+                                    <label class="col-form-label">{{ __('Tanggal Dokumen') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input name="sertificate_date" class="form-control base-plugin--datepicker"
@@ -199,7 +199,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Pembelian') }}</label>
+                                    <label class="col-form-label">{{ __('Tanggal Pembelian') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="receipt_date" value="{{ $usulan->trans->spk_start_date->format('Y/m/d') }}" readonly>
@@ -211,7 +211,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Penerimaan') }}</label>
+                                    <label class="col-form-label">{{ __('Tanggal Penerimaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="receipt_date" value="{{ $usulan->trans->receipt_date->format('Y/m/d') }}" readonly>
@@ -222,7 +222,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Pembukuan') }}</label>
+                                    <label class="col-form-label">{{ __('Tanggal Pembukuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="book_date" value="{{ now()->format('Y/m/d') }}" readonly>
@@ -234,7 +234,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Asal Usul') }}</label>
+                                    <label class="col-form-label">{{ __('Asal Usul') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source" id="source" class="form-control base-plugin--select2-ajax">
@@ -252,7 +252,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Vendor') }}</label>
+                                    <label class="col-form-label">{{ __('Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="vendor_id" class="form-control base-plugin--select2-ajax vendor_id" disabled>
@@ -271,7 +271,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga') }}</label>
+                                    <label class="col-form-label">{{ __('Harga') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -289,7 +289,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga') }}</label>
+                                    <label class="col-form-label">{{ __('Harga') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -310,7 +310,7 @@
                             <div class="form-group row">
                 
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Lokasi Hibah Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Lokasi Hibah Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="departemen_id" id="departemen_id_h" class="form-control base-plugin--select2-ajax departemen_id"
@@ -327,7 +327,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Unit Pengusul') }}</label>
+                                    <label class="col-form-label">{{ __('Unit Pengusul') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="departemen_id" id="departemen_id" class="form-control base-plugin--select2-ajax departemen_id">
@@ -345,7 +345,7 @@
                         <div class="col-sm-6" id="percepatan" style="display:none">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Jumlah') }}</label>
+                                    <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input type="number" class="form-control" id="qty" name="qty" max="{{ $jumlah }}" min="1" value="1">
@@ -356,7 +356,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Kondisi') }}</label>
+                                    <label class="col-form-label">{{ __('Kondisi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <select name="condition" class="form-control">
@@ -371,7 +371,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Masa Manfaat') }}</label>
+                                    <label class="col-form-label">{{ __('Masa Manfaat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -389,7 +389,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Nilai Residu') }}</label>
+                                    <label class="col-form-label">{{ __('Nilai Residu') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">

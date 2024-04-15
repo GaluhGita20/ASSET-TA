@@ -98,7 +98,7 @@ class KIBEController extends Controller
             ->addColumn(
                 'name',
                 function ($record) {
-                   return $record->usulans ? $record->usulans->asetd->name : '-';
+                    return $record->usulans ? $record->usulans->asetd->name : '-';
                 }
             
             )->addColumn(
@@ -127,7 +127,7 @@ class KIBEController extends Controller
             )->addColumn(
                 'pencipta',
                 function ($record) {
-                   return $record->creators ? ucwords($record->creators) : '-';
+                    return $record->creators ? ucwords($record->creators) : '-';
                 }
             )->addColumn(
                 'spesifikasi',
@@ -195,12 +195,11 @@ class KIBEController extends Controller
                     }
                     //return $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-';
                 }
-            )
-            ->addColumn(
+            )->addColumn(
                 'kondisi',
                 function ($record) {
                   //  return $record->condition ? ucfirst($record->condition) : '-';
-                  if ($record->condition == 'baik') {
+                if ($record->condition == 'baik') {
                     return $record->condition ? '<span class="badge bg-success text-white">'.ucwords($record->condition).'</span>' : '-';
                 } elseif ($record->condition == 'rusak berat') {
                     return $record->condition ? '<span class="badge bg-danger text-white">'.ucwords($record->condition).'</span>' : '-';
@@ -212,13 +211,17 @@ class KIBEController extends Controller
                 'status',
                 function ($record) {
                     if ($record->status == 'actives') {
-                        return $record->status ? '<span class="badge bg-success text-white">'.ucwords('active').'</span>' : '-';
+                        return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
                     } elseif ($record->status == 'notactive') {
-                        return $record->status ? '<span class="badge bg-danger text-white">'.ucwords($record->status).'</span>' : '-';
-                    } else {
-                        return $record->status ? '<span class="badge bg-light">'.ucwords($record->status).'</span>' : '-';
+                        return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in repair') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in deletion') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } 
+                    else {
+                        return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
-                    //return $record->status ? ucfirst($record->status) : '-';
                 }
             )->addColumn(
                 'unit',
@@ -243,7 +246,7 @@ class KIBEController extends Controller
             ->addColumn(
                 'masa_manfaat',
                 function ($record) {
-                   return $record->useful ? $record->useful : '-';
+                    return $record->useful ? $record->useful : '-';
             }
             )->addColumn(
                 'updated_by',
@@ -260,7 +263,7 @@ class KIBEController extends Controller
                         'url' => route($this->routes . '.show', $record->id),
                     ];
 
-                    if($record->condition =='baik'){
+                    if($record->condition =='baik' && $record->status =='actives'){
                         if (auth()->user()->checkPerms('perbaikan-aset.create')) {
                             $actions[] = [
                                 'type' => 'edit',
@@ -273,18 +276,19 @@ class KIBEController extends Controller
                         }
                     }
     
-                    if($record->condition =='rusak berat'){
+                    if($record->condition =='rusak berat' && $record->status =='actives'){
                         if (auth()->user()->checkPerms('penghapusan-aset.create')) {
                             $actions[] = [
                                 'type' => 'edit',
                                 'page' => true,
-                                'label' => 'Perbaikan',
-                                'icon' => 'fa fa-trash-o text-danger',
+                                'label' => 'Hapus',
+                                'icon' => 'fas fa-trash text-danger',
                                 'id' => $record->id,
-                                'url' => route($this->routes . '.repair', $record->id),
+                                'url' => route($this->routes . '.deletes', $record->id),
                             ];
                         }
                     }
+    
                 // }
                     return $this->makeButtonDropdown($actions);
                 }
@@ -297,7 +301,7 @@ class KIBEController extends Controller
     public function createKibB(Request $request){
         return $this->render($this->views.'.create');
     }
-   
+
     public function show(Aset $record){
         // $type ='show';
         return $this->render($this->views . '.detailShow',compact('record'));
@@ -322,7 +326,12 @@ class KIBEController extends Controller
     public function repair(Aset $record)
     {
         // dd($record);
-        return $this->render('pengajuan.perbaikan-aset.create',compact('record'));
+        return $this->render('perbaikan.perbaikan-aset.create',compact('record'));
+    }
+
+    public function deletes(Aset $record)
+    {
+        return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
     }
 
 }

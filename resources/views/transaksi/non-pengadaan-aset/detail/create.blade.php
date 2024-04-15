@@ -10,7 +10,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
+                    <label class="col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
@@ -29,7 +29,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
+                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <textarea class="form-control" name="desc_spesification" placeholder="{{ __('Spesifikasi Aset') }}"></textarea>
@@ -41,7 +41,7 @@
         <div class="col-sm-12 col-sm-12" >
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Harga Unit') }}</label>
+                    <label class="col-form-label">{{ __('Harga Unit') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
@@ -60,7 +60,7 @@
         <div class="col-sm-12 col-sm-12" >
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Jumlah Diterima') }}</label>
+                    <label class="col-form-label">{{ __('Jumlah Diterima') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">

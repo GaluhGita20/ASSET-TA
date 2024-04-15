@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                    <label class="col-sm-12 col-md-3 col-form-label">{{ __('Vendor') }}</label>
+                    <label class="col-sm-12 col-md-3 col-form-label">{{ __('Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                     <div class=" col-sm-12 col-md-9 parent-group">
                         <input name="name" value="{{ $record->name }}" type="text" class="form-control" placeholder="{{ __('Vendor') }}">
                     </div>
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="form-group row">  
-        <label class="col-md-3 col-form-label">{{ __('Jenis Usaha') }}</label>
+        <label class="col-md-3 col-form-label">{{ __('Jenis Usaha') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-md-9 parent-group">
             <select name="jenisUsaha[]" class="form-control base-plugin--select2-ajax"
                 data-url="{{ route('ajax.selectJenisUsaha', [
@@ -46,14 +46,14 @@
     <div class="row">
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nama Pimpinan') }}</label>
+                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nama Pimpinan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 <div class="col-sm-12 col-md-9 parent-group">
                     <input name="leader" value={{ $record->leader }} type="text" class="form-control" placeholder="{{ __('Nama Pimpinan') }}">
                 </div>
             </div>
 
             <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}</label>
+                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Nomor Instansi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 <div class="col-sm-12 col-md-9 parent-group">
                     <input name="instansi_code" type="text" value="{{ $record->instansi_code }}" class="form-control" placeholder="{{ __('Nomor Instansi') }}"></textarea>
                 </div>
@@ -62,7 +62,7 @@
 
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                    <label class="col-sm-12 col-md-3 col-form-label">{{ __('Telepon') }}</label>
+                    <label class="col-sm-12 col-md-3 col-form-label">{{ __('Telepon') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                     <div class="col-sm-12 col-md-9 parent-group">
                         <input type="tel" name="telp" class="form-control" placeholder="{{ __('Telepon') }}"
                            value="{{ $record->telp }}" pattern="[0-9]{4}[0-9]{4}-[0-9]{0,7}">
@@ -72,7 +72,7 @@
 
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Email') }}</label>
+                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Email') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 <div class="col-sm-12 col-md-9 parent-group">
                     <input type="email" value="{{ $record->email }}" name="email" class="form-control" placeholder="{{ __('Email') }}">
                 </div>
@@ -80,7 +80,7 @@
         </div>
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Contact Person') }}</label>
+                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Contact Person') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 <div class="col-sm-12 col-md-9 parent-group">
                     <input name="contact_person" class="form-control"
                     value="{{ $record->contact_person }}" placeholder="{{ __('Contact Person') }}">
@@ -89,7 +89,7 @@
         </div>
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
-                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Alamat') }}</label>
+                <label class="col-sm-12 col-md-3 col-form-label">{{ __('Alamat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 <div class="col-sm-12 col-md-9 parent-group">
                     <input name="address" class="form-control"
                     value="{{ $record->address }}"  placeholder="{{ __('Alamat') }}">
@@ -100,7 +100,7 @@
 
     <div>  
         <div class="form-group row">
-            <label class="col-md-3 col-form-label">{{ __('Provinsi') }}</label>
+            <label class="col-md-3 col-form-label">{{ __('Provinsi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
             <div class="col-md-9 parent-group">
                 <select name="province_id" class="form-control base-plugin--select2-ajax province_id"
                     data-url="{{ rut('ajax.selectProvince', [
@@ -119,7 +119,7 @@
         </div>
 
         <div class="form-group row">
-            <label class="col-md-3 col-form-label">{{ __('Kota') }}</label>
+            <label class="col-md-3 col-form-label">{{ __('Kota') }}<span style=" color: red;margin-left: 5px;">*</span></label>
             <div class="col-md-9 parent-group">
                 <select name="city_id" class="form-control base-plugin--select2-ajax city_id"
                     data-url="{{ rut('ajax.selectCity', ['province_id']) }}"
@@ -135,7 +135,7 @@
 
 
         <div class="form-group row">
-            <label class="col-md-3 col-form-label">{{ __('Daerah') }}</label>
+            <label class="col-md-3 col-form-label">{{ __('Daerah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
             <div class="col-md-9 parent-group">
                 <select name="district_id" class="form-control base-plugin--select2-ajax district_id"
                     data-url="{{ rut('ajax.selectDistrict', ['city_id']) }}"

@@ -19,7 +19,7 @@ return [
 
     'logo' => [
         'favicon' => 'assets/media/logos/logo-rsud-klu.ico',
-        'auth' => 'assets/media/logos/logo-rsud-klu.jpg',
+        'auth' => 'assets/media/logos/logo-rsud.png',
         'aside' => 'assets/media/logos/logo-rsud-klu.jpg',
         'print' => 'assets/media/logos/logo-rsud-klu.jpg',
         'barcode' => 'assets/media/logos/logo-rsud-klu.png',

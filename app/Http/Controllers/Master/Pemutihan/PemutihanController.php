@@ -73,7 +73,7 @@ class PemutihanController extends Controller
             ->addColumn(
                 'name',
                 function ($record) {
-                   return $record->name;
+                    return $record->name;
                 }
             )
             ->addColumn(
@@ -112,7 +112,7 @@ class PemutihanController extends Controller
         $baseContentReplace = "base-modal--render";
         return $this->render($this->views . '.create');
     }
-   
+
     public function show(Pemutihan $record){
         // dd($record);
         return $this->render($this->views . '.show',compact('record'));

@@ -53,9 +53,9 @@ class PerencanaanAsetController extends Controller
                     $this->makeColumn('name:no_surat|label:Nomor Surat|className:text-center|width:300px'),
                     $this->makeColumn('name:struct|label:Unit Kerja|className:text-center|width:250px'),
                     $this->makeColumn('name:perihal|label:Perihal|className:text-center|width:300px'),
-                    // $this->makeColumn('name:is_repair|label:Jenis Usulan|className:text-center|width:300px'),
+                // $this->makeColumn('name:is_repair|label:Jenis Usulan|className:text-center|width:300px'),
                     $this->makeColumn('name:procurement_year|label:Tahun Pengadaan|className:text-center|width:300px'),
-                 //   $this->makeColumn('name:version|label:Revisi|className:text-center'),
+                //   $this->makeColumn('name:version|label:Revisi|className:text-center'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
@@ -85,7 +85,8 @@ class PerencanaanAsetController extends Controller
 
             ->addColumn('no_surat', function ($record) {
                 if ($record->code) {
-                    return $record->code . "<br>" . $record->date->translatedFormat('d/m/Y');
+                    // return $record->code . "<br>" . $record->date->translatedFormat('d/m/Y');
+                    return $record->code;
                 }
                 return '';
             })
@@ -180,7 +181,6 @@ class PerencanaanAsetController extends Controller
                     }
                 }
 
-
                 if ($record->checkAction('tracking', $this->perms)) {
                     $actions[] = 'type:tracking';
                 }
@@ -217,11 +217,9 @@ class PerencanaanAsetController extends Controller
 
     public function edit(Perencanaan $record)
     {
-        
         $type ='edit';
         $position = auth()->user()->position_id;
         $departemen = Position::with('location')->where('id',$position)->first();
-
         return $this->render($this->views . '.edit', compact('record','type','departemen'));
     }
 
@@ -294,7 +292,6 @@ class PerencanaanAsetController extends Controller
                     return number_format($detail->HPS_total_cost, 0, ',', ',');
                 }
             )
-          
             ->addColumn(
                 'qty_agree',
                 function ($detail) {
@@ -319,6 +316,20 @@ class PerencanaanAsetController extends Controller
                     return $detail->createdByRaw();
                 }
             )
+
+            ->addColumn(
+                'status',
+                function ($detail) use ($record) {
+                    if($detail->reject_notes == null && $detail->sumber_biaya_id == null){
+                        return '<span class="badge bg-primary text-white">'.'Waiting Approval'.'</span>';
+                    }elseif(($detail->sumber_biaya_id == null && $detail->reject_notes != null) || ($detail->sumber_biaya_id != null && $detail->reject_notes == null) ){
+                        return '<span class="badge bg-success text-white">'.'completed'.'</span>';
+                    }else{
+                        return '<span class="badge bg-success text-white">'.'completed'.'</span>';
+                    }
+                }
+            )
+
             ->addColumn(
                 'action_show',
                 function ($detail) use ($user, $record, $approval1, $approval2) {
@@ -392,7 +403,7 @@ class PerencanaanAsetController extends Controller
                     return $this->makeButtonDropdown($actions, $detail->id);
                 }
             )
-            ->rawColumns(['qty_agree','action', 'action_show','action_approval' ,'updated_by','created_by'])
+            ->rawColumns(['qty_agree','action', 'action_show','status','action_approval' ,'updated_by','created_by'])
             ->make(true);
     }
 
@@ -412,10 +423,11 @@ class PerencanaanAsetController extends Controller
                     $this->makeColumn('name:qty_req|label:Pengajuan|className:text-center|width:250px'),
                     $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:250px'),
                     $this->makeColumn('name:HPS_total_cost|label:Total Harga (Rupiah) |className:text-center|width:250px'),
-                    $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center|width:250px'),
+                    $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center|width:100px'),
                     $this->makeColumn('name:HPS_total_agree|label:Harga Total Pembelian (Rupiah)|className:text-center|width:250px'),
                     $this->makeColumn('name:sumber_dana|label:Sumber Dana|className:text-center|width:250px'),
-                    $this->makeColumn('name:updated_by|width:300px'),
+                    $this->makeColumn('name:status|width:100px'),
+                    $this->makeColumn('name:updated_by|label:Diperbarui|width:300px'),
                     // $this->makeColumn('name:created_by|width:100px'),
                     $this->makeColumn('name:action|label:Aksi'),
                 ],
@@ -472,7 +484,6 @@ class PerencanaanAsetController extends Controller
         return $this->render($this->views . '.detail.approve', compact('record','detail','baseContentReplace','type'));
     }
     
-
     public function detailUpHarga(PerencanaanDetailUpdateHargaRequest $request,  PerencanaanDetail $detail)
     {
         $record = $detail->perencanaan;
@@ -549,11 +560,12 @@ class PerencanaanAsetController extends Controller
                     $this->makeColumn('name:requirement_standard|label:Standar Kebutuhan|className:text-center'),
                     $this->makeColumn('name:existing_amount|label:Tersedia|className:text-center'),
                     $this->makeColumn('name:qty_req|label:Jumlah Pengajuan|className:text-center'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-left|width:500px'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:500px'),
                     $this->makeColumn('name:HPS_total_cost|label:Harga Total (Rupiah)|className:text-center'),
                     $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center,label-info'),
                     $this->makeColumn('name:HPS_total_agree|label:Harga Total Disetujui (Rupiah)|className:text-center'),
-                    $this->makeColumn('name:updated_by'),
+                    $this->makeColumn('name:status'),
+                    $this->makeColumn('name:updated_by|label:Diperbarui'),
                     $this->makeColumn('name:action_approval|label:Aksi'),
                 ],
                 'url' => route($this->routes . '.detailGrid', $record->id),
@@ -570,8 +582,8 @@ class PerencanaanAsetController extends Controller
 
     public function approve(Perencanaan $record, Request $request)
     {
-        
         $data = $record->handleDetailApproval($record);
+        // dd($data);
         if($data['status'] == 'gagal'){
             $request = [
                 'message' => $data['message'],
@@ -585,6 +597,7 @@ class PerencanaanAsetController extends Controller
             );
 
         }else{
+            // dd('tes');
             return $record->handleApprove($request);
         }
     }
@@ -628,11 +641,12 @@ class PerencanaanAsetController extends Controller
                     $this->makeColumn('name:requirement_standard|label:Standar Kebutuhan|className:text-center'),
                     $this->makeColumn('name:existing_amount|label:Jumlah Tersedia|className:text-center'),
                     $this->makeColumn('name:qty_req|label:Jumlah Pengajuan|className:text-center'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga|className:text-left|width:500px'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga|className:text-center|width:500px'),
                     $this->makeColumn('name:HPS_total_cost|label:Harga Total Usulan|className:text-center'),
                     $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center,label-info'),
                     $this->makeColumn('name:HPS_total_agree|label:Harga Total Disetujui|className:text-center'),
-                    $this->makeColumn('name:updated_by'),
+                    $this->makeColumn('name:status'),
+                    $this->makeColumn('name:updated_by|label:Diperbarui'),
                     $this->makeColumn('name:action_show|label:Aksi'),
                 ],
                 'url' => route($this->routes . '.detailGrid', $record->id),

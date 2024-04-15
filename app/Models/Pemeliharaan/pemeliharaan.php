@@ -27,16 +27,21 @@ class Pemeliharaan extends Model
     protected $fillable = [
         'code',
         'departemen_id',
-        'dates',
+        'maintenance_date',
+        'status',
     ];
 
     protected $casts = [
-        'dates'  => 'date',
+        'maintenance_date'  => 'date',
     ];
 
     /*******************************
      ** MUTATOR
      *******************************/
+    public function mainTenanceDate($value)
+    {
+        $this->attributes['maintenance_date'] = Carbon::createFromFormat('d/m/Y', $value);
+    }
 
     /*******************************
      ** ACCESSOR
@@ -66,10 +71,10 @@ class Pemeliharaan extends Model
      ** SCOPE
      *******************************/
 
-     public function scopeGrid($query)
+    public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(!in_array($user->position->location->id, [8,17]), 
+        return $query->when(empty(array_intersect(['Direksi','Sarpras','BPKAD'], $user->roles->pluck('name')->toArray())), 
         function ($q) use ($user) { 
             return $q->when($user->position->imKepalaDeparetemen(), 
                 function ($qq) use ($user) {
@@ -89,9 +94,16 @@ class Pemeliharaan extends Model
 
     public function scopeFilters($query)
     {
-        return $query->filterBy(['code'])
-        ->filterBy(['departemen_id'])->latest();
-        
+        return $query->filterBy(['code','status'])
+        ->filterBy(['departemen_id'])->when(request()->maintenance_date_year, function ($q) {
+            // $date = request()->maintenance_date_year;
+            // $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y');
+            $q->whereYear('maintenance_date',request()->maintenance_date_year);
+        })->when(request()->maintenance_date_month, function ($q) {
+            // $date = request()->maintenance_date_month;
+            // $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('m');
+            $q->whereMonth('maintenance_date',request()->maintenance_date_month);
+        })->latest();
     }
 
     /*******************************
@@ -100,33 +112,161 @@ class Pemeliharaan extends Model
     public function handleStore($request,$statusOnly = false){
         $this->beginTransaction();
         try {
-           
-            $data = $request->all();
-            $this->fill($data);
-            $time = Carbon::createFromFormat('d/m/Y', $request->dates);
-
-
-            $idMax = Pemeliharaan::where('departemen_id',$request->departemen_id)->count('id');
-            $dep = OrgStruct::where('id',$request->departemen_id)->first('name');
-            $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 3, '0', STR_PAD_LEFT);
-            $this->code = $format_angka."/ Pemeliharaan Aset /".$dep->name."/".$time->month."/".$time->year;
+            $now = Carbon::now();
+            $time = Carbon::createFromFormat('d/m/Y', $request->maintenance_date);
+            if($now->month == $time->month && $now->year == $time->year){
+               // $data = $request->all();
+                $this->maintenance_date = $time;
+                $this->departemen_id = $request->departemen_id;
+                $idMax = Pemeliharaan::where('departemen_id',$request->departemen_id)->count('id');
+                $dep = OrgStruct::where('id',$request->departemen_id)->first('name');
+                $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 3, '0', STR_PAD_LEFT);
+                $this->code = $format_angka."/ Pemeliharaan Aset /".$dep->name."/".$time->month."/".$time->year;
+                $last = str_pad(($idMax) < 10 ? '0' . ($idMax) : ($idMax), 3, '0', STR_PAD_LEFT);
+                $last_code = $last."/ Pemeliharaan Aset /".$dep->name."/".$time->month."/".$time->year;
+                $flag = Pemeliharaan::where('code',$last_code)->count();
             
-
-            $last = str_pad(($idMax) < 10 ? '0' . ($idMax) : ($idMax), 3, '0', STR_PAD_LEFT);
-            $last_code = $last."/ Pemeliharaan Aset /".$dep->name."/".$time->month."/".$time->year;
-            $flag = Pemeliharaan::where('code',$last_code)->count();
-        
-            if($flag != 0){
+                if($flag != 0){
+                    return $this->rollback(
+                        [
+                            'message' => 'Pemeliharaan Pada Unit '.$dep->name.' Bulan '.$time->month.'/'.$time->year.' Sudah Dilakukan!'
+                        ]
+                    );
+                }
+                $this->save();
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                $this->createDetail($request);
+                $this->saveLogNotify();
+                $redirect = route(request()->get('routes') . '.index');
+                return $this->commitSaved(compact('redirect'));
+            }else{
                 return $this->rollback(
                     [
-                        'message' => 'Pemeliharaan Pada Unit '.$dep->name.' Bulan '.$time->month.'/'.$time->year.' Sudah Dilakukan!'
+                        'message' => 'Jadwal Pemeliharaan Hanya Dapat Dibuat Pada Bulan Ini! (Bulan '.$now->month.' Tahun '.$now->year.')'
                     ]
                 );
             }
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
 
-            $this->save();
+    public function createDetail($request){
+        $dep = $request->departemen_id;
+        $data = Aset::where('condition','baik')->where('status', 'actives')->whereHas('usulans', function ($q) use ($dep) {
+            $q->whereHas('perencanaan', function ($qq) use ($dep) {
+                $qq->where('struct_id', $dep);
+            })->whereHas('trans',function($qqq){
+                $qqq->where('unit_cost','>=',1000000);
+            });
+        })->orWhere('location_hibah_aset', $dep)->whereHas('usulans', function ($q){
+            $q->whereHas('trans', function ($qq){
+                $qq->where('unit_cost','>=', 1000000);
+            });
+        })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();;
+        // $data = Aset::with('usulans')
+        //     ->where('condition', 'baik')
+        //     ->where('status', 'actives')
+        //     // ->where('unit_cost','>=',100000)
+        //     // ->whereNotIn('id',$peliharaan)
+        //     ->where(function ($query) use ($dep) {
+        //         $query->orWhere(function ($q) use ($dep) {
+        //             $q->whereHas('usulans', function ($qq) use ($dep) {
+        //                 $qq->whereHas('perencanaan', function ($qqq) use ($dep) {
+        //                     $qqq->where('struct_id', $dep);
+        //                 });
+        //             });
+        //         })
+        //         ->orWhere('location_hibah_aset', $dep);
+        //     })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
 
-            $this->createDetail($request);
+        //dd($data);
+
+        foreach ($data as $aset_id) {
+            $detail = new PemeliharaanDetail;
+            $detail->pemeliharaan_id = $this->id;
+            $detail->kib_id = $aset_id;
+            $detail->save();
+        }
+    }
+
+    // public function handleStoreOrUpdate($request){
+    //     $this->beginTransaction();
+    //     try {
+    //         $data = $request->all();
+    //         $this->fill($data);
+    //         $this->save();
+    //         $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+    //         $redirect = route(request()->get('routes') . '.index');
+    //         return $this->commitSaved(compact('redirect'));
+    //     } catch (\Exception $e) {
+    //         return $this->rollbackSaved($e);
+    //     }
+    // }
+
+    public function handleStoreOrUpdate($request, $statusOnly = false)
+    {
+        $this->beginTransaction();
+        try {
+            
+            if($request->is_submit == 1){
+                $time = $this->maintenance_date;
+                $check = PemeliharaanDetail::Where('pemeliharaan_id',$this->id)->whereHas('pemeliharaan',function ($q) use ($time) {
+                    $q->whereMonth('maintenance_date', $time->month);
+                })->count();
+
+                $flag = PemeliharaanDetail::Where('pemeliharaan_id',$this->id)->where('maintenance_action','!=',null)->whereHas('pemeliharaan',function ($q) use ($time) {
+                    $q->whereMonth('maintenance_date', $time->month);
+                })->count();
+
+                if($check == $flag){
+                    $this->handleSubmitSave($request);
+                    $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                   // Pemeliharaan::where('id',$this->id)->update(['status'=>'waiting.verify']);
+                    return $this->commitSaved();
+                }else{
+                    return $this->rollback(
+                        [
+                            'message' => 'Silahkan Lengkapi Data Pemeliharaan Sebelum Melakukan Submit!'
+                        ]
+                    );
+                }
+            }
+
+            if($request->is_submit == 0 && $request->maintenance_date == null){
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                $redirect = route(request()->get('routes') . '.index');
+                return $this->commitSaved(compact('redirect'));
+            }
+
+            $time = Carbon::createFromFormat('d/m/Y', $request->maintenance_date);
+            $last_time = $this->maintenance_date;
+            if($last_time->month == $time->month && $last_time->year == $time->year){
+                Pemeliharaan::where('id',$this->id)->update(['maintenance_date'=>$time]);
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                $this->saveLogNotify();
+            }else{
+                return $this->rollback(
+                    [
+                        'message' => 'Pembaruan Jadwal Pemeliharaan Hanya Dapat Dilakukan Pada Bulan Yang Sama Dengan Jadwal Sebelumnya! (Bulan '.$last_time->month.' Tahun '.$last_time->year.')'
+                    ]
+                );
+            }
+            // $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
+    public function handleSubmitSave($request)
+    {
+        $this->beginTransaction();
+        try {
+            $this->update(['status' => 'waiting.approval']);
+            $this->generateApproval($request->module);
             $this->saveLogNotify();
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
@@ -135,62 +275,25 @@ class Pemeliharaan extends Model
         }
     }
 
-    public function createDetail($request){
-        $dep = $request->departemen_id;
-        $data = Aset::where('condition','baik')->where('status', 'active')->whereHas('usulans', function ($q) use ($dep) {
-            $q->whereHas('perencanaan', function ($qq) use ($dep) {
-                $qq->where('struct_id', $dep);
-            });
-        })->orWhere('location_hibah_aset', $dep)->whereHas('usulans', function ($q){
-            $q->whereHas('trans', function ($qq){
-                $qq->where('unit_cost','>=', 100000);
-            });
-        })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();;
-      
-        // dd($data);
-        foreach ($data as $aset_id) {
-            $detail = new PemeliharaanDetail;
-            $detail->pemeliharaan_id = $this->id;
-            $detail->kib_id = $aset_id;
-            $detail->save();
-        }
-        
-    }
-
-    public function handleStoreOrUpdate($request){
-        $this->beginTransaction();
-        try {
-          
-            $data = $request->all();
-            $this->fill($data);
-            $this->save();
-            
-            $redirect = route(request()->get('routes') . '.index');
-            return $this->commitSaved(compact('redirect'));
-        } catch (\Exception $e) {
-            return $this->rollbackSaved($e);
-        }
-    }
-
-
     public function handleDetailStoreOrUpdate($request, PemeliharaanDetail $detail)
     {
         $this->beginTransaction();
         try {
             $detail->fill($request->all());
+           // $time = $this->maintenance_date;
             $this->details()->save($detail);
             $this->save();
-
-            $awal = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->count('id');
-            $flag = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->where('maintenance_action','<>',null)->count('id');
-           
-            if($flag == $awal){
-                Pemeliharaan::where('id',$this->id)->update(['status'=>'completed']);
-                $this->saveLogNotify();
-            }
-
+            // $awal = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->whereHas('pemeliharaan',function ($q) use ($time) {
+            //     $q->whereMonth('maintenance_date', $time->month);
+            // })->count('id');
+            // $flag = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->where('maintenance_action','<>',null)->whereHas('pemeliharaan',function ($q) use ($time) {
+            //     $q->whereMonth('maintenance_date', $time->month);
+            // })->count('id');
+            // if($flag == $awal){
+            //     Pemeliharaan::where('id',$this->id)->update(['status'=>'completed']);
+            //     $this->saveLogNotify();
+            // }
             return $this->commitSaved();
-
         } catch (\Exception $e) {
             return $this->rollbackSaved($e);
         }
@@ -202,7 +305,6 @@ class Pemeliharaan extends Model
         try {
             PemeliharaanDetail::where('pemeliharaan_id',$this->id)->delete();
             $this->delete();
-
             return $this->commitDeleted();
         } catch (\Exception $e) {
             return $this->rollbackDeleted($e);
@@ -224,12 +326,73 @@ class Pemeliharaan extends Model
         }
     }
 
+    public function handleReject($request)
+    {
+        $this->beginTransaction();
+        try {
+            $this->rejectApproval($request->module, $request->note);
+            $this->update(['status' => 'rejected']);
+            $this->saveLogNotify();
+
+            $redirect = route(request()->get('routes').'.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
+    public function handleApprove($request)
+    {
+        $this->beginTransaction();
+        try {
+            // dd($request);
+                if ($this->status === 'waiting.approval.revisi') {
+                    $this->approveApproval($request->module . '_upgrade');
+                    if ($this->firstNewApproval($request->module . '_upgrade')) {
+                        $this->update(['status' => 'waiting.approval.revisi']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(
+                            [
+                                'status' => 'draft',
+                                'version' => $this->version + 1,
+                            ]
+                        );
+                        $this->saveLogNotify();
+                    }
+                } else {
+                    $this->approveApproval($request->module);
+                    if ($this->firstNewApproval($request->module)) {
+                        $this->update(['status' => 'waiting.approval']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(['status' => 'completed']);
+                        // Aset::where('id',$this->kib_id)->update(['status'=>'notactive']);
+                        $this->saveLogNotify();
+                    }
+                }
+    
+                $redirect = route(request()->get('routes') . '.index');
+                return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            $customMessage = 'This is a custom error message';
+            return $this->rollback($customMessage);
+          //  return $this->rollbackSaved($e);
+            
+        }
+    }
+
 
 
     public function saveLogNotify()
     {
         $user = auth()->user()->name;
-        $data = 'Membuat Jadwal Pemeliharaan Aset : ' . $this->code;
+        $location = 8;
+        $kepala_department = User::whereHas('position', function ($q) use ($location) {
+            $q->where([['location_id', $location], ['level', 'kepala']]);
+        })->pluck('id')->toArray();
+
+        $data = 'Jadwal Pemeliharaan Aset : ' . $this->code;
         $routes = request()->get('routes');
         switch (request()->route()->getName()) {
             case $routes . '.store':
@@ -241,24 +404,28 @@ class Pemeliharaan extends Model
                     $this->addNotify([
                         'message' => 'Waiting Verification ' . $data,
                         'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
+                        'user_ids' => $kepala_department,
                     ]);
-                    $pesan = $user.' Menunggu Verifikasi ' . $data;
+                    $pesan = $user.' Menunggu Verifikasi Hasil Pemeliharaan';
                     $this->sendNotification($pesan);
                 }
+                
                 break;
             case $routes . '.update':
                 $this->addLog('Mengubah ' . $data);
                 if (request()->is_submit) {
+
                     $this->addLog('Submit ' . $data);
+                    //dd($data);
                     $this->addNotify([
                         'message' => 'Waiting Verification ' . $data,
                         'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
+                        'user_ids' => $kepala_department,
                     ]);
-
-                    $pesan = $user.' Menunggu Verifikasi ' . $data;
+                    
+                    $pesan = $user.' Menunggu Verifikasi Hasil Pemeliharaan';
                     $this->sendNotification($pesan);
+
                 }
                 break;
             case $routes . '.destroy':
@@ -331,7 +498,7 @@ class Pemeliharaan extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4170853844'; // Ganti dengan chat ID penerima notifikasi
 
         Telegram::sendMessage([
             'chat_id' => $chatId,

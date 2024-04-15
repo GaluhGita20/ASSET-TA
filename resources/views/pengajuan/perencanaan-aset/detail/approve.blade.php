@@ -12,7 +12,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
+                    <label class="col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
@@ -31,7 +31,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
+                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <textarea class="form-control" name="desc_spesification" placeholder="{{ __('Spesifikasi Aset') }}" value ="{{ $detail->desc_spesification }}" readonly>{{ $detail->desc_spesification }}</textarea>
@@ -42,7 +42,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Standar Kebutuhan') }}</label>
+                    <label class="col-form-label">{{ __('Standar Kebutuhan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
@@ -61,12 +61,12 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Jumlah yang Ada') }}</label>
+                    <label class="col-form-label">{{ __('Jumlah Tersedia') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
                         <input type="text" min=0 name="existing_amount" class="form-control base-plugin--inputmask_currency text-right"
-                            placeholder="{{ __('Jumlah yang Ada') }}" value="{{ $detail->existing_amount }}" readonly>
+                            placeholder="{{ __('Jumlah Tersedia') }}" value="{{ $detail->existing_amount }}" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 Unit
@@ -80,7 +80,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Jumlah Pengajuan') }}</label>
+                    <label class="col-form-label">{{ __('Jumlah Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
@@ -99,7 +99,7 @@
         <div class="col-sm-12 col-sm-12" >
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Harga Unit') }}</label>
+                    <label class="col-form-label">{{ __('Harga Unit') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
@@ -138,12 +138,12 @@
         <div class="col-sm-12 col-sm-12" >
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Jumlah Disetujui') }}</label>
+                    <label class="col-form-label">{{ __('Jumlah Disetujui') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
                         <input type="text" id="qty_agree" min=0 name="qty_agree" class="form-control base-plugin--inputmask_currency text-right"
-                            placeholder="{{ __('Jumlah Disetujui') }}" value="{{ $detail->qty_agree ?  $detail->qty_agree : 0}}" oninput="updateTotal()" required>
+                            placeholder="{{ __('Jumlah Disetujui') }}" value="{{ $detail->qty_agree ?  $detail->qty_agree : 0}}" oninput="updateTotal()" required autofocus style="border: 1px solid #007bff;">
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 Unit
@@ -162,7 +162,7 @@
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
                         <input type="text" id ="HPS_total_agree" min=0  name="HPS_total_agree" class="form-control base-plugin--inputmask_currency text-right"
-                            placeholder="{{ __('Harga Total Disetujui') }}" value="{{ $detail->HPS_total_agree ?  $detail->HPS_total_agree : 0}}" readonly >
+                            placeholder="{{ __('Harga Total Disetujui') }}" value="{{ $detail->HPS_total_agree ?  $detail->HPS_total_agree : 0}}" readonly  >
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 Rupiah
@@ -182,26 +182,40 @@
                     <select name="sumber_biaya_id" class="form-control base-plugin--select2-ajax"
                         data-url="{{ rut('ajax.selectSSBiaya', [
                             'search'=>'all'
-                        ]) }}"
-                        placeholder="{{ __('Pilih Salah Satu') }}">
-                        <option value="">{{ __('Pilih Salah Satu') }}</option>
+                        ]) }}" autofocus style="border: 1px solid #007bff;" data-placeholder="{{ __('Pilih Salah Satu Sumber Pendanaan') }}">
+                        <option value="" selected>{{ __('Pilih Salah Satu Sumber Pendanaan') }}</option>
                         @if (isset($detail) && ($dana = $detail->danad))
                             <option value="{{ $dana->id }}" selected>{{ $dana->name }}</option>
                         @endif
                     </select>
                 </div>
             </div>
+            <div class="form-group row">
+                <div class="col-sm-12 offset-md-5 col-md-7">
+                    <span style="font-size: 11px">{{ __('Sumber Pendanaan Diisi Ketika Jumlah Disetujui Lebih dari 0 (Nol)') }}</span>
+                </div>
+            </div>
         </div>
+
         <div class="col-sm-12 col-sm-12" id="reject_note">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
                     <label class="col-form-label">{{ __('Catatan Penolakan') }}</label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
-                    <textarea class="form-control" id="reject_notes" value ="{{ $detail->reject_notes }}" name="reject_notes" placeholder="{{ __('Catatan Penolakan') }}" required>{{ $detail->reject_notes }}</textarea>
+                    <textarea class="form-control" id="reject_notes" value ="{{ $detail->reject_notes }}" name="reject_notes" placeholder="{{ __('Catatan Penolakan DetaiL Aset') }}" >{{ $detail->reject_notes }}</textarea>
                 </div>
             </div>
+            <div class="form-group row">
+                <div class="col-sm-12 offset-md-5 col-md-7">
+                    <span style="font-size: 11px">{{ __('Catatan Penolakan Diisi Ketika Jumlah Disetujui Kurang Dari Jumlah Pengajuan') }}</span>
+                </div>
+            </div>
+            {{-- <span>
+                <strong>{{"__(Catatan Penolakan Diisi Ketika Jumlah Disetujui Kurang Dari Jumlah Diajukan)"}}</strong>
+            </span> --}}
         </div>
+        
         @endif
     </div>
 @endsection

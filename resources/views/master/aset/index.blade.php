@@ -5,16 +5,16 @@
             <input type="text" class="form-control filter-control" data-post="name" placeholder="{{ __('Nama Aset') }}">
         </div>
     
-        {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
-            <select class="form-control base-plugin--select2-ajax" name="jenis_aset" data-placeholder="Jenis Aset">
-                <option disabed value="">Tipe Akun Utama</option>
+        <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
+            <select class="form-control filter-control" name="jenis_aset" data-post="jenis_aset" placeholder="{{ __('Jenis Aset') }}">
+                <option disabed value="">Tipe Akun</option>
                 <option value="Tanah">Tanah</option>
                 <option value="Peralatan Mesin">Peralatan Mesin</option>
                 <option value="Gedung Bangunan">Gedung Bangunan</option>
                 <option value="Aset Tetap Lainya">Aset Tetap Lainya</option>
                 <option value="Jalan Irigasi Jaringan">Jalan Irigasi Jaringan</option>
             </select>
-        </div> --}}
+        </div>
     </div>
 @endsection
 

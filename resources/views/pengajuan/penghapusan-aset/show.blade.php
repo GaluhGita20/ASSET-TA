@@ -3,8 +3,8 @@
 @section('action', rut($routes . '.reject', $record->id))
 
 {{-- @extends('layouts.pageSubmit')
-
-@section('action', route($routes . '.update', $record->id)) --}}
+--}}
+{{-- @section('action', route($routes . '.update', $record->id)) --}}
 
 @section('card-body')
 @section('page-content')
@@ -14,7 +14,7 @@
         <div class="col-sm-12">
             <div class="card card-custom">
                 <div class="card-header">
-                    <h3 class="card-title">@yield('card-title', 'Pengajuan Penghapusan ', $title)</h3>
+                    <h3 class="card-title">@yield('card-title', 'Pengajuan Penghapusan', $title)</h3>
                     <div class="card-toolbar">
                         @include('layouts.forms.btnBackTop')
                     </div>
@@ -34,11 +34,41 @@
                             </div>
                         </div>
 
+                        
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">{{ __('Type Aset') }}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <input type="text" class="form-control" value="{{ $record->asets->type }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <div class="col-2 pr-0">
+                                    <label class="col-form-label">{{ __('Kode Aset') }}</label>
+                                </div>
+                                <div class="col-10 parent-group">
+                                    <select name="coa_id" class="form-control base-plugin--select2-ajax coa_id"
+                                        data-url="{{ rut('ajax.selectCoa', ['c']) }}"
+                                        data-url-origin="{{ rut('ajax.selectCoa', ['c']) }}"
+                                        placeholder="{{ __('Pilih Salah Satu') }}" disabled>
+                                        <option value="" required>{{ __('Pilih Salah Satu') }}</option>
+                                        @if (!empty($record->asets->coa_id))
+                                            <option value="{{ $record->asets->coa_id }}" selected>{{ $record->asets->coad->nama_akun.' ( '.$record->asets->coad->kode_akun.' )'  }}</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Merek') }}</label>
                                 <div class="col-sm-8 col-form-label">
-                                    @if(!empty($record->merek_type_item))
+                                {{-- {{dd($record->asets->merek_type_item)}} --}}
+                                    @if(!empty($record->asets->merek_type_item))
                                     <input type="text" name="merek" class="form-control" value="{{ $record->asets->merek_type_item }}" disabled>
                                     @else
                                     <input type="text" name="merek" class="form-control" value="-" disabled>
@@ -49,12 +79,12 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Nomor Seri') }}</label>
+                                <label class="col-sm-4 col-form-label">{{ __('Nomor Pabrik') }}</label>
                                 <div class="col-sm-8 col-form-label">
-                                    @if(!empty($record->no_factory_item))
-                                    <input type="text" name="no_seri" class="form-control" value="{{ $record->asets->no_factory_item }}" disabled>
+                                    @if(!empty($record->asets->no_factory))
+                                        <input type="text" name="no_seri" class="form-control" value="{{ $record->asets->no_factory_item }}" disabled>
                                     @else
-                                    <input type="text" name="no_seri" class="form-control" value="-" disabled>
+                                        <input type="text" name="no_seri" class="form-control" value="-" disabled>
                                     @endif
                                 </div>
                             </div>
@@ -62,9 +92,26 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Type Aset') }}</label>
+                                <label class="col-sm-4 col-form-label">{{ __('Nomor Mesin') }}</label>
                                 <div class="col-sm-8 col-form-label">
-                                    <input type="text" class="form-control" value="{{ $record->asetstype }}" disabled>
+                                    @if(!empty($record->asets->no_machine_item))
+                                        <input type="text" name="no_seri" class="form-control" value="{{ $record->asets->no_machine_item }}" disabled>
+                                    @else
+                                        <input type="text" name="no_seri" class="form-control" value="-" disabled>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">{{ __('Nomor Rangka') }}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    @if(!empty($record->asets->no_frame))
+                                        <input type="text" name="no_seri" class="form-control" value="{{ $record->asets->no_frame }}" disabled>
+                                    @else
+                                        <input type="text" name="no_seri" class="form-control" value="-" disabled>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -109,7 +156,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Unit Lokasi Aset') }}</label>
                                 <div class="col-sm-8 col-form-label">
-                                    <select class="form-control"  name="departemen_id">
+                                    <select class="form-control"  name="departemen_id" disabled>
                                         @if(!empty($record->asets->usulans->perencanaan))
                                             <option value="{{ $record->asets->usulans->perencanaan->struct_id}}" selected> {{ $record->asets->usulans->perencanaan->struct->name }} </option>
                                         @else
@@ -137,7 +184,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Tanggal Pengajuan') }}</label>
                                 <div class="col-sm-8 col-form-label">
-                                    <input type="text" class="form-control" name="dates" value = "{{ $record->submission_date }}" data-date-end-date="{{ now() }}" disabled>
+                                    <input type="text" class="form-control" name="dates" value = "{{ $record->submmission_date->format('d/m/Y') }}" data-date-end-date="{{ now() }}" disabled>
                                 </div>
                             </div>
                         </div>
@@ -152,6 +199,55 @@
                         </div>
 
                         <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">{{ __('Foto Kerusakan') }}</label>
+                                <div class="col-10 parent-group">
+                                    {{-- <div class="custom-file">
+                                        <input type="hidden"
+                                            name="uploads[uploaded]"
+                                            class="uploaded"
+                                            value="0">
+                                        <input type="file" multiple
+                                            class="custom-file-input base-form--save-temp-files"
+                                            data-name="uploads"
+                                            data-container="parent-group"
+                                            data-max-size="30024"
+                                            data-max-file="100"
+                                            accept="*">
+                                        <label class="custom-file-label" for="file">Choose File</label>
+                                    </div> --}}
+
+                                    <div class="form-text text-muted">*Maksimal 20MB</div>
+                                    @foreach ($record->files as $file)
+                                    <div class="progress-container w-100" data-uid="{{ $file->id }}">
+                                    
+                                            <div class="alert alert-custom alert-light fade show py-2 px-3 mb-0 mt-2 success-uploaded" role="alert">
+                                                <div class="alert-icon">
+                                                    <i class="{{ $file->file_icon }}"></i>
+                                                </div>
+                                                <div class="alert-text text-left">
+                                                    <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
+                                                    <div>Uploaded File:</div>
+                                                    <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
+                                                        {{ $file->file_name }}
+                                                    </a>
+                                                </div>
+                                                <div class="alert-close">
+                                                    {{-- <button type="button" class="close base-form--remove-temp-files" data-toggle="tooltip"
+                                                        data-original-title="Remove">
+                                                        <span aria-hidden="true">
+                                                            <i class="ki ki-close"></i>
+                                                        </span>
+                                                    </button> --}}
+                                                </div>
+                                            </div>
+                                    </div>
+                                    @endforeach
+                                    
+                                </div>
+                            </div> 
+                        </div>
+                        <!-- <div class="col-sm-12">
                             <div class="form-group row">
                                 <label class="col-2 col-form-label">{{ __('Foto Kerusakan') }}</label>
                                 <div class="col-10 parent-group">
@@ -172,7 +268,7 @@
                                     <div class="form-text text-muted">*Maksimal 20MB</div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>

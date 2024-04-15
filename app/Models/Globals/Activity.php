@@ -29,6 +29,8 @@ class Activity extends Model
         return $this->message;
     }
 
+    // public function get
+
 
     /** RELATION **/
     public function target()

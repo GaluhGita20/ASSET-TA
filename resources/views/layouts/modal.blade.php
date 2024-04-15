@@ -32,4 +32,19 @@
 	@endif
 </form>
 
+
+{{-- <script src="{{ (('/assets/js/plugins.bundle.js')) }}"></script>
+        {{-- <script src="{{ ('/assets/js/theme.config.js')) }}"></script> --}}
+{{-- <script src="{{ (('/assets/js/theme.bundle.js')) }}"></script>
+<script src="{{ (('/assets/js/base.bundle.js')) }}"></script>
+<script src="{{ (('/assets/js/modules.bundle.js')) }}"></script>  --}}
+		{{-- @stack('scripts') --}}
+<script>
+	// Mendaftarkan fungsi untuk menangani penutupan modal saat tombol close diklik
+	$(document).ready(function () {
+		$('.modal .close').click(function () {
+			$(this).closest('.modal').modal('hide');
+		});
+	});
+</script>
 @stack('scripts')

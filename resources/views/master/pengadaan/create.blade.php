@@ -4,13 +4,13 @@
 @section('modal-body')
     @method('POST')
 	<div class="form-group row">
-        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Jenis Pengadaan') }}</label>
+        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Jenis Pengadaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
             <input name="name" type="text" class="form-control" placeholder="{{ __('Jenis Pengadaan') }}">
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Deskripsi Pengadaan') }}</label>
+        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Deskripsi Pengadaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
             <textarea name="description" class="form-control" placeholder="{{ __('Deskripsi') }}"></textarea>
         </div>

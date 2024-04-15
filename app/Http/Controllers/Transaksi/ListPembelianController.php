@@ -41,11 +41,10 @@ class ListPembelianController extends Controller
         ]);
     }
 
-
     public function grid(Request $request)
     {
         $user = auth()->user();
-      
+
         if($request->data != null){ //data yang sudah di checklist
             $allIds = collect($request->data)->flatten()->toArray();
             $records = PerencanaanDetail::with('perencanaan')
@@ -61,9 +60,7 @@ class ListPembelianController extends Controller
             })->where(function ($query) {
                 $query->where('qty_agree', '>', 0)->where('status', 'waiting purchase');
             })->filters()->dtGet();
-            
         }
- 
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {
                 return request()->start;
@@ -107,14 +104,19 @@ class ListPembelianController extends Controller
                         <span></span>
                     </label>';
                 }
-            ) ->addColumn('action', function ($detail){
-                
+            )->addColumn('action', function ($detail){
                 $actions[] = [
                     'type' => 'delete',
                     'url' => route($this->routes . '.detailDestroy', $detail->id),
                 ];
                 return $this->makeButtonDropdown($actions, $detail->id);
-                
+            })
+            ->addColumn('action_shows', function ($detail){
+                $actions[] = [
+                    'type' => 'show',
+                    'url' => route($this->routes . '.showDetail', $detail->id),
+                ];
+                return $this->makeButtonDropdown($actions, $detail->id);
             })
             ->addColumn('actionDetail', function ($detail){
                 $perms = 'transaksi.pengadaan-aset';
@@ -140,7 +142,7 @@ class ListPembelianController extends Controller
                     }
                 }
             })
-            ->rawColumns(['tahun_usulan','checkbox','action','actionDetail'])
+            ->rawColumns(['tahun_usulan','checkbox','action','actionDetail','action_shows'])
             ->make(true);
     }
     
@@ -156,7 +158,7 @@ class ListPembelianController extends Controller
                     $this->makeColumn('name:tahun_usulan|label:Tahun Usulan|className:text-center|width:200px'),
                     $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center|width:300px'),
                     $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:200px'),
-                    $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
+                    // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
                     $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
                     $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
@@ -197,7 +199,7 @@ class ListPembelianController extends Controller
             request()->session()->forget('usulan_id');
     
             return $record->handleStoreListPembelian($request); //handle pertama kali data diambil
-         }}
+        }}
     }
 
 
@@ -232,7 +234,6 @@ class ListPembelianController extends Controller
     }
     
     public function update($record){
-   
         $data = $data1->id;
         $record = $data1->pembelian_id;
 
@@ -268,14 +269,6 @@ class ListPembelianController extends Controller
             return $detail->handleStoreEditListPembelian($pengadaan);
         }
     }
-
-
-
-
-
-
-
-
 
     /// store data detail usulan non pembelian
 

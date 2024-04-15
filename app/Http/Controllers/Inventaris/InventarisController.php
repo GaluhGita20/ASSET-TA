@@ -97,10 +97,12 @@ class InventarisController extends Controller
             ->editColumn(
                 'checkbox',
                 function ($detail) {
-                    return '<label class="checkbox" style="text-align:center; display: flex; align-items: center;">
-                        <input  type="checkbox" ' . '' . ' class="usulan" name="usulan_id[' . $detail->id . ']" value="' . $detail->id . '">
-                        <span></span>
-                    </label>';
+                    if ($detail->checkAction('create', $this->perms)|| auth()->user()->hasRole('Sarpras')) {
+                        return '<label class="checkbox" style="text-align:center; display: flex; align-items: center;">
+                            <input  type="checkbox" ' . '' . ' class="usulan" name="usulan_id[' . $detail->id . ']" value="' . $detail->id . '">
+                            <span></span>
+                        </label>';
+                    }
                 }
             )
             ->rawColumns(['source_acq','tahun_usulan','checkbox','action'])
@@ -122,11 +124,12 @@ class InventarisController extends Controller
                     $this->makeColumn('name:HPS_unit_cost|label:Harga Unit (Rupiah)|className:text-center|width:200px'),
                    // $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                   // @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create'))
                     $this->makeColumn('name:checkbox|label:check|class:usulan|className:text-center|width:50px'),
+                   // @endif
                 ],
             ],
         ]);
-    
         return $this->render($this->views . '.index');
     }
 

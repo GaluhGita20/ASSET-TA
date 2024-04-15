@@ -101,11 +101,11 @@ class FlowController extends Controller
                         'label' => 'Assign Approval',
                         'id' => $record->id,
                     ];
-                    $actions[] = [
-                        'type' => 'history',
-                        'attrs' => 'data-modal-size="modal-md"',
-                        'id' => $record->id,
-                    ];
+                    // $actions[] = [
+                    //     'type' => 'history',
+                    //     'attrs' => 'data-modal-size="modal-md"',
+                    //     'id' => $record->id,
+                    // ];
                 }
                 return $this->makeButtonDropdown($actions);
             })

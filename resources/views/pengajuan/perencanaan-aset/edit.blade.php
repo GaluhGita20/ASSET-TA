@@ -68,7 +68,7 @@
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Perihal') }}</label>
+                    <label class="col-form-label">{{ __('Perihal') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     <input class="form-control" name="regarding" placeholder="{{ __('Perihal') }}" value="{{ $record->regarding }}">
@@ -77,7 +77,7 @@
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Tahun Pengadaan') }}</label>
+                    <label class="col-form-label">{{ __('Tahun Pengadaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     <input class="form-control" value={{ $record->procurement_year }} type="number" min="1900" max="2100" name="procurement_year" placeholder="{{ __('Tahun Pengadaan') }}">
@@ -130,6 +130,8 @@
                     
                 </div>
             </div> 
+
+            
         </div>
     </div>
 @endsection

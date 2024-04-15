@@ -12,7 +12,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
+                    <label class="col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
@@ -31,7 +31,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
+                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <textarea class="form-control" name="desc_spesification" placeholder="{{ __('Spesifikasi Aset') }}" value ="{{ $detail->desc_spesification }}" readonly>{{ $detail->desc_spesification }}</textarea>
@@ -42,7 +42,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Standar Kebutuhan') }}</label>
+                    <label class="col-form-label">{{ __('Standar Kebutuhan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
@@ -61,12 +61,12 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Jumlah yang Ada') }}</label>
+                    <label class="col-form-label">{{ __('Jumlah Tersedia') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
                         <input type="text" min=0 name="existing_amount" class="form-control base-plugin--inputmask_currency text-right"
-                            placeholder="{{ __('Jumlah yang Ada') }}" value="{{ $detail->existing_amount }}" readonly>
+                            placeholder="{{ __('Jumlah Tersedia') }}" value="{{ $detail->existing_amount }}" readonly>
                         <div class="input-group-append">
                             <span class="input-group-text">
                                 Unit
@@ -80,7 +80,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Jumlah Pengajuan') }}</label>
+                    <label class="col-form-label">{{ __('Jumlah Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">
@@ -99,7 +99,7 @@
         <div class="col-sm-12 col-sm-12" >
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Harga Unit') }}</label>
+                    <label class="col-form-label">{{ __('Harga Unit') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <div class="input-group">

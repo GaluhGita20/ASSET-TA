@@ -80,6 +80,7 @@
         "es6-shim": "0.35.6",
         "esri-leaflet": "2.5.3",
         "esri-leaflet-geocoder": "2.3.4",
+        "flatpickr": "^4.6.13",
         "flot": "4.2.1",
         "gmaps": "0.4.25",
         "handlebars": "4.7.6",

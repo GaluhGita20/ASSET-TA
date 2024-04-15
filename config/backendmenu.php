@@ -131,23 +131,55 @@ return [
         'name' => 'pemeliharaan-aset',
         'title' => 'Pemeliharaan Aset',
         'perms' => 'pemeliharaan-aset',
-        'icon' => 'fa fa-road',
+        'icon' => 'fa fa-toolbox',
         'url' => 'pemeliharaan/pemeliharaan-aset',
     ],
 
     [
-        'name' => 'perbaikan-aset',
+        'name' => 'perbaikan',
         'title' => 'Pengajuan Perbaikan',
-        'perms' => 'perbaikan-aset',
-        'icon' => 'fa fa-road',
-        'url' => '/pengajuan/perbaikan-aset',
+        'icon' => 'fa fa-hammer',
+        'submenu' => [
+            [
+                'name' => 'perbaikan-aset',
+                'perms' => 'perbaikan-aset',
+                'title' => 'Usulan Perbaikan',
+                'url' => '/perbaikan/perbaikan-aset',
+            ],
+            [
+                'name' => 'usulan_pembelian-sperpat',
+                'perms' => 'usulan_pembelian-sperpat',
+                'title' => 'Usulan Sperpat',
+                'url' => '/perbaikan/usulan-sperpat',
+            ],
+            [
+                'name' => 'trans-sperpat',
+                'perms' => 'trans-sperpat',
+                'title' => 'Transaksi Sperpat Aset',
+                'url' => '/perbaikan/trans-sperpat',
+            ],
+            [
+                'name' => 'pj-perbaikan-aset',
+                'perms' => 'perbaikan-aset',
+                'title' => 'Hasil Akhir Perbaikan',
+                'url' => '/perbaikan/pj-perbaikan',
+            ],
+        ]
     ],
+
+    // [
+    //     'name' => 'perbaikan-aset',
+    //     'title' => 'Pengajuan Perbaikan',
+    //     'perms' => 'perbaikan-aset',
+    //     'icon' => 'fa fa-road',
+    //     'url' => '/pengajuan/perbaikan-aset',
+    // ],
 
     [
         'name' => 'penghapusan-aset',
         'title' => 'Pengajuan Penghapusan',
         'perms' => 'penghapusan-aset',
-        'icon' => 'fa fa-road',
+        'icon' => 'fa fa-trash',
         'url' => '/pengajuan/penghapusan-aset',
     ],
 
@@ -155,8 +187,8 @@ return [
         'name' => 'pemutihan-aset',
         'title' => 'Pemutihan Aset',
         'perms' => 'pemutihan-aset',
-        'icon' => 'fa fa-road',
-        'url' => '/pemutihan-aset',
+        'icon' => 'fa fa-coins',
+        'url' => '/pengajuan/pemutihan-aset',
     ],
 
     [
@@ -165,64 +197,77 @@ return [
         'icon' => 'fa fa-book',
         'submenu' => [
             [
-                'name' => 'laporan_perencanaan-aset',
-                'perms' => 'perencanaan-aset',
-                'title' => 'Usulan Aset',
-                'url' => '/laporan/perencanaan-aset',
+                'name' => 'laporan.Inventaris',
+                'title' => 'Daftar Laporan Aset',
+                'url' => '',
+                'submenu' => [
+                    [
+                        'name' => 'laporan-inventaris_kib-a',
+                        'perms' => 'registrasi.inventaris-aset',
+                        'title' => 'Aset KIB A',
+                        'url' => '/laporan/inventaris/kib-a',
+                    ],
+                    [
+                        'name' => 'laporan-inventaris_kib-b',
+                        'perms' => 'registrasi.inventaris-aset',
+                        'title' => 'Aset KIB B',
+                        'url' => '/laporan/inventaris/kib-b',
+                    ],
+                    [
+                        'name' => 'laporan-inventaris_kib-c',
+                        'perms' => 'registrasi.inventaris-aset',
+                        'title' => 'Aset KIB C',
+                        'url' => '/laporan/inventaris/kib-c',
+                    ],
+                    [
+                        'name' => 'laporan-inventaris_kib-d',
+                        'perms' => 'registrasi.inventaris-aset',
+                        'title' => 'Aset KIB D',
+                        'url' => '/laporan/inventaris/kib-d',
+                    ],
+                    [
+                        'name' => 'laporan-inventaris_kib-e',
+                        'perms' => 'registrasi.inventaris-aset',
+                        'title' => 'Aset KIB E',
+                        'url' => '/laporan/inventaris/kib-e',
+                    ],
+                    [
+                        'name' => 'laporan-inventaris_kib-f',
+                        'perms' => 'registrasi.inventaris-aset',
+                        'title' => 'Aset KIB F',
+                        'url' => '/laporan/inventaris/kib-f',
+                    ],
+                    [
+                        'name' => 'laporan_perencanaan-aset',
+                        'perms' => 'perencanaan-aset',
+                        'title' => 'Usulan Aset',
+                        'url' => '/laporan/perencanaan-aset',
+                    ],
+                ]
             ],
-
             [
                 'name' => 'laporan_penerimaan-aset',
                 'perms' => 'perencanaan-aset',
                 'title' => 'Penerimaan Aset',
                 'url' => '/laporan/penerimaan-aset',
             ],
+
+            [
+                'name' => 'laporan_hibah-aset',
+                'perms' => 'perencanaan-aset',
+                'title' => 'Penerimaan Hibah Aset',
+                'url' => '/laporan/hibah-aset',
+            ],
+
+            // [
+            //     'name' => 'laporan_pengadaan-aset',
+            //     'perms' => 'perencanaan-aset',
+            //     'title' => 'Pengadaan Aset',
+            //     'url' => '/laporan/pengadaan-aset',
+            // ],
         ]
     ],
-    // laporan_perencanaan-aset
-    // [
-    //     'name' => 'registrasi_aset',
-    //     'title' => 'Registrasi Aset',
-    //     'icon' => 'fa fa-road',
-    //     'submenu' => [
-    //         [
-    //             'name' => 'aset_tanah',
-    //             'perms' => 'registrasi.aset_tanah',
-    //             'title' => 'Aset Tanah',
-    //             'url' => '/registrasi/aset-tanah',
-    //         ],
-    //         [
-    //             'name' => 'aset_bangunan',
-    //             'perms' => 'registrasi.aset_bangunan',
-    //             'title' => 'Aset Bangunan',
-    //             'url' => '/registrasi/aset-bangunan',
-    //         ],
-    //         [
-    //             'name' => 'aset_peralatan_mesin',
-    //             'perms' => 'registrasi.aset_peralatan_mesin',
-    //             'title' => 'Aset Tanah',
-    //             'url' => '/registrasi/aset-peralatan-mesin',
-    //         ],
-    //         [
-    //             'name' => 'aset_jalan_irigasi_jaringan',
-    //             'perms' => 'registrasi.aset_jalan_irigasi_jaringan',
-    //             'title' => 'Aset Jalan Irgasi Jaringan',
-    //             'url' => '/registrasi/aset-jalan-irigasi-jaringan',
-    //         ],  
-    //         [
-    //             'name' => 'aset_tetap_lainya',
-    //             'perms' => 'registrasi.aset_tetap_lainya',
-    //             'title' => 'Aset Tetap Lainya',
-    //             'url' => '/registrasi/aset-tetap-lainya',
-    //         ],    
-    //         [
-    //             'name' => 'aset_kontruksi_pembangunan',
-    //             'perms' => 'registrasi.aset_kontruksi_pembangunan',
-    //             'title' => 'Aset Kontruksi Pembangunan',
-    //             'url' => '/registrasi/aset-kontruksi-pembangunan',
-    //         ],             
-    //     ]
-    // ],
+
     [
         'section' => 'ADMIN KONSOL',
         'name' => 'console_admin',
@@ -312,7 +357,7 @@ return [
             ],
             [
                 'name' => 'master.Coa',
-                'title' => 'Chart of Accounts',
+                'title' => 'Daftar Akun Aset',
                 'url' => '',
                 'submenu' => [
                     [
@@ -388,13 +433,21 @@ return [
                 'name' => 'master_dana',
                 'title' => 'Sumber Dana',
                 'url' => '/master/dana',
-                // 'submenu' => [
-                //     [
-                //         'name' => 'master_dana',
-                //         'title' => 'Master Sumber Dana',
-                //         'url' => '/master/dana'
-                //     ],
-                // ],
+            ],
+            [
+                'name' => 'master_hakTanah',
+                'title' => 'Hak Tanah',
+                'url' => '/master/hakTanah',
+            ],
+            [
+                'name' => 'master_statusTanah',
+                'title' => 'Status Tanah',
+                'url' => '/master/statusTanah',
+            ],
+            [
+                'name' => 'master_bahanAset',
+                'title' => 'Bahan Aset',
+                'url' => '/master/bahanAset',
             ],
             [
                 'name' => 'Vendor',

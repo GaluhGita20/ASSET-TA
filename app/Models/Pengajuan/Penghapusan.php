@@ -66,10 +66,10 @@ class Penghapusan extends Model
      ** SCOPE
      *******************************/
 
-     public function scopeGrid($query)
+    public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(!in_array($user->position->location->id, [8,17]), 
+        return $query->when(empty(array_intersect(['Sarpras','Keuangan','Direksi','BPKAD'], $user->roles->pluck('name')->toArray())), 
             function ($q) use ($user) { 
             return $q->when($user->position->imKepalaDeparetemen(), 
                 function ($qq) use ($user) {
@@ -96,8 +96,21 @@ class Penghapusan extends Model
 
     public function scopeFilters($query)
     {
-        return $query->filterBy(['code','procurement_year'])
-        ->filterBy(['struct_id'])->latest();
+        return $query->filterBy(['code','status'])
+        ->filterBy(['struct_id'])->when(
+            $names = request()->aset_name,
+            function ($q) use ($names){
+                $q->whereHas('asets', function ($qq) use ($names){
+                    $qq->whereHas('asetData',function ($qqq) use ($names){
+                        $qqq->where('name','LIKE','%'.request()->sperpat_name.'%');
+                    });
+            });
+        })->when(request()->submmission_date, function ($q) {
+            $date = request()->submmission_date;
+            $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
+            //dd($formatted_date);
+            $q->where('submmission_date',$formatted_date);
+        })->latest();
         
     }
 
@@ -118,24 +131,22 @@ class Penghapusan extends Model
             $uid= Aset::where('id',$request->kib_id)->pluck('usulan_id');
             $aset = PerencanaanDetail::where('id',$uid)->pluck('ref_aset_id');
             $name= AsetRs::where('id',$aset[0])->pluck('name');
-      
             // dd(Carbon::createFromFormat('Y/m/d',now()));
             $this->submmission_date = Carbon::now();
 
- 
             $format_angka = str_pad(($idMax + 1) < 10 ? '0' . ($idMax + 1) : ($idMax + 1), 3, '0', STR_PAD_LEFT);
 
             $this->code = $format_angka."/Penghapusan Aset/".$name[0]."/".$dep->name."/".now()->format('d/m/Y');
             $this->save();
+            Aset::where('id',$request->kib_id)->update(['status'=>'in deletion']);
             
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
 
             if($request->is_submit == 1 ){
                 $this->handleSubmitSave($request);
+            }else{
+                $this->saveLogNotify();
             }
-
-         
-            $this->saveLogNotify();
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -144,7 +155,6 @@ class Penghapusan extends Model
     }
 
     // public function handleStoreOrUpdate($request,$statusOnly = false){
-     
     //     $data = $request->all();
     //     $this->fill($data);
     //        // dd($request->all());
@@ -164,15 +174,24 @@ class Penghapusan extends Model
     {
         $this->beginTransaction();
         try {
-
+            //dd($request->all());
+            if($request->desc_del == null){
+                return $this->rollback(
+                    [
+                        'message' => 'Alasan Penghapusan Wajib Diisi!'
+                    ]
+                );
+            }
             $data = $request->all();
             $this->fill($data);
             $this->save();
 
             if($request->is_submit == 1 ){
                 $this->handleSubmitSave($request);
+            }else{
+                $this->saveLogNotify();
             }
-         
+
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -201,6 +220,8 @@ class Penghapusan extends Model
         $this->beginTransaction();
         try {
             $this->saveLogNotify();
+            Aset::where('id',$this->kib_id)->update(['condition'=>'rusak berat']);
+            Aset::where('id',$this->kib_id)->update(['status'=>'actives']);
             $this->delete();
 
             return $this->commitDeleted();
@@ -214,9 +235,8 @@ class Penghapusan extends Model
     {
         $this->beginTransaction();
         try {
-
+            // dd('tes');
             $this->update(['status' => 'waiting.approval']);
-            //dd($this->status);
             $this->generateApproval($request->module);
             $this->saveLogNotify();
             $redirect = route(request()->get('routes') . '.index');
@@ -226,8 +246,6 @@ class Penghapusan extends Model
             return $this->rollbackSaved($e);
         }
     }
-
-
 
     public function handleApprove($request)
     {
@@ -254,11 +272,9 @@ class Penghapusan extends Model
                         $this->update(['status' => 'waiting.approval']);
                         $this->saveLogNotify();
                     } else {
-                        // dd($this->kib_id);
                         $this->update(['status' => 'completed']);
                         Aset::where('id',$this->kib_id)->update(['status'=>'notactive']);
                         $this->saveLogNotify();
-
                     }
                 }
     
@@ -307,8 +323,6 @@ class Penghapusan extends Model
 
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
-
-                   
                     $pesan = $user.' Menunggu Approval ' . $data;
                     $this->sendNotification($pesan);
                 }
@@ -384,7 +398,7 @@ class Penghapusan extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4132612354'; // Ganti dengan chat ID penerima notifikasi
 
         Telegram::sendMessage([
             'chat_id' => $chatId,

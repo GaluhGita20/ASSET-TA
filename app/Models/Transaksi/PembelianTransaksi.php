@@ -19,12 +19,11 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DateTime;
 use App\Models\Auth\Role;
+// use App\Models\Traits\HasFiles;
 use App\Models\Globals\Approval;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use Telegram\Bot\Laravel\Facades\Telegram;
-
-
 
 class PembelianTransaksi extends Model
 {
@@ -63,9 +62,6 @@ class PembelianTransaksi extends Model
         'sp2d_date'             => 'date',
     ];
 
- 
-
-   
     /*******************************
      ** MUTATOR
      *******************************/
@@ -116,7 +112,6 @@ class PembelianTransaksi extends Model
     {
         
         $value = str_replace(['.',','],'',$value);
- 
         $this->attributes['tax_cost'] = (int)$value;
     }
 
@@ -166,13 +161,12 @@ class PembelianTransaksi extends Model
     //     return $this->belongsToMany(User::class, 'trans_pengajuan_pembelian_cc', 'perencanaan_id', 'user_id');
     // }
 
-   
     /*******************************
      ** SCOPE
      *******************************/
 
-     public function scopeGrid($query)
-     {
+    public function scopeGrid($query)
+    {
 
         $user = auth()->user();
        // dd($user->roles()->pluck('name'));
@@ -180,7 +174,7 @@ class PembelianTransaksi extends Model
             function ($q) use ($user) { 
                 $q->WhereHas('approvals', function ($q) use ($user) {
                     $q->when($user->id, function ($qq) use ($user) {
-                         $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
+                        $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
                     },function ($qq) use ($user) {
                         $qq->orWhereIn('role_id', $user->getRoleIds())
                         ->orWhere('position_id', $user->position->id);
@@ -189,20 +183,36 @@ class PembelianTransaksi extends Model
             }
         )
         ->latest();
-     }
+    }
 
     public function scopeFilters($query)
     {
-        // return $query;
-        return $query->filterBy(['no_spk','sp2d_code'])->when(
-            $jenis_vendor = request()->vendor_id,
-            function ($q) use ($jenis_vendor){
-                $q->whereHas('vendors', function ($qq) use ($jenis_vendor){
-                        $qq->where('id',$jenis_vendor);
-            });
-            })->latest();
-    }
+        return $query->filterBy(['no_spk','status'])
+            ->when(request()->vendor_id, function ($q) {
+                $q->whereHas('vendors', function ($qq) {
+                    $qq->where('id', request()->vendor_id);
+                });
+            })
+            ->when(request()->spk_start_date, function ($q) {
+                $date = request()->spk_start_date;
+                $formatted_date = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+                $q->where('spk_start_date',$formatted_date);
+            })
+            ->when(request()->spk_end_date, function ($q) {
+                $date = request()->spk_end_date;
+                $formatted_date = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+                $q->where('spk_end_date',$formatted_date);
+            })
+            ->when(request()->receipt_date, function ($q) {
+                $date = request()->receipt_date;
+                $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
+                //dd($formatted_date);
+                $q->where('receipt_date',$formatted_date);
+            })
+            ->where('trans_name', 'LIKE', '%' . request()->trans_name . '%')
+            ->latest();
 
+    }
 
     /*******************************
      ** SAVING
@@ -245,14 +255,10 @@ class PembelianTransaksi extends Model
 
     //         $value6 = str_replace(['.', ','],'',$request->qty);
     //         $this->qty = (int)$value6;
-            
-            
     //         $start_time = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
     //         $end_time = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
     //         $selisih = $start_time->diffInDays($end_time);
-            
     //         $this->spk_range_time = $selisih;
-            
     //         $this->save();
     //         $dataArray = json_decode($request->usulan_id, true);
 
@@ -260,7 +266,6 @@ class PembelianTransaksi extends Model
 
     //         //$this->jenisUsaha()->sync($request->user_id);
     //         $this->pengujianPengadaan()->sync($request->user_id ?? []);
-            
 
     //         if ($dataArray) {
     //             PerencanaanDetail::whereIn('id', $dataArray)->update(['status' => 'waiting receipt']);
@@ -269,7 +274,6 @@ class PembelianTransaksi extends Model
     //         if ($request->is_submit == 1) {
     //             $this->handleSubmitSave($request);
     //         }
-            
     //         $redirect = route('transaksi.pengadaan-aset' . '.index');
     //         return $this->commitSaved(compact('redirect'));
     //     } catch (\Exception $e) {
@@ -301,16 +305,15 @@ class PembelianTransaksi extends Model
                 $data = $request->all();
                 $this->fill($data);
                 $this->save();
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $this->pengujianPengadaan()->sync($request->user_id ?? []);
                 $this->saveLogNotify();
                 $this->handleSubmitSave($request);
-
-
             }else{
-
                 $data = $request->all();
                 $this->fill($data);
                 $this->save();
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 if($request->user_id != null){
                     $this->pengujianPengadaan()->sync($request->user_id ?? []);
                 }
@@ -357,7 +360,7 @@ class PembelianTransaksi extends Model
 
                 $this->usulans()->save($detail);
                 $this->save();
-
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $this->pengujianPengadaan()->sync($request->user_id ?? []);
                 
                 return $this->commitSaved();
@@ -370,6 +373,7 @@ class PembelianTransaksi extends Model
 
                 $this->usulans()->save($detail);
                 $this->save();
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 return $this->commitSaved();
             }
 
@@ -398,6 +402,7 @@ class PembelianTransaksi extends Model
     {
         $this->beginTransaction();
         try { 
+           //dd($request->all());
             if($request->unit_cost == 0){
                 return $this->rollback(
                     [
@@ -405,6 +410,7 @@ class PembelianTransaksi extends Model
                     ]
                 );
             }
+
             if($request->total_cost == 0){
                 return $this->rollback(
                     [
@@ -416,9 +422,17 @@ class PembelianTransaksi extends Model
 
             $this->fill($data);
 
+            // dd('tes');
+            if($request->sp2d_code != null){
+                $this->sp2d_code = $request->sp2d_code;
+            }
+            if($request->sp2d_date != null){
+                $this->sp2d_date = $request->sp2d_date;
+            }
+
             $value1 = str_replace(['.', ','],'',$request->unit_cost);
             $this->unit_cost = (int)$value1;
-            
+
             $value2 = str_replace(['.', ','],'',$request->tax_cost);
             $this->tax_cost = (int)$value2;
 
@@ -434,20 +448,16 @@ class PembelianTransaksi extends Model
             $value6 = str_replace(['.', ','],'',$request->qty);
             $this->qty = (int)$value6;
             
-            
             $start_time = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
             $end_time = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
             $selisih = $start_time->diffInDays($end_time);
-            
             $this->spk_range_time = $selisih;
             
             $this->save();
-
             $dataArray = json_decode($request->usulan_id, true);
-
             PerencanaanDetail::whereIn('id',$dataArray)->update(['trans_id' => $this->id]);
-
             $this->pengujianPengadaan()->sync($request->user_id ?? []);
+            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
             
             if ($dataArray) {
                 PerencanaanDetail::whereIn('id', $dataArray)->update(['status' => 'waiting receipt']);
@@ -455,11 +465,12 @@ class PembelianTransaksi extends Model
 
             if ($request->is_submit == 1) {
                 $this->handleSubmitSave($request);
+            }else{
+                $module='transaksi_waiting-purchase';
+                $this->addLog('Memperbarui ' . $request->trans_name);
+                $this->logs()->whereModule($module)->latest()->update(['module'=>'transaksi_pengadaan-aset']);
             }
             
-            $module='transaksi_waiting-purchase';
-            $this->addLog('Membuat ' . $request->trans_name);
-            $this->logs()->whereModule($module)->latest()->update(['module'=>'transaksi_pengadaan-aset']);
             
             $redirect = route('transaksi.pengadaan-aset' . '.index');
             return $this->commitSaved(compact('redirect'));
@@ -493,7 +504,6 @@ class PembelianTransaksi extends Model
     //     ->pluck('detail_usulan_id');
 
     //     $usulan_id = collect($usulan)->flatten()->toArray();
-
     //     $pagu = PerencanaanDetail::whereIn('id',$usulan_id)->sum('HPS_total_agree');
     //     $jumlah_beli = PerencanaanDetail::whereIn('id',$usulan_id)->sum('qty_agree');
 
@@ -507,7 +517,7 @@ class PembelianTransaksi extends Model
     //     $this->qty= $jumlah_beli;
     //     $this->total_cost = $this->qty * $this->unit_cost + $this->tax_cost + $this->shiping_cost;
     //     $this->save();
-        
+    
     //     return $data;
     // }
 
@@ -536,7 +546,6 @@ class PembelianTransaksi extends Model
         return $data;
     }
 
- 
     // public function handleDestroy()
     // {
     //     $this->beginTransaction();
@@ -597,9 +606,29 @@ class PembelianTransaksi extends Model
                 } else {
                     $this->approveApproval($request->module);
                     if ($this->firstNewApproval($request->module)) {
+                        
+                        if($request->sp2d_code == null){
+                            return $this->rollback(
+                                [
+                                    'message' => 'Kode SP2D Wajib Diisi!'
+                                ]
+                            );
+                        }
+
+                        if($request->sp2d_date == null){
+                            return $this->rollback(
+                                [
+                                    'message' => 'Tanggal SP2D Wajib Diisi!'
+                                ]
+                            );
+                        }
+                            // dd($this);
                         $this->update(['status' => 'waiting.approval']);
+                        $this->update(['sp2d_code'=> $request->sp2d_code]);
+                        $this->update(['sp2d_date' => $request->sp2d_date]);
                         $this->saveLogNotify();
                     } else {
+                        // dd($request->all());
                         $this->update(['status' => 'completed']);
                         $this->saveLogNotify();
                        // $this->_generateReport('completed');
@@ -647,7 +676,7 @@ class PembelianTransaksi extends Model
     public function saveLogNotify()
     {
         $user = auth()->user()->name;
-        $data = 'Transaksi : ' . $this->trans_name;
+        $data = $this->trans_name;
         $routes = request()->get('routes');
         switch (request()->route()->getName()) {
             case $routes . '.store':
@@ -667,7 +696,7 @@ class PembelianTransaksi extends Model
                 }
                 break;
             case $routes . '.update':
-                $this->addLog('Mengubah ' . $data);
+                $this->addLog('Memperbarui ' . $data);
                 if (request()->is_submit) {
                     $this->addLog('Submit ' . $data);
                     $this->addNotify([
@@ -755,7 +784,7 @@ class PembelianTransaksi extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
 
         Telegram::sendMessage([
             'chat_id' => $chatId,

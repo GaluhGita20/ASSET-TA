@@ -20,7 +20,7 @@
         <div class="col-sm-12">
             <div class="form-group row">
                 <div class="col-2">
-                    <label class="col-form-label">{{ __('Unit Departemen') }}</label>
+                    <label class="col-form-label">{{ __('Unit Departemen') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     <select class="form-control" name="departemen_id">
@@ -35,11 +35,10 @@
         <div class="col-sm-12">
             <div class="form-group row">
                 <div class="col-2">
-                    <label class="col-form-label">{{ __('Tanggal Pemeliharaan') }}</label>
+                    <label class="col-form-label">{{ __('Tanggal Pemeliharaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
-                    <input name="dates" class="form-control base-plugin--datepicker"
-                        placeholder="{{ __('Tanggal Pemeliharaan') }}"  value="{{ $record->dates->format('d/m/Y') }}" max="{{ now()->addMonths(1) }}" >
+                    <input class="form-control base-plugin--datepicker" name="maintenance_date" placeholder="{{ __('Tanggal Pemeliharaan') }}" value="{{ $record->maintenance_date->format('d/m/Y') }}">
                 </div>
             </div>
         </div>
@@ -51,6 +50,27 @@
 <script>
 	$('.modal-dialog-right-bottom').removeClass('modal-md').addClass('modal-lg');
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Mendapatkan tanggal saat ini
+    var today = new Date();
+    var currentYear = today.getFullYear();
+    var currentMonth = today.getMonth() + 1; // Perhatikan bahwa JavaScript menghitung bulan dimulai dari 0 (Januari adalah bulan 0)
+
+    // Mendefinisikan tanggal awal dan akhir untuk rentang tanggal
+    var minDate = currentYear + '-' + currentMonth + '-01';
+    var maxDate = currentYear + '-' + currentMonth + '-' + new Date(currentYear, currentMonth, 0).getDate();
+
+    // Menginisialisasi flatpickr dengan rentang tanggal dinamis
+    flatpickr("#datepickered", {
+        dateFormat: "Y-m-d",
+        defaultDate: "today",
+        minDate: "2024-03-01",
+        maxDate: "2024-03-31"
+    });
+</script>
+
 @endpush
 
 @push('script')

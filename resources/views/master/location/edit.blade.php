@@ -3,19 +3,19 @@
 @section('modal-body')
 @method('PATCH')
     <div class="form-group row">
-		<label class="col-3 col-form-label">{{ __('Nama') }}</label>
+		<label class="col-3 col-form-label">{{ __('Nama') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<input type="text" name="name" value="{{ $record->name }}" class="form-control" placeholder="{{ __('Nama Ruang') }}" >
 		</div>
 	</div>
     <div class="form-group row">
-		<label class="col-3 col-form-label">{{ __('Kode') }}</label>
+		<label class="col-3 col-form-label">{{ __('Kode') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<input type="text" name="space_code"  value="{{ $record->space_code }}" class="form-control" placeholder="{{ __('Kode Ruang') }}" >
 		</div>
 	</div>
 	<div class="form-group row">
-        <label class="col-3 col-form-label">{{ __('Posisi Lantai') }}</label>
+        <label class="col-3 col-form-label">{{ __('Posisi Lantai') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-9 parent-group">
         <select class="form-control base-plugin--select2-ajax"  name="floor_position" data-placeholder="Posisi Lantai" >
             <option value="1" {{ $record->floor_position == 1 ? 'selected':'' }}>1</option>
@@ -30,7 +30,7 @@
 
 
 	<div class="form-group row">
-		<label class="col-3 col-form-label">{{ __('Struktur') }}</label>
+		<label class="col-3 col-form-label">{{ __('Struktur') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<select name="departemen_id" class="form-control base-plugin--select2-ajax departemen_id"
 				data-url="{{ route('ajax.selectStruct', ['all']) }}"
@@ -44,7 +44,7 @@
 	</div>
 
     <div class="form-group row">
-		<label class="col-3 col-form-label">{{ __('Penanggung Jawab') }}</label>
+		<label class="col-3 col-form-label">{{ __('Penanggung Jawab') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<select name="pic_id" class="form-control base-plugin--select2-ajax pic_id"
 				data-url="{{ route('ajax.selectUser', ['org_struct']) }}"

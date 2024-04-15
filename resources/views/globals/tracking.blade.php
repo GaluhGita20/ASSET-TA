@@ -24,10 +24,14 @@
 
                         @if($val->role->name == 'Umum')
                             Departemen
+                        @elseif($val->role->name == 'BPKAD' && $val->module =='pemutihan-aset')
+                            Kepala Badan
+                        @elseif($val->role->name == 'BPKAD' && $val->module =='penghapusan-aset')
+                            Bidang Pengelolaan Aset Daerah
                         @else
                             {{ $val->role->name }}
                         @endif
-                         <span class="text-{{ $val->show_color }}">({{ $val->show_type }})</span>
+                        <span class="text-{{ $val->show_color }}">({{ $val->show_type }})</span>
                         @if ($val->status == 'approved' && $val->user)
                             <div class="text-muted font-italic">
                                 <div>{{ __('Approved by:') }} {{ $val->user->name }}</div>

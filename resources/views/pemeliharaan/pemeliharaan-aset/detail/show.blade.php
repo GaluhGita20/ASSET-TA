@@ -73,7 +73,7 @@
         <div class="col-sm-12">
             <div class="form-group row">  
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Petugas Pemeliharaan') }}</label>
+                    <label class="col-form-label">{{ __('Penanggung Jawab Pemeliharaan') }}</label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="repair_officer" class="form-control base-plugin--select2-ajax"
@@ -90,7 +90,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
 

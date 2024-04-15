@@ -14,21 +14,35 @@
                     <button class="btn btn-secondary btn-icon width-full reset button" data-toggle="tooltip"
                         data-original-title="Reset Filter"><i class="fas fa-sync"></i></button>
                 </div> --}}
-                <div class="label-filter mr-1">
+                <div class="label-filter mr-1 mt-2">
                     <button class="btn btn-secondary btn-icon width-full filter button" data-toggle="tooltip"
                         data-original-title="Filter"><i class="fas fa-filter"></i></button>
                 </div>
             </td>
             <td>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-12 col-sm-6 col-xl-3 pb-2">
                         <input type="text" class="form-control filter-control" data-post="jenis_aset"
                             placeholder="{{ __('Nama Aset') }}">
                     </div>
+                    {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2">
+                        <input type="text" class="form-control filter-control" data-post="source_acq"
+                            placeholder="{{ __('Sumber Perolehan') }}">
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3 pb-2">
+                        <input type="text" class="form-control filter-control" data-post="location_id"
+                            placeholder="{{ __('Sumber Perolehan') }}">
+                    </div> --}}
                 </div>
+
+                {{-- <div class="row">
+                </div> --}}
+
+
             </td>
 
-        @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create'))
+        @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create') || auth()->user()->hasRole('Sarpras') )
             <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
                 <input type="hidden" id="customValue" name="customValue" value="">
 

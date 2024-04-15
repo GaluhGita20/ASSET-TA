@@ -47,7 +47,7 @@ class HibahAsetController extends Controller
     public function grid(Request $request)
     {
         $user = auth()->user();
-      
+
         $records = PembelianTransaksi::grid()->where('source_acq','<>','pembelian')->filters()->dtGet();
         
         return DataTables::of($records)
@@ -65,7 +65,6 @@ class HibahAsetController extends Controller
             })
             ->addColumn('tanggal_penerimaan', function ($detail) {
                 return Carbon::parse($detail->receipt_date)->format('Y/m/d');
-                // return  $detail->receipt_date;
             })
 
             ->addColumn('status', function ($detail) {
@@ -144,7 +143,6 @@ class HibahAsetController extends Controller
             'trans_name',
             'vendor_id',
             'tanggal_penerimaan',
-            
             'jenis_penerimaan',
             'status',
             'updated_by',
@@ -396,7 +394,7 @@ class HibahAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:500px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-left|width:500px'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:500px'),
                     $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center,label-info'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action_show|label:Aksi'),
@@ -444,7 +442,7 @@ class HibahAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:500px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga|className:text-left|width:500px'),
+                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga|className:text-center|width:500px'),
                     $this->makeColumn('name:qty_agree|label:Jumlah Diterima|className:text-center,label-info'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action_show|label:Aksi'),

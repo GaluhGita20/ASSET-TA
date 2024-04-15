@@ -3,12 +3,12 @@
 		<div class="card-header h-auto py-3">
 			<div class="card-title">
 				<h3 class="card-label">
-					<span class="d-block text-dark font-weight-bolder">{{ __('Tahap Audit') }}</span>
+					<span class="d-block text-dark font-weight-bolder">{{ __('Jumlah Aset Masuk') }}</span>
 				</h3>
 			</div>
 			<div class="card-toolbar" style="max-width: 500px;">
 				<form id="filter-chart-stage"
-					action="{{ rut($routes.'.chartStage') }}"
+					action="{{ rut($routes.'.chartAset') }}"
 					class="form-inline"
 					role="form">
 					<div class="row">
@@ -79,24 +79,24 @@
 @push('scripts')
 	<script>
 		$(function() {
-		    iniFilterChartStage();
-		    drawChartStage();
+			iniFilterChartStage();
+			drawChartStage();
 		});
 
 		var iniFilterChartStage = function () {
-		    $('input.stage_year').datepicker({
-	            format: "yyyy",
-			    viewMode: "years",
-			    minViewMode: "years",
-		        orientation: "bottom auto",
-		        autoclose:true,
-	        })
-	        .on('changeDate', function (selected) {
-	        	drawChartStage();
+			$('input.stage_year').datepicker({
+				format: "yyyy",
+				viewMode: "years",
+				minViewMode: "years",
+				orientation: "bottom auto",
+				autoclose:true,
+			})
+			.on('changeDate', function (selected) {
+				drawChartStage();
 			});
 
-		    $('.content-page').on('change', 'select.stage_object', function () {
-	        	drawChartStage();
+			$('.content-page').on('change', 'select.stage_object', function () {
+				drawChartStage();
 			});
 		}
 
@@ -127,50 +127,50 @@
 			var element = document.getElementById('chart-stage');
 
             var defaultsOptions = {
-            	title: {
-            		text: options.title.text ?? 'Tahap Audit',
-            		align: 'center',
-            		style: {
-    					fontSize:  '18px',
-    					fontWeight:  '500',
-    				},
-            	},
+				title: {
+					text: options.title.text ?? 'Jumlah Aset Aktive',
+					align: 'center',
+					style: {
+						fontSize:  '18px',
+						fontWeight:  '500',
+					},
+				},
                 series: options.series ?? [],
                 chart: {
-                    type: 'line',
+                    type: 'bar',
                     height: '400px',
                     stacked: true,
                     toolbar: {
                         show: true,
                         tools: {
-    						download: true,
-    						selection: false,
-    						zoom: false,
-    						zoomin: false,
-    						zoomout: false,
-    						pan: false,
-    						reset: false,
-    						customIcons: []
-    					},
+							download: true,
+							selection: false,
+							zoom: false,
+							zoomin: false,
+							zoomout: false,
+							pan: false,
+							reset: false,
+							customIcons: []
+						},
                     }
                 },
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: ['30%'],
+                        columnWidth: ['13%'],
                         endingShape: 'rounded'
                     },
                 },
-    	        legend: {
-    	        	position: 'top',
-    	        	offsetY: 2
-    	        },
+				legend: {
+					position: 'top',
+					offsetY: 2
+				},
                 dataLabels: {
                     enabled: false
                 },
                 stroke: {
                     show: true,
-                    width: [4, 0, 0, 0],
+                    width: [2, 2, 2, 2,2,2],
                     curve: 'smooth'
                     // colors: ['transparent']
                 },
@@ -193,19 +193,19 @@
                 yaxis: {
                     labels: {
                         style: {
-                            colors: KTApp.getSettings()['colors']['gray']['gray-500'],
+                            colors: KTApp.getSettings()['colors']['gray']['gray-600'],
                             fontSize: '12px',
                             fontFamily: KTApp.getSettings()['font-family']
                         }
                     }
                 },
                 fill: {
-                    opacity: [0.3, 1, 1, 1],
-    				gradient: {
-    					inverseColors: false,
-    					shade: 'light',
-    					type: "vertical",
-    				}
+                    opacity: [0.8, 0.8, 0.8, 0.8,0.8,0.8],
+					gradient: {
+						inverseColors: false,
+						shade: 'light',
+						type: "vertical",
+					}
                 },
                 states: {
                     normal: {
@@ -240,13 +240,16 @@
                     }
                 },
                 colors: [
-                	KTApp.getSettings()['colors']['theme']['base']['secondary'],
-                	KTApp.getSettings()['colors']['theme']['base']['info'],
-                	KTApp.getSettings()['colors']['theme']['base']['success'],
+					KTApp.getSettings()['colors']['theme']['base']['secondary']='#000080',
+					KTApp.getSettings()['colors']['theme']['base']['info'] ='#FFA500',
+					KTApp.getSettings()['colors']['theme']['base']['success'],
+					KTApp.getSettings()['colors']['theme']['base']['primary'],
+					KTApp.getSettings()['colors']['theme']['base']['dark'] = '#FFFF00',
+					KTApp.getSettings()['colors']['theme']['base']['warning'] = '#FF0000',
                 ],
                 grid: {
                     borderColor: KTApp.getSettings()['colors']['gray']['gray-200'],
-                    strokeDashArray: 4,
+                    strokeDashArray: 6,
                     yaxis: {
                         lines: {
                             show: true
@@ -254,12 +257,12 @@
                     }
                 },
                 noData: {
-                	text: 'Loading...'
+					text: 'Loading...'
                 }
             };
 
-	        var chart = new ApexCharts(element, defaultsOptions);
-	        chart.render();
+			var chart = new ApexCharts(element, defaultsOptions);
+			chart.render();
 		}
 	</script>
 @endpush

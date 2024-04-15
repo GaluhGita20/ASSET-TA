@@ -19,6 +19,7 @@
 
                 <div class="card-body">
                     @include('globals.notes')
+                    
                     @csrf
                     @include('pengajuan.perencanaan-aset.includes.header') 
                     {{-- data --}}

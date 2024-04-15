@@ -9,6 +9,7 @@ use App\Models\Globals\MenuFlow;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use App\Models\Model;
+use App\Models\Perbaikan\TransPerbaikanDisposisi;
 use App\Models\Traits\ResponseTrait;
 use App\Models\Master\Aset\AsetRs;
 use App\Models\Inventaris\Aset;
@@ -35,6 +36,7 @@ class Perbaikan extends Model
         'problem',
         'action_repair',
         'is_disposisi',
+        'check_up_result'
     ];
 
     protected $casts = [
@@ -74,10 +76,12 @@ class Perbaikan extends Model
      ** SCOPE
      *******************************/
 
-     public function scopeGrid($query)
+    public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(!in_array($user->position->location->id, [8,17]), 
+        // empty(array_intersect(['Keuangan','PPK','Direksi','Sarpras','BPKAD'], $user->roles->pluck('name')->toArray())
+        // !in_array($user->position->location->id, [8,17]
+        return $query->when(empty(array_intersect(['Keuangan','Direksi','Sarpras','BPKAD'], $user->roles->pluck('name')->toArray())), 
         function ($q) use ($user) { 
             return $q->when($user->position->imKepalaDeparetemen(), 
                 function ($qq) use ($user) {
@@ -98,7 +102,7 @@ class Perbaikan extends Model
     public function scopeFilters($query)
     {
         return $query->filterBy(['code'])
-        ->filterBy(['departemen_id'])->latest();
+        ->filterBy(['departemen_id','repair_results','status'])->latest();
         
     }
 
@@ -121,15 +125,18 @@ class Perbaikan extends Model
 
             $this->code = $format_angka."/ Perbaikan Aset /".$name[0]."/".$dep->name."/".now()->format('d/m/Y');
             $this->submission_date = Carbon::now();
-         
             $this->save();
+
+            Aset::where('id',$request->kib_id)->update(['status'=>'in repair']);
 
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
 
             if($request->is_submit == 0 ){
                 $this->handleSubmitSave($request);
             }
+
             $this->saveLogNotify();
+            
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -140,21 +147,25 @@ class Perbaikan extends Model
     public function handleVerify($request){
         $this->beginTransaction();
         try {
-
-            $this->update(['repair_date' => $request->repair_date]);
+            //dd($request->all());
+            $time = Carbon::createFromFormat('d/m/Y', $request->repair_date);
+            $this->update(['repair_date' => $time]);
+            // dd('tes');
             $this->approveApproval($request->module);
-           
+
             $this->update(['status' => 'approved']);
         
             $user = auth()->user()->name;
-            $this->addLog('Memverifikasi '. $this->code);
+            $this->addLog('Memverifikasi Pengajuan Perbaikan Aset :'. $this->code. ' dengan Tanggal Pemanggilan Perbaikan Aset :'. $this->submission_date);
+
             $this->addNotify([
-                'message' => 'Melakukan Verifikasi Permintaan Perbaikan Aset ',$this->code,
-                'url' => route('pengajuan.perbaikan-aset.show',$this->id),
+                'message' => 'Melakukan Verifikasi Pengajuan Perbaikan Aset ',$this->code,
+                'url' => route('perbaikan.perbaikan-aset.show',$this->id),
                 'user_ids' => [$this->created_by],
             ]);
-           
-            $pesan = ($user.' Melakukan Verifikasi Permintaan Perbaikan Aset ' . $this->code);
+            
+
+            $pesan = ($user.' Melakukan Verifikasi Permintaan Perbaikan Aset '.$this->code);
             $this->sendNotification($pesan);
 
             $redirect = route(request()->get('routes') . '.index');
@@ -169,31 +180,81 @@ class Perbaikan extends Model
     public function handleStoreOrUpdate($request){
         $this->beginTransaction();
         try {
-          
             $data = $request->all();
+            if($request->repair_results != null && $this->is_disposisi == 'yes'){
+                $flag_awal = TransPerbaikanDisposisi::where('perbaikan_id',$this->id)->count();
+                if($flag_awal > 0 ){
+                    // dd('tes');
+                    $flagco = TransPerbaikanDisposisi::where('perbaikan_id', $this->id)
+                    ->where('sper_status','completed')
+                    ->count();
+
+                    $flagnc = TransPerbaikanDisposisi::where('perbaikan_id', $this->id)
+                    ->whereIn('sper_status', ['new', 'draft', 'waiting.approval'])
+                    ->count();
+
+                    $flagre = TransPerbaikanDisposisi::where('perbaikan_id', $this->id)
+                    ->where('sper_status', 'rejected')
+                    ->count();
+
+                    $flag_completed = TransPerbaikanDisposisi::where('perbaikan_id', $this->id)
+                        ->where('status', ['completed'])
+                        ->count();
+                    
+                    $flag_total = $flagco + $flagnc;
+                    if($flag_completed != $flag_total){
+
+                        return $this->rollback(
+                            [
+                                'message' => 'Masih Terdapat Transaksi Sperpat Yang Belum Diselesaikan, Silahkan Lengkapi Data Transaksi Sperpat!'
+                            ]
+                        );
+                        
+                    }
+                }
+            }
+
             $this->fill($data);
             $this->save();
             $this->petugas()->sync($request->user_id ?? []);
 
             $user = auth()->user()->name;
-            if($request->repair_results == 'SELESAI'){
-                Aset::where('id',$request->kib_id)->update(['condition'=>'baik']);
-                
-            }elseif($request->repair_results == 'ALAT TIDAK BISA DIGUNAKAN'){
-                Aset::where('id',$request->kib_id)->update(['condition'=>'rusak berat']);
-               
+
+            if($request->repair_results != null){
+                if($request->repair_results == 'SELESAI'){
+                    Aset::where('id',$request->kib_id)->update(['condition'=>'baik']);
+                    Aset::where('id',$request->kib_id)->update(['status'=>'actives']);
+                }elseif($request->repair_results == 'ALAT TIDAK BISA DIGUNAKAN'){
+                    Aset::where('id',$request->kib_id)->update(['condition'=>'rusak berat']);
+                    Aset::where('id',$request->kib_id)->update(['status'=>'actives']);
+                }
             }
-            $user = auth()->user()->name;
-            $this->addLog('Update Hasil Perbaikan '. $this->code);
-            $this->addNotify([
-                'message' => 'Melakukan Update Hasil Perbaikan Aset ',$this->code,
-                'url' => route('pengajuan.perbaikan-aset.show',$this->id),
-                'user_ids' => [$this->created_by],
-            ]);
-           
-            $pesan = ($user.' Melakukan Update Hasil Perbaikan Aset ' . $this->code);
-            $this->sendNotification($pesan);
-            
+
+            if($this->check_up_results == null && $request->check_up_results != null){
+                $this->addLog('Update Hasil Pemeriksaan Aset'.$this->code);
+                $this->addNotify([
+                    'message' => 'Melakukan Update Hasil Pemeriksaan Aset ',$this->code,
+                    'url' => route('perbaikan.perbaikan-aset.show',$this->id),
+                    'user_ids' => [$this->created_by],
+                ]);
+
+                $pesan = ($user.' Melakukan Update Hasil Pemeriksaan Aset ' . $this->code);
+                $this->sendNotification($pesan);
+            }
+
+            if($request->repair_results != null){
+                // dd('tes');
+                $this->addLog('Update Hasil Perbaikan Aset'.$this->code);
+                $this->addNotify([
+                    'message' => 'Melakukan Update Hasil Perbaikan Aset ',$this->code,
+                    'url' => route('perbaikan.perbaikan-aset.show',$this->id),
+                    'user_ids' => [$this->created_by],
+                ]);
+
+                $pesan = ($user.' Melakukan Update Hasil Perbaikan Aset ' . $this->code);
+                $this->sendNotification($pesan);
+            }
+
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -206,6 +267,7 @@ class Perbaikan extends Model
         $this->beginTransaction();
         try {
             Aset::where('id',$this->kib_id)->update(['condition'=>'baik']);
+            Aset::where('id',$this->kib_id)->update(['status'=>'actives']);
             $this->delete();
 
             return $this->commitDeleted();
@@ -222,6 +284,7 @@ class Perbaikan extends Model
             $module ='perbaikan-aset';
             // dd('tes');
             Aset::where('id',$request->kib_id)->update(['condition'=>'rusak sedang']);
+            Aset::where('id',$request->kib_id)->update(['status'=>'in repair']);
             $this->generateApproval($module);
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
@@ -233,63 +296,56 @@ class Perbaikan extends Model
 
     public function handleApprove($request)
     {
-
         $this->beginTransaction();
         try {
         
-           
-          
         } catch (\Exception $e) {
             return $this->rollback($e);
         }
         
-
     }
 
     public function saveLogNotify()
     {
         $user = auth()->user()->name;
         // dd('hjhjh');
-        $data = 'Pengajuan Perbaikan Aset : ' . $this->code;
+        $data =  $this->code;
         $routes = request()->get('routes');
         switch (request()->route()->getName()) {
             case $routes . '.store':
-                $this->addLog('Membuat ' . $data);
-                $pesan = $user.' Melakukan ' . $data;
+                $this->addLog('Membuat Pengajuan Perbaikan Aset : '. $data);
+                $pesan = $user.' Membuat Pengajuan Perbaikan Aset :' . $data;
                 $this->sendNotification($pesan);
                 if (request()->is_submit) {
-                    $this->addLog('Submit ' . $data);
+                    $this->addLog('Submit Pengajuan Perbaikan Aset :' . $data);
                     $this->addNotify([
-                        'message' => 'Waiting Verification ' . $data,
+                        'message' => 'Waiting Verification Pengajuan Perbaikan Aset :' . $data,
                         'url' => route($routes . '.show', $this->id),
                         'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->struct),
                     ]);
-                    $pesan = $user.' Menunggu Verifikasi ' . $data;
+                    $pesan = $user.' Menunggu Verifikasi Pengajuan Perbaikan Aset :' . $data;
                     $this->sendNotification($pesan);
                 }
                 break;
             case $routes . '.update':
-                $this->addLog('Mengubah ' . $data);
+                $this->addLog('Mengubah Pengajuan Perbaikan Aset :' . $data);
                 if($this->status == 'waiting.verify'){
-                        dd('yh');
 
                         $this->addNotify([
-                            'message' => 'Memverifikasi ' . $data,
+                            'message' => 'Memverifikasi Pengajuan Perbaikan Aset :' . $data,
                             'url' => route($routes . '.show', $this->id),
                             'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->departemen_id),
                         ]);
-                 
-                        $pesan = $user.' Memverifikasi ' . $data;
+                        $pesan = $user.' Memverifikasi Pengajuan Perbaikan Aset : ' . $data;
                         $this->sendNotification($pesan);
                     }
                     if($this->status == 'verify'){
-                        dd($tes);
+                    
                         $this->addNotify([
                             'message' => 'Melakukan Update Hasil Perbaikan Aset ' . $data,
                             'url' => route($routes . '.show', $this->id),
                             'user_ids' => auth()->user()->imVerificationKepalaDepartement($this->departemen_id),
                         ]);
-                        dd('tes');
                         $pesan = $user.' Melakukan Update Hasil Perbaikan Aset ' . $data;
                         $this->sendNotification($pesan);
                     }
@@ -297,69 +353,69 @@ class Perbaikan extends Model
                 
                 break;
             case $routes . '.destroy':
-                $this->addLog('Menghapus ' . $data);
+                $this->addLog('Menghapus Pengajuan Perbaikan Aset :' . $data);
                 break;
             case $routes . '.verify':
                 $this->addNotify([
-                    'message' => 'Melakukan Verifikasi ' . $data,
+                    'message' => 'Melakukan Verifikasi Pengajuan Perbaikan Aset :' . $data,
                     'url' => route($routes . '.show', $this->id),
                     'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                 ]);
-                $pesan = $user.' Melakukan Verifikasi Permintaan Perbaikan ' . $data;
+                $pesan = $user.' Melakukan Verifikasi Pengajuan Perbaikan :' . $data;
                 $this->sendNotification($pesan);
 
                 break;
             case $routes . '.approve':
                 if (in_array($this->status, ['draft', 'waiting.approval.revisi'])) {
-                    $this->addLog('Menyetujui Revisi ' . $data);
+                    $this->addLog('Menyetujui Revisi Pengajuan Perbaikan Aset :' . $data);
 
                     $this->addNotify([
-                        'message' => 'Waiting Approval Revisi ' . $data,
+                        'message' => 'Waiting Approval Revisi Pengajuan Perbaikan Aset :' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
 
-                    $pesan = $user. ' Waiting Approval Revisi ' . $data;
+                    $pesan = $user. ' Waiting Approval Revisi Pengajuan Perbaikan Aset :' . $data;
                     $this->sendNotification($pesan);
 
                 } else {
-                    $this->addLog('Menyetujui ' . $data);
+                    $this->addLog('Menyetujui Pengajuan Perbaikan Aset :' . $data);
 
                     $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
+                        'message' => 'Waiting Approval Pengajuan Perbaikan Aset :' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
-                    $pesan = $user. ' Menyetujui ' . $data;
+                    $pesan = $user. ' Menyetujui Pengajuan Perbaikan Aset :' . $data;
                     $this->sendNotification($pesan);
                 }
                 break;
             case $routes . '.reject':
                 if (in_array($this->status, ['rejected'])) {
-                    $this->addLog('Menolak ' . $data . ' dengan alasan: ' . request()->get('note'));
+                    $this->addLog('Menolak Pengajuan Perbaikan Aset : ' . $data . ' dengan alasan: ' . request()->get('note'));
 
                     $this->addNotify([
-                        'message' => 'Menolak ' . $data . ' dengan alasan: ' . request()->get('note'),
+                        'message' => 'Menolak Pengajuan Perbaikan Aset :' . $data . ' dengan alasan: ' . request()->get('note'),
                         'url' => route($routes . '.show', $this->id),
                         'user_ids' => [$this->created_by],
                     ]);
 
-                    $pesan = $user .' Menolak Pengajuan ' . $data;
+                    $pesan = $user .' Menolak Pengajuan Pengajuan Perbaikan Aset :' . $data;
                     $this->sendNotification($pesan);
                 } else {
-                    $this->addLog('Menolak Revisi ' . $data . ' dengan alasan: ' . request()->get('note'));
+                    $this->addLog('Menolak Revisi Pengajuan Perbaikan Aset :' . $data . ' dengan alasan: ' . request()->get('note'));
 
                     $this->addNotify([
-                        'message' => 'Menolak Revisi ' . $data . ' dengan alasan: ' . request()->get('note'),
+                        'message' => 'Menolak Revisi Pengajuan Perbaikan Aset :' . $data . ' dengan alasan: ' . request()->get('note'),
                         'url' => route($routes . '.show', $this->id),
                         'user_ids' => [$this->created_by],
                     ]);
                 }
                 break;
             case $routes . '.revisi':
-                $this->addLog('Revisi ' . $data);
+                $this->addLog('Revisi Pengajuan Perbaikan Aset :' . $data);
                 $this->addNotify([
-                    'message' => 'Waiting Approval Revisi ' . $data,
+                    'message' => 'Waiting Approval Revisi Pengajuan Perbaikan Aset :' . $data,
                     'url' => route($routes . '.approval', $this->id),
                     'user_ids' => $this->getNewUserIdsApproval(request()->get('module') . "_upgrade"),
                 ]);
@@ -369,7 +425,7 @@ class Perbaikan extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4136008848'; // Ganti dengan chat ID penerima notifikasi
 
         Telegram::sendMessage([
             'chat_id' => $chatId,

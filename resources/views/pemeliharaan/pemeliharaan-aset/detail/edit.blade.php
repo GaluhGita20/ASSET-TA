@@ -11,7 +11,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
+                    <label class="col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="ref_aset_id" class="form-control base-plugin--select2-ajax"
@@ -29,7 +29,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Merek') }}</label>
+                    <label class="col-form-label">{{ __('Merek') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <input class="form-control" name="merek" value = "{{ $detail->asetd->merek_type_item }}"  disabled>
@@ -40,7 +40,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Kondisi Awal Aset') }}</label>
+                    <label class="col-form-label">{{ __('Kondisi Awal Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <textarea class="form-control" name="first_condition" value = "{{ $detail->first_condition }}" placeholder="{{ __('Kondisi Awal Aset') }}">{{ $detail->first_condition }}</textarea>
@@ -51,7 +51,7 @@
         <div class="col-sm-12 col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Kondisi Setelah Pemeliharaan Aset') }}</label>
+                    <label class="col-form-label">{{ __('Kondisi Setelah Pemeliharaan Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <textarea class="form-control" name="latest_condition" value="{{ $detail->latest_condition }}" placeholder="{{ __('Kondisi Setelah Pemeliharaan Aset') }}">{{ $detail->latest_condition }} </textarea>
@@ -62,7 +62,7 @@
         <div class="col-sm-12">
             <div class="form-group row">
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Tindakan Pemeliharaan Dilakukan') }}</label>
+                    <label class="col-form-label">{{ __('Tindakan Pemeliharaan Dilakukan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <textarea class="form-control" name="maintenance_action" value="{{ $detail->maintenance_action }}" placeholder="{{ __('Tindakan Pemeliharaan Dilakukan') }}">{{ $detail->maintenance_action }}</textarea>
@@ -73,7 +73,7 @@
         <div class="col-sm-12">
             <div class="form-group row">  
                 <div class="col-sm-12 col-md-5 pr-0">
-                    <label class="col-form-label">{{ __('Petugas Pemeliharaan') }}</label>
+                    <label class="col-form-label">{{ __('Penanggung Jawab Pemeliharaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
                     <select name="repair_officer" class="form-control base-plugin--select2-ajax"

@@ -6,6 +6,7 @@ use App\Imports\Master\OrgStructImport;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Aspect\Aspect;
 use App\Models\Master\Geografis\Province;
+use App\Models\Pemeliharaan\Pemeliharaan;
 use App\Models\Master\Geografis\District;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Risk\LastAudit;
@@ -89,6 +90,11 @@ class OrgStruct extends Model
     public function positions()
     {
         return $this->hasMany(Position::class, 'location_id');
+    }
+
+    public function pemeliharaan()
+    {
+        return $this->hasMany(Pemeliharaan::class, 'departemen_id');
     }
 
     public function letterNo()

@@ -17,6 +17,7 @@ use App\Models\Traits\ResponseTrait;
 use App\Models\Master\Geografis\Province;
 use App\Models\Master\Geografis\District;
 use App\Models\Master\Coa\Coa;
+use App\Models\Master\Aset\AsetRs;
 use App\Support\Base;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Models\Model;
@@ -70,6 +71,8 @@ class Aset extends Model
     'residual_value', //nilai akhir masa manfaat
     'accumulated_depreciation', //nlai penyusutan //dicari
     'book_value',   //nilai saat ini //dicari
+    'acq_value',
+    'dates_depreciation',
     'tanah_id',
     'location_hibah_aset',
     'book_date',
@@ -84,6 +87,11 @@ class Aset extends Model
     public function coad()
     {
         return $this->belongsTo(Coa::class, 'coa_id'); // Sesuaikan dengan kunci asing yang sesuai
+    }
+
+    public function asetData()
+    {
+        return $this->belongsTo(AsetRs::class, 'coa_id'); // Sesuaikan dengan kunci asing yang sesuai
     }
 
     public function usulans()
@@ -131,7 +139,7 @@ class Aset extends Model
     public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(empty(array_intersect(['PPK','Keuangan','Sarpras','Direksi','Sub Bagian Program Perencanaan','BPKAD'], $user->roles->pluck('name')->toArray())), 
+        return $query->when(empty(array_intersect(['Keuangan','PPK','Direksi','Sarpras','BPKAD'], $user->roles->pluck('name')->toArray())), 
         function ($q) use ($user) { 
         $q->when($user->position->imKepalaDeparetemen(), 
             function ($qq) use ($user) {
@@ -173,6 +181,7 @@ class Aset extends Model
         //         });
         //     }
         // )->latest();
+        
 
         return $query
         ->when(
@@ -193,10 +202,17 @@ class Aset extends Model
                 });
             });
         })->when(
-            $loc = request()->room_location,
-            function ($q) use ($loc){
-            $q->where('room_location', $loc);
-        })->filterBy(['status','condition'])
+            $type = request()->source,
+            function ($q) use ($type){
+            $q->whereHas('trans', function ($qq) use ($type) {
+                $qq->where('source_acq','LIKE','%'.$type.'%');
+            });
+        // })->when(
+        //     $loc = request()->room_location,
+        //     function ($q) use ($loc){
+        //     $q->where('room_location', $loc);
+        })
+        ->filterBy(['status','condition'])
         ->latest();
       //room location
         
@@ -257,15 +273,17 @@ class Aset extends Model
     public function handleStoreOrUpdateKibB($request){
 
     //    dd($request->all());
-       $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
-       $flagInv = $jumlah_item - $request->qty;
-       $data = $request->all();
-       if($request->qty > $jumlah_item ){
+        $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
+        $flagInv = $jumlah_item - $request->qty;
+        $data = $request->all();
+
+        if($request->qty > $jumlah_item ){
             return $this->rollback(__('Jumlah Tidak Sesuai'));
-       }
-       if($request->qty == 0){
+        }
+        if($request->qty == 0){
             return $this->rollback(__('Jumlah Tidak Boleh Kosong'));
-       }
+        }
+
         $value6 = str_replace(['.', ','],'',$request->residual_value);
         $residu = (int)$value6;
 
@@ -274,8 +292,27 @@ class Aset extends Model
 
 
         if($request->qty > 1){
-            if($request->no_factory_item !=null || $request->no_police_item !=null || $request->no_BPKB_item !=null || $request->no_machine_item != null){
-                return $this->rollback(__('Tidak Bisa Melakukan Percepatan Karena Spesifikas Detail Sama'));
+            if($request->no_factory_item !=null || $request->no_police_item !=null || $request->no_BPKB_item !=null || $request->no_machine_item != null || $request->no_frame != null){
+                if($request->no_factory_item !=null){
+                    $flags = 'No Pabrik';
+                    $datax = $request->no_factory_item;
+                }elseif($request->no_police_item !=null){
+                    $flags = 'No Polisi';
+                    $datax = $request->no_police_item;
+                }elseif($request->no_BPKB_item !=null){
+                    $flags = 'No BPKB';
+                    $datax = $request->no_BPKB_item;
+                }
+                elseif($request->no_machine_item != null){
+                    $flags = 'No Mesin';
+                    $datax = $request->no_machine_item;
+                }
+                else{
+                    $flags = 'No Rangka';
+                    $datax = $request->no_frame;
+                }
+
+                return $this->rollback(__('Tidak Bisa Melakukan Percepatan Karena Spesifikas Detail Sama pada '.$flags.' '.$datax));
             }else{
                 $no_inventaris=0;
                 for ($i = 0 ; $i < $request->qty ; $i++) {
@@ -284,6 +321,7 @@ class Aset extends Model
                     $aset->material = strtolower($request->material);
                     $aset->merek_type_item = strtolower($request->merek_type_item);
                     $aset->type = 'KIB B';
+                    $aset->acq_value = $cost;
                     if($request->location_hibah_aset != null){
                         $aset->location_hibah_aset = $request->location_hibah_aset;
                     }
@@ -314,6 +352,7 @@ class Aset extends Model
             $this->no_register = $no_inventaris + 1;
             $this->accumulated_depreciation =0;
             // $this->residual_depresi = ($cost - $residu) / $request->useful;
+            $this->acq_value = $cost;
             $this->book_value = $cost;
             $this->status = 'actives';
             $this->save();
@@ -354,8 +393,27 @@ class Aset extends Model
     
     
             if($request->qty > 1){
-                if($request->no_factory_item !=null || $request->no_police_item !=null || $request->no_BPKB_item !=null || $request->no_machine_item != null){
-                    return $this->rollback(__('Tidak Bisa Melakukan Percepatan Karena Spesifikas Detail Sama'));
+                if($request->no_factory_item !=null || $request->no_police_item !=null || $request->no_BPKB_item !=null || $request->no_machine_item != null || $request->no_frame != null){
+                    if($request->no_factory_item !=null){
+                        $flags = 'No Pabrik';
+                        $datax = $request->no_factory_item;
+                    }elseif($request->no_police_item !=null){
+                        $flags = 'No Polisi';
+                        $datax = $request->no_police_item;
+                    }elseif($request->no_BPKB_item !=null){
+                        $flags = 'No BPKB';
+                        $datax = $request->no_BPKB_item;
+                    }
+                    elseif($request->no_machine_item != null){
+                        $flags = 'No Mesin';
+                        $datax = $request->no_machine_item;
+                    }
+                    else{
+                        $flags = 'No Rangka';
+                        $datax = $request->no_frame;
+                    }
+    
+                    return $this->rollback(__('Tidak Bisa Melakukan Percepatan Karena Spesifikas Detail Sama pada '.$flags.' '.$datax));
                 }else{
                     $no_inventaris=0;
                     for ($i = 0 ; $i < $request->qty ; $i++) {
@@ -374,6 +432,7 @@ class Aset extends Model
                         $aset->accumulated_depreciation = 0;
                         //nilai residu    = harga unit - residu / masa manfaat
                         // $aset->residual_depresi = ($cost - $residu) / $request->useful;
+                        $aset->acq_value = $cost;
                         $aset->book_value = $cost; ///nilai saat ini
                         $aset->residual_value= $value6;
                         $aset->status = 'actives';
@@ -399,6 +458,7 @@ class Aset extends Model
                 $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
                 $this->no_register = $no_inventaris + 1;
                 $this->accumulated_depreciation =0;
+                $this->acq_value = $cost;
                 // $this->residual_depresi = ($cost - $residu) / $request->useful;
                 $this->book_value = $cost;
                 $this->status = 'actives';
@@ -436,11 +496,11 @@ class Aset extends Model
         $cost = (int)$value7;
 
         $sertif_date = Carbon::createFromFormat('d/m/Y', $request->sertificate_date);
- 
         // $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
         $this->fill($data);
         $this->sertificate_date = $sertif_date;
         $this->type='KIB A';
+        $this->acq_value = $cost;
         $this->book_value = $cost;
         $this->wide= $wide;
         $this->land_rights = strtolower($request->land_rights);
@@ -450,7 +510,6 @@ class Aset extends Model
         $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
-         
         if($flagInv == 0){
             PerencanaanDetail::where('id',$request->usulan_id)->update(['status'=>'completed']);
             $redirect = route(request()->get('routes') . '.index');
@@ -508,6 +567,7 @@ class Aset extends Model
         $this->no_register = $no_inventaris + 1;
         $this->accumulated_depreciation = 0;
         $this->book_value = $cost;
+        $this->acq_value = $cost;
         $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
@@ -563,6 +623,7 @@ class Aset extends Model
         $this->accumulated_depreciation = 0;
         // $this->residual_depresi = ($cost - $residu) / $request->useful;
         $this->book_value = $cost;
+        $this->acq_value = $cost;
         $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
@@ -679,14 +740,11 @@ class Aset extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
 
         Telegram::sendMessage([
             'chat_id' => $chatId,
             'text' => $pesan,
         ]);
     }
-
-   
-
 }

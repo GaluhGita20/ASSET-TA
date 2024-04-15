@@ -8,15 +8,17 @@
 @extends('layouts.page')
 
 @section('page')
-    {{-- <div class="row">
-        @include($views . '._card-progress')
-    </div> --}}
     <div class="row">
-        @include($views . '._chart-aset_a')
-        {{-- @include($views . '._chart-aset_b') --}}
-        {{-- @include($views . '._chart-termin') --}}
+        @include($views . '._card-progress')
     </div>
     <div class="row">
+        {{-- @include($views . '._chart-aset_b') --}}
+        {{-- @include($views . '._chart-aset_b') --}}
+        @include($views . '._chart-stage')
+    </div>
+    <div class="row">
+        {{-- @include($views . '._chart-followup') --}}
+        {{-- @include($views . '._chart-finding') --}}
         {{-- @include($views . '._chart-aset_c')
         @include($views . '._chart-aset_d') --}}
         {{-- @include($views . '._chart-termin') --}}

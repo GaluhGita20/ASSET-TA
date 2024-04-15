@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Master\Aset;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\Aset\AsetRequest;
 use App\Models\Globals\Menu;
-use App\Models\Master\Aset\Aset;
+use App\Models\Master\Aset\AsetRs;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ class AsetController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::grid()->filters()->dtGet();
+        $records = AsetRs::grid()->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn(

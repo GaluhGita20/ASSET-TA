@@ -20,8 +20,7 @@
                 </div>
             </td>
             <td class="text-right td-btn-create width-200px">
-                @if (request()->route()->getName() ==
-                    $routes . '.detail')
+                @if (request()->route()->getName() ==$routes . '.detail')
                     {{-- @if ($record->checkAction('edit', $perms)) --}}
                         @include('layouts.forms.btnAddModal', [
                             'urlAdd' => route($routes.'.detailCreate', $record->id),
@@ -33,25 +32,33 @@
     </tbody>
 </table>
 
+<div class="alert alert-custom alert-light-primary fade show py-4" role="alert">
+    <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+    <div class="alert-text text-primary">
+        <div class="text-bold">{{ __('Informasi') }}:</div>
+        <div class="mb-10px" style="white-space: pre-wrap;">List Aset Yang Ditampilkan Hanya Dengan Harga Diatas Rp 1000.000 , Gunakan +DATA Untuk Menambah Aset Yang Akan Dipelihara</div>
+    </div>
+</div>
+
 <div class="table-responsive">
     @if (isset($tableStruct['datatable_1']))
         <table id="datatable_1" class="table table-bordered is-datatable" style="width: 100%;"
             data-url="{{ $tableStruct['url'] }}" data-paging="{{ $paging ?? true }}" data-info="{{ $info ?? true }}">
-            <thead>
-                <tr>
-                    @foreach ($tableStruct['datatable_1'] as $struct)
-                        <th class="text-center v-middle" data-columns-name="{{ $struct['name'] ?? '' }}"
-                            data-columns-data="{{ $struct['data'] ?? '' }}"
-                            data-columns-label="{{ $struct['label'] ?? '' }}"
-                            data-columns-sortable="{{ $struct['sortable'] === true ? 'true' : 'false' }}"
-                            data-columns-width="{{ $struct['width'] ?? '' }}"
-                            data-columns-class-name="{{ $struct['className'] ?? '' }}"
-                            style="{{ isset($struct['width']) ? 'width: ' . $struct['width'] . '; ' : '-' }}">
-                            {{ $struct['label'] }}
-                        </th>
-                    @endforeach
-                </tr>
-            </thead>
+                <thead>
+                    <tr>
+                        @foreach ($tableStruct['datatable_1'] as $struct)
+                            <th class="text-center v-middle" data-columns-name="{{ $struct['name'] ?? '' }}"
+                                data-columns-data="{{ $struct['data'] ?? '' }}"
+                                data-columns-label="{{ $struct['label'] ?? '' }}"
+                                data-columns-sortable="{{ $struct['sortable'] === true ? 'true' : 'false' }}"
+                                data-columns-width="{{ $struct['width'] ?? '' }}"
+                                data-columns-class-name="{{ $struct['className'] ?? '' }}"
+                                style="{{ isset($struct['width']) ? 'width: ' . $struct['width'] . '; ' : '-' }}">
+                                {{ $struct['label'] }}
+                            </th>
+                        @endforeach
+                    </tr>
+                </thead>
             <tbody>
             </tbody>
         </table>

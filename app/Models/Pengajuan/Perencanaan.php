@@ -26,15 +26,15 @@ class Perencanaan extends Model
         'code',
         'date',
         'struct_id',
-        'is_repair',
+        // 'is_repair',
         'regarding',
         'sentence_start',
         'sentence_end',
         'note',
         'procurement_year',
         'status',
-        'version',
-        'upgrade_reject'
+        // 'version',
+        // 'upgrade_reject'
     ];
 
     protected $casts = [
@@ -81,7 +81,7 @@ class Perencanaan extends Model
      ** SCOPE
      *******************************/
 
-     public function scopeGrid($query)
+    public function scopeGrid($query)
     {
         $user = auth()->user();
         return $query->when(!in_array($user->position->location->id, [13]), 
@@ -146,7 +146,7 @@ class Perencanaan extends Model
 
     public function scopeFilters($query)
     {
-        return $query->filterBy(['code','procurement_year'])
+        return $query->filterBy(['code','procurement_year','status'])
         ->filterBy(['struct_id'])->latest();
         // $position = auth()->user()->position_id;
         // $departemen = Position::with('location')->where('id',$position)->first();
@@ -247,9 +247,9 @@ class Perencanaan extends Model
             
             $idMax = Perencanaan::where('struct_id',$request->struct_id)->count('id');
             $dep = OrgStruct::where('id',$request->struct_id)->first('name');
-            $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 2, '0', STR_PAD_LEFT);
+            $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 3, '0', STR_PAD_LEFT);
             
-            $this->code = $format_angka.'/'.$dep->name;
+            $this->code = $format_angka.'/'.$dep->name.'/'.now()->format('Y');
             
             $this->status = 'draft';
             $time = now()->format('Y-m-d');
@@ -274,6 +274,7 @@ class Perencanaan extends Model
     {
         $this->beginTransaction();
         try {
+            // dd($request->all());
             if($request->procurement_year < now()->format('Y')){
                 return $this->rollback(
                     [
@@ -281,9 +282,15 @@ class Perencanaan extends Model
                     ]
                 );
             }
+            if($request->note != null){
+              //  dd($request->all());
+                $this->update(['note' => $request->note]);
+            }
+            
             if($request->is_submit == 0 && $request->regarding != null){
                 $data = $request->all();
                 $this->fill($data);
+                
                 $this->save();
                 $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $this->saveLogNotify();
@@ -291,15 +298,31 @@ class Perencanaan extends Model
 
             $data = PerencanaanDetail::Where('perencanaan_id',$this->id)->count();
             if ($request->is_submit == 1) {
-                if($data > 0){
-                    $this->handleSubmitSave($request);
-                }else{
+                // if($data > 0){
+                //     if($request->note != null){
+                //         $this->update(['note',$request->note]);
+                //     }
+                //     $this->handleSubmitSave($request);
+                // }else{
+                //     return $this->rollback(
+                //         [
+                //             'message' => 'Detail Usulan Tidak Boleh Kosong!'
+                //         ]
+                //     );
+                // }
+
+                if($data == 0){
                     return $this->rollback(
                         [
                             'message' => 'Detail Usulan Tidak Boleh Kosong!'
                         ]
                     );
                 }
+                if($request->note != null){
+                    $this->update(['note',$request->note]);
+                }
+                $this->handleSubmitSave($request);
+                
             }
 
             $redirect = route(request()->get('routes') . '.index');
@@ -336,7 +359,7 @@ class Perencanaan extends Model
             }elseif($datas->status == 'waiting purchase' && ($approval1 > 0)){ //data baru di reject
                 $flag = $flag + 0;
             }elseif($datas->status =='waiting purchase' && ($approval2 > 0) && ($approval1 == 0) ){
-               $flag = $flag + 0;
+                $flag = $flag + 0;
             }elseif($datas->status =='waiting purchase' && ($approval3 > 0) && ($approval2 == 0) && ($approval1 == 0) ){
                 $flag = $flag + 0;
             }else{
@@ -344,20 +367,23 @@ class Perencanaan extends Model
                 $list_error[] = ['text' => $datas->asetd->name];
             }
         }
-      
         if($flag <= 0){
-        return $data = [
-                'status' => 'ok',
-                'message' => 'null',
-        ];
+            return $data = [
+                    'status' => 'ok',
+                    'message' => 'null',
+            ];
         }else{
+            // return $this->rollback(
+            //     [
+            //         'message' => 'Silahkan lakukan approval pada .'
+            //     ]
+            // );
             $datak = implode(', ', array_column($list_error, 'text'));
             return $data = [
                 'status' => 'gagal',
                 'message' => $datak,
             ];
         }
-
     }
 
     public function handleDetailStoreOrUpdate($request, PerencanaanDetail $detail)
@@ -374,6 +400,7 @@ class Perencanaan extends Model
             }
             
             $detail->fill($request->all());
+            
             $value1 = str_replace(['.', ','],'',$request->HPS_unit_cost);
             $detail->HPS_unit_cost = (int)$value1;
 
@@ -502,9 +529,11 @@ class Perencanaan extends Model
         try {
 
             $data = PerencanaanDetail::Where('perencanaan_id',$this->id)->count();
-           
             if($data > 0){
                 $this->update(['status' => 'waiting.approval']);
+                if($request->note != null){
+                    $this->update(['note',$request->note]);
+                }
                 //dd($request->module);
                 $this->generateApproval($request->module);
                 $this->saveLogNotify();
@@ -692,6 +721,7 @@ class Perencanaan extends Model
             'text' => $pesan,
         ]);
     }
+    //-4151848000
 
 
     public function checkAction($action, $perms, $record = null)

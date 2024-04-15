@@ -291,7 +291,6 @@
 	            	text: 'Loading...'
 	            }
 	        };
-
 	        var chart = new ApexCharts(element, defaultsOptions);
 	        chart.render();
 		}

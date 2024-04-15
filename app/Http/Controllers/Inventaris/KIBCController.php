@@ -51,7 +51,6 @@ class KIBCController extends Controller
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
-                    // $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-center|width:300px'),
                     $this->makeColumn('name:luas_lantai|label:Luas Lantai (m2)|className:text-center'),
                     $this->makeColumn('name:luas_bangunan|label:Luas Bangunan (m2)|className:text-center'),
                     $this->makeColumn('name:alamat|label:Alamat|className:text-center'),
@@ -68,7 +67,6 @@ class KIBCController extends Controller
                     $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
                     $this->makeColumn('name:updated_by'),
-                    // $this->makeColumn('name:created_by'),
                     $this->makeColumn('name:action'),
                 ],
             ],
@@ -91,7 +89,7 @@ class KIBCController extends Controller
             ->addColumn(
                 'name',
                 function ($record) {
-                   return $record->usulans ? $record->usulans->asetd->name : '-';
+                    return $record->usulans ? $record->usulans->asetd->name : '-';
                 }
             
             )->addColumn(
@@ -117,7 +115,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'berbeton',
                 function ($record) {
-                   return $record->is_concreate_bld ? $record->is_concreate_bld : '-';
+                    return $record->is_concreate_bld ? $record->is_concreate_bld : '-';
                 }
             )->addColumn(
                 'luas_lantai',
@@ -167,7 +165,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'nilai_beli',
                 function ($record) {
-                   return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',') ;
+                    return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',') ;
                 }
             )->addColumn(
                 'nilai_buku',
@@ -187,13 +185,17 @@ class KIBCController extends Controller
             )->addColumn(
                 'status',
                 function ($record) {
-                    // return $record->status ? ucfirst($record->status) : '-';
                     if ($record->status == 'actives') {
-                        return $record->status ? '<span class="badge bg-success text-white">'.ucwords('active').'</span>' : '-';
+                        return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
                     } elseif ($record->status == 'notactive') {
-                        return $record->status ? '<span class="badge bg-danger text-white">'.ucwords($record->status).'</span>' : '-';
-                    } else {
-                        return $record->status ? '<span class="badge bg-light">'.ucwords($record->status).'</span>' : '-';
+                        return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in repair') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in deletion') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } 
+                    else {
+                        return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
                 }
             )->addColumn(
@@ -242,7 +244,7 @@ class KIBCController extends Controller
                     'url' => route($this->routes . '.show', $record->id),
                 ];
 
-                if($record->condition =='baik'){
+                if($record->condition =='baik' && $record->status =='actives'){
                     if (auth()->user()->checkPerms('perbaikan-aset.create')) {
                         $actions[] = [
                             'type' => 'edit',
@@ -255,18 +257,20 @@ class KIBCController extends Controller
                     }
                 }
 
-                if($record->condition =='rusak berat'){
+                if($record->condition =='rusak berat' && $record->status =='actives'){
                     if (auth()->user()->checkPerms('penghapusan-aset.create')) {
                         $actions[] = [
                             'type' => 'edit',
                             'page' => true,
-                            'label' => 'Perbaikan',
-                            'icon' => 'fa fa-trash-o text-danger',
+                            'label' => 'Hapus',
+                            'icon' => 'fas fa-trash text-danger',
                             'id' => $record->id,
-                            'url' => route($this->routes . '.repair', $record->id),
+                            'url' => route($this->routes . '.deletes', $record->id),
                         ];
                     }
                 }
+
+
                     return $this->makeButtonDropdown($actions);
                 }
             )
@@ -304,7 +308,12 @@ class KIBCController extends Controller
     public function repair(Aset $record)
     {
         // dd($record);
-        return $this->render('pengajuan.perbaikan-aset.create',compact('record'));
+        return $this->render('perbaikan.perbaikan-aset.create',compact('record'));
+    }
+
+    public function deletes(Aset $record)
+    {
+        return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
     }
 
 }

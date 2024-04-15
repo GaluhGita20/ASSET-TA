@@ -49,6 +49,6 @@ class Notification extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'sys_notifications_users', 'notification_id', 'user_id')
-                    ->withPivot('readed_at');
+        ->withPivot('readed_at');
     }
 }

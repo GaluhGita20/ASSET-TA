@@ -29,19 +29,17 @@ class PemeliharaanRequest extends FormRequest
 
         $rules= [
             // 'kib_id'=>'required',
-            'dates' => 'required',
+            'maintenance_date' => 'required',
             'departemen_id' => 'required'
         ];
-
         return $rules;
-
     }
 
     public function messages()
     {
         return [
             // 'kib_id.required' => 'Nama Aset Wajib Diisi.',
-            'dates.required' => 'Tanggal Pemeliharaan wajib diisi.',
+            'maintenance_date.required' => 'Tanggal Pemeliharaan wajib diisi.',
             'departemen_id.required' => 'Lokasi Departemen wajib diisi.',
         ];
     }

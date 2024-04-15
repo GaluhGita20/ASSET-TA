@@ -177,7 +177,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'nilai_beli',
                 function ($record) {
-                   return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',');
+                    return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',');
                 }
             )->addColumn(
                 'status',
@@ -186,7 +186,12 @@ class KIBAController extends Controller
                         return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
                     } elseif ($record->status == 'notactive') {
                         return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
-                    } else {
+                    } elseif ($record->status == 'in repair') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'in deletion') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } 
+                    else {
                         return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
                 }
@@ -208,6 +213,20 @@ class KIBAController extends Controller
                     'id' => $record->id,
                     'url' => route($this->routes . '.show', $record->id),
                 ];
+
+                // if($record->condition =='rusak berat' && $record->status =='actives'){
+                if (auth()->user()->checkPerms('penghapusan-aset.create')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'page' => true,
+                        'label' => 'Hapus',
+                        'icon' => 'fas fa-trash text-danger',
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.deletes', $record->id),
+                    ];
+                }
+                // }
+
                     return $this->makeButtonDropdown($actions);
                 }
             )
@@ -233,6 +252,11 @@ class KIBAController extends Controller
     public function edit(Aset $record)
     {
         return $this->render($this->views.'.edit',compact('record'));
+    }
+
+    public function deletes(Aset $record)
+    {
+        return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
     }
 
 

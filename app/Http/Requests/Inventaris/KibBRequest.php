@@ -33,10 +33,8 @@ class KibBRequest extends FormRequest
             'useful' => 'required',
             'residual_value' => 'required',
         ];
-
         
         return $rules;
-
     }
 
     public function messages()

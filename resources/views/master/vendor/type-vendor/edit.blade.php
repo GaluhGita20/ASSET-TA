@@ -12,7 +12,7 @@
     @endif
 
     <div class="form-group row">
-		<label class="col-3 col-form-label">{{ __('Nama') }}</label>
+		<label class="col-3 col-form-label">{{ __('Nama') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<input name="name" class="form-control" placeholder="{{ __('Nama') }}" {{$page_action == "show" ? "readonly" : ""}}
 			value="{{$record->name}}"
@@ -20,7 +20,7 @@
 		</div>
 	</div>
     <div class="form-group row">
-		<label class="col-3 col-form-label">{{ __('Keterangan') }}</label>
+		<label class="col-3 col-form-label">{{ __('Keterangan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<textarea name="description" class="form-control" placeholder="{{ __('Keterangan') }}" {{$page_action == "show" ? "readonly" : ""}}
 		>{!! $record->description !!}</textarea>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pengajuan;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pengajuan\PenghapusanRequest;
 use App\Models\Pengajuan\Penghapusan;
+use App\Models\Pengajuan\Pemutihans;
 use App\Models\Globals\Approval;
 use App\Models\Master\Org\Position;
 use App\Support\Base;
@@ -45,6 +46,7 @@ class PenghapusanAsetController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:#|className:text-right'),
                     $this->makeColumn('name:no_surat|label:Nomor Surat|className:text-center|width:300px'),
+                    $this->makeColumn('name:type_aset|label:Tipe Aset|className:text-center|width:250px'),
                     $this->makeColumn('name:nama_aset|label:Nama Aset|className:text-center|width:250px'),
                     $this->makeColumn('name:departemen|label:Departemen|className:text-center|width:300px'),
                     $this->makeColumn('name:status'),
@@ -69,6 +71,13 @@ class PenghapusanAsetController extends Controller
                 'nama_aset',
                 function ($record) {
                     return $record->asets ? $record->asets->usulans->asetd->name : '-';
+                }
+            )
+
+            ->addColumn(
+                'type_aset',
+                function ($record) {
+                    return $record->asets ? $record->asets->type : '-';
                 }
             )
 
@@ -108,6 +117,10 @@ class PenghapusanAsetController extends Controller
                     $actions[] = 'type:history';
                 }
 
+                if ($record->checkAction('tracking', $this->perms)) {
+                    $actions[] = 'type:tracking';
+                }
+
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
                         'type' => 'edit',
@@ -119,6 +132,8 @@ class PenghapusanAsetController extends Controller
                     ];
                 }
 
+
+                // dd(auth()->user()->position->location_id);
                 if ($record->checkAction('delete', $this->perms)) {
                     $actions[] = [
                         'type' => 'delete',
@@ -128,7 +143,8 @@ class PenghapusanAsetController extends Controller
                     ];
                 }
 
-                if ($record->checkAction('approval', $this->perms)) {
+                if ( ($record->checkAction('approval', $this->perms) && (auth()->user()->position->location_id == 55 )) || (($record->checkAction('approval', $this->perms))  && (auth()->user()->position->location_id == 8)) ) {
+                    // dd(auth()->user()->position->location_id);
                     $actions[] = [
                         'type' => 'approval',
                         'label' => 'Approval',
@@ -137,7 +153,6 @@ class PenghapusanAsetController extends Controller
                         'url' => route($this->routes . '.approval', $record->id)
                     ];
                 }
-           
                 return $this->makeButtonDropdown($actions, $record->id);
             })
             ->rawColumns([
@@ -151,7 +166,6 @@ class PenghapusanAsetController extends Controller
     public function store(PenghapusanRequest $request)
     {
         $record = new Penghapusan;
-      
         return $record->handleStore($request);
     }
 
@@ -163,15 +177,10 @@ class PenghapusanAsetController extends Controller
 
     public function detail(Penghapusan $record)
     {
-        return $this->render($this->views . '.show', compact('record'));
+        return $this->render($this->views . '.detail', compact('record'));
     }
 
-    // public function updateSummary(PenghapusanRequest $request, Penghapusan $record)
-    // {
-    //     return $record->handleVerify($request);
-    // }
-
-    public function update(PenghapusanRequest $request, Penghapusan $record)
+    public function update(Request $request, Penghapusan $record)
     {
         return $record->handleStoreOrUpdate($request);
     }
@@ -189,6 +198,7 @@ class PenghapusanAsetController extends Controller
 
     public function submitSave(Penghapusan $record, Request $request)
     {
+       // dd(($request->all()));
         return $record->handleSubmitSave($request);
     }
 
@@ -205,6 +215,7 @@ class PenghapusanAsetController extends Controller
 
     public function reject(Penghapusan $record, Request $request)
     {
+        // dd('tes');
         $request->validate(
             [
                 'note'  => 'required',

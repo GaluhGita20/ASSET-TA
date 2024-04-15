@@ -77,6 +77,39 @@
                             </div>
                         </div>
 
+                        <!-- <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">{{ __('Bukti Penerimaan') }}</label>
+                                <div class="col-10 parent-group">
+                                    <div class="form-text text-muted">*Maksimal 20MB</div>
+                                        @foreach ($record->files()->where('flag', 'uploads')->get() as $file)
+                                        <div class="progress-container w-100" data-uid="{{ $file->id }}">
+                                            <div class="alert alert-custom alert-light fade show py-2 px-3 mb-0 mt-2 success-uploaded" role="alert">
+                                                <div class="alert-icon">
+                                                    <i class="{{ $file->file_icon }}"></i>
+                                                </div>
+                                                <div class="alert-text text-left">
+                                                    <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
+                                                    <div>Uploaded File:</div>
+                                                    <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
+                                                        {{ $file->file_name }}
+                                                    </a>
+                                                </div>
+                                                <div class="alert-close">
+                                                    <button type="button" class="close base-form--remove-temp-files" data-toggle="tooltip"
+                                                        data-original-title="Remove">
+                                                        <span aria-hidden="true">
+                                                            <i class="ki ki-close"></i>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                </div>
+                            </div>
+                        </div> -->
+
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">{{ __('Hasil Pengujian Aset') }}</label>

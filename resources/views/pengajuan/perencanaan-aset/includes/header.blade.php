@@ -25,12 +25,12 @@
         </div>
     </div>
 
-    <div class="col-sm-12">
+    <div class="col-sm-6">
         <div class="form-group row">
-            <div class="col-2">
+            <div class="col-4">
                 <label class="col-form-label">{{ __('Unit Kerja') }}</label>
             </div>
-            <div class="col-10 parent-group">
+            <div class="col-8 parent-group">
                 <select name="struct_id" class="form-control base-plugin--select2-ajax"
                     data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
                     data-placeholder="{{ __('Unit Kerja') }}" disabled>
@@ -43,6 +43,7 @@
                 </select>
             </div>
         </div>
+    </div>
 
         {{-- <div class="form-group row">
             <div class="col-2 pr-0">
@@ -58,7 +59,7 @@
                 </select>
             </div>
         </div> --}}
-
+    <div class="col-sm-12">
         <div class="form-group row">
             <div class="col-2 pr-0">
                 <label class="col-form-label">{{ __('Perihal') }}</label>
@@ -67,27 +68,40 @@
                 <input class="form-control" name="regarding" placeholder="{{ __('Perihal') }}" value="{{ $record->regarding }}" disabled>
             </div>
         </div>
+    </div>
 
+    <div class="col-sm-12">
         <div class="form-group row">
             <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
             <div class="col-10 parent-group">
-                @foreach ($record->files as $file)
-                <div class="progress-container w-100" data-uid="{{ $file->id }}">
-                    <div class="alert alert-custom alert-light fade show py-2 px-3 mb-0 mt-2 success-uploaded" role="alert">
-                        <div class="alert-icon">
-                            <i class="{{ $file->file_icon }}"></i>
-                        </div>
-                        <div class="alert-text text-left">
-                            <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
-                            <div>Uploaded File:</div>
-                            <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
-                                {{ $file->file_name }}
-                            </a>
+
+                <div class="form-text text-muted">*Maksimal 20MB</div>
+                    @foreach ($record->files()->where('flag', 'uploads')->get() as $file)
+                    <div class="progress-container w-100" data-uid="{{ $file->id }}">
+                        <div class="alert alert-custom alert-light fade show py-2 px-3 mb-0 mt-2 success-uploaded" role="alert">
+                            <div class="alert-icon">
+                                <i class="{{ $file->file_icon }}"></i>
+                            </div>
+                            <div class="alert-text text-left">
+                                <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
+                                <div>Uploaded File:</div>
+                                <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
+                                    {{ $file->file_name }}
+                                </a>
+                            </div>
+                            <div class="alert-close">
+                                <button type="button" class="close base-form--remove-temp-files" data-toggle="tooltip"
+                                    data-original-title="Remove">
+                                    <span aria-hidden="true">
+                                        <i class="ki ki-close"></i>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                @endforeach
+                    @endforeach
             </div>
         </div>
     </div>
+
 </div>

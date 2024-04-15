@@ -25,7 +25,9 @@
         <link rel="stylesheet" href="{{ (('/assets/css/modules.bundle.css')) }}">
         <style>
             body {
-                background-color: white;
+                /* background-color: {{ ('/assets/images/bg-01.jpg') }}; */
+				background-image: url('/assets/images/bg-01.jpg');
+				background-size: cover;
             }
         </style>
 	</head>
@@ -42,11 +44,11 @@
 		        <div class="d-flex flex-column flex-row-fluid position-relative p-7 overflow-hidden">
 					<div class="d-flex flex-column align-items p-5">
 						<div class="text-center">
-							<img src="{{ '/'.(config('base.logo.auth')) }}" alt="Image" style="max-width: 500px; max-height: 90px">
+							<img src="{{ '/'.(config('base.logo.auth')) }}" alt="Image" style="max-width: 600px; max-height: 130px">
 						</div>
-						<div class="text-center">
+						<div class="text-center mt-2">
 							{{-- <h1 class="font-size-h1 font-weight-boldest"  style="color:#0d0c12;"><b>E-ASET RSUD</b></h1> --}}
-							<h1 class="font-size-h3 font-weight-boldest"  style="color:#0c0b10;">
+							<h1 class="font-size-h3 font-weight-boldest"  style="color:#ffffff;">
 								<b>
 									APLIKASI SISTEM MANAJAMEN ASET<br>
 									RSUD - KABUPATEN LOMBOK UTARA

@@ -53,7 +53,7 @@ class AsetRs extends Model
         //         $q->where('name','LIKE', '%' . $jenis_jenis_aset . '%');
         //     }
         // )
-         ->latest();
+        ->latest();
     }
 
     /** SAVE DATA **/

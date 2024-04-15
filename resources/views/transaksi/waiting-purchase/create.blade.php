@@ -23,13 +23,16 @@
                             <div class="col-10 parent-group">
                                 <input type="hidden" id="dataArray" name="usulan_id" value="{{ json_encode($data) }}">
                             </div>
-
+                            @php 
+                                $temp_id = \App\Models\Pengajuan\PerencanaanDetail::where('id', $data[0])->pluck('ref_aset_id')->first();
+                                $name = \App\Models\Master\Aset\AsetRs::where('id',$temp_id)->pluck('name')->first(); 
+                            @endphp
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Nama Transaksi') }}</label>
+                                    <label class="col-form-label">{{ __('Nama Transaksi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <input type="text" class="form-control" name="trans_name" placeholder="{{ __('Nama Transaksi') }}">
+                                    <input type="text" class="form-control" name="trans_name" placeholder="{{ __('Nama Transaksi') }}" value="Transaksi Pembelian {{$name}}">
                                 </div>
                             </div>
                         </div>
@@ -37,7 +40,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Nama Vendor') }}</label>
+                                    <label class="col-form-label">{{ __('Nama Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <select name="vendor_id" class="form-control base-plugin--select2-ajax vendor_id"
@@ -57,7 +60,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Nomor Kontrak') }}</label>
+                                    <label class="col-form-label">{{ __('Nomor Kontrak') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input type="text" class="form-control" name="no_spk" placeholder="{{ __('Nomor Kontrak') }}">
@@ -79,7 +82,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Mulai Kontrak') }}</label>
+                                    <label class="col-form-label">{{ __('Tanggal Mulai Kontrak') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control base-plugin--datepicker" name="spk_start_date" placeholder="{{ __('Tanggal Mulai Kontrak') }}" data-date-end-date="{{ now()}}" >
@@ -90,7 +93,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Selesai Kontrak') }}</label>
+                                    <label class="col-form-label">{{ __('Tanggal Selesai Kontrak') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control base-plugin--datepicker" name="spk_end_date" placeholder="{{ __('Tanggal Selesai Kontrak') }}">
@@ -101,7 +104,7 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <div class="col-2">
-                                    <label class="col-form-label">{{ __('Jenis Pengadaan') }}</label>
+                                    <label class="col-form-label">{{ __('Jenis Pengadaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-10 parent-group">
                                     <select name="jenis_pengadaan_id" class="form-control base-plugin--select2-ajax jenis_pengadaan_id"
@@ -121,7 +124,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
+                                    <label class="col-form-label">{{ __('Jumlah Beli') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -139,7 +142,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Pagu') }}</label>
+                                    <label class="col-form-label">{{ __('Pagu') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -157,7 +160,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga Unit') }}</label>
+                                    <label class="col-form-label">{{ __('Harga Unit') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -176,7 +179,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Biaya Pajak') }}</label>
+                                    <label class="col-form-label">{{ __('Biaya Pajak') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -195,7 +198,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Biaya Pengiriman') }}</label>
+                                    <label class="col-form-label">{{ __('Biaya Pengiriman') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -214,7 +217,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Total Cost') }}</label>
+                                    <label class="col-form-label">{{ __('Total Biaya') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -229,7 +232,30 @@
                                 </div>
                             </div>
                         </div>
-                        
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">{{ __('Bukti Nota Pembelian ') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <div class="col-10 parent-group">
+                                    <div class="custom-file">
+                                        <input type="hidden"
+                                            name="uploads[uploaded]"
+                                            class="uploaded"
+                                            value="0">
+                                        <input type="file" multiple
+                                            class="custom-file-input base-form--save-temp-files"
+                                            data-name="uploads"
+                                            data-container="parent-group"
+                                            data-max-size="30024"
+                                            data-max-file="100"
+                                            accept="*">
+                                        <label class="custom-file-label" for="file">Choose File</label>
+                                    </div>
+                                    <div class="form-text text-muted">*Maksimal 20MB</div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="d-flex justify-content-between">
                         @include('layouts.forms.btnBack')

@@ -71,6 +71,7 @@ class Role extends SpatieRole
     {
         $this->beginTransaction();
         try {
+            // dd('tes');
             $this->syncPermissions($request->check ?? []);
             $this->save();
             $this->saveLogNotify();

@@ -17,7 +17,7 @@
         "laravel/framework": "^9.0",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "^3.1",  
         "reinbier/laravel-unique-with": "^1.0",
         "simplesoftwareio/simple-qrcode": "~4",
         "spatie/laravel-permission": "^5.5",
