@@ -74,7 +74,24 @@ class UsulanSperpat extends Model
     public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(empty(array_intersect(['Sarpras','Sub Bagian Program Perencanaan'], $user->roles->pluck('name')->toArray())),
+        // return $query->when(empty(array_intersect(['Sarpras','Sub Bagian Program Perencanaan','BPKAD'], $user->roles->pluck('name')->toArray()))
+        // )->when(auth()->user()->roles->pluck('id')->contains(3), function ($query) {
+        //     $query->orWhereHas('approvals', function ($q) {
+        //         $q->where('module','usulan_pembelian-sperpat')->where('order', 1)->whereIn('status', ['new','rejected']);
+        //     });
+        // })
+        // ->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+        //     $query->whereHas('approvals', function ($subQuery) {
+        //         $subQuery->where('module','usulan_pembelian-sperpat')->where('order', 1)->where('status', 'approved');
+        //     })
+        //     ->whereHas('approvals', function ($subQuery) {
+        //         $subQuery->where('module','usulan_pembelian-sperpat')->where('order', 2)->where('status', 'new');
+        //     });
+        // });
+
+
+
+        return $query->when(empty(array_intersect(['Sarpras','BPKAD'], $user->roles->pluck('name')->toArray())),
         function ($q) use ($user) { 
             $q->WhereHas('approvals', function ($q) use ($user) {
                 $q->when($user->id, function ($qq) use ($user) {

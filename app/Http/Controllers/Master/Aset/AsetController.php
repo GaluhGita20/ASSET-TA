@@ -91,15 +91,26 @@ class AsetController extends Controller
             ->addColumn('action',function ($record) use ($user) {
                     $actions = [
                         'type:show|id:' . $record->id,
-                        'type:edit|id:' . $record->id,
+                        // 'type:edit|id:' . $record->id,
                     ];
-                    if ($record->canDeleted()) {
+                    if (auth()->user()->hasRole('Sarpras')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'id' => $record->id,
+                        ];
                         $actions[] = [
                             'type' => 'delete',
                             'id' => $record->id,
-                            'attrs' => 'data-confirm-text="' . __('Hapus') . ' ' . $record->name . '?"',
+                            'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                         ];
                     }
+                    // if ($record->canDeleted()) {
+                    //     $actions[] = [
+                    //         'type' => 'delete',
+                    //         'id' => $record->id,
+                    //         'attrs' => 'data-confirm-text="' . __('Hapus') . ' ' . $record->name . '?"',
+                    //     ];
+                    // }
                     return $this->makeButtonDropdown($actions);
                 }
             )
@@ -113,7 +124,7 @@ class AsetController extends Controller
         return $this->render($this->views . '.create');
     }
    
-    public function show(Aset $record){
+    public function show(AsetRs $record){
         return $this->render($this->views . '.show',compact('record'));
     }
 
@@ -122,23 +133,23 @@ class AsetController extends Controller
         return $record->handleStoreOrUpdate($request);
     }
 
-    public function edit(Aset $record)
+    public function edit(AsetRs $record)
     {
         return $this->render($this->views.'.edit',compact('record'));
     }
 
 
-    public function update(Aset $record, AsetRequest $request){
+    public function update(AsetRs $record, AsetRequest $request){
         return $record->handleStoreOrUpdate($request);
     }
 
-    public function destroy(Aset $record){
+    public function destroy(AsetRs $record){
         return $record->handleDestroy();
     }
 
     public function getDetailAset(AsetRequest $request){
         $id_akun = $request->id;
-        $aset = Aset::where('id', $id)->first();
+        $aset = AsetRs::where('id', $id)->first();
         return response()->json([
             'name' => $aset->name,
            /// 'jenis_pengadaan' => $aset->jenis_pengadaan,

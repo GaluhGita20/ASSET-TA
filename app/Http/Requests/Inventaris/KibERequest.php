@@ -36,7 +36,7 @@ class KibERequest extends FormRequest
             'coa_id' => 'required',
             'useful' => 'required',
             'residual_value' => 'required',
-            'room_location' => 'required',
+            //'room_location' => 'required',
         ];
 
         return $rules;
@@ -47,7 +47,7 @@ class KibERequest extends FormRequest
         return [
             'title.required'=> 'Judul Wajib Diisi',
             // 'creator.required' => 'Pencipta Wajib Diisi.',
-            'room_location.required' => 'Lokasi Ruang Wajib Diisi',
+            //'room_location.required' => 'Lokasi Ruang Wajib Diisi',
             // 'size_animal.required' => 'Ukuran Wajib Diisi.',
             // 'tipe_animal.required' => 'Status Tanah Wajib Diisi.',
             // 'material.required' => 'Bahan Wajib Diisi',

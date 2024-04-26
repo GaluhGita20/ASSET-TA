@@ -69,12 +69,23 @@ class LevelPositionController extends Controller
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show',
-                    'type:edit',
+                    // 'type:edit',
                 ];
-                if ($record->canDeleted()) {
+                // if ($record->canDeleted()) {
+                //     $actions[] = [
+                //         'type' => 'delete',
+                //         'text' => $record->name,
+                //     ];
+                // }
+                if ($record->canDeleted() || auth()->user()->hasRole('Administrator')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
                     $actions[] = [
                         'type' => 'delete',
-                        'text' => $record->name,
+                        'id' => $record->id,
+                        'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                     ];
                 }
                 return $this->makeButtonDropdown($actions, $record->id);

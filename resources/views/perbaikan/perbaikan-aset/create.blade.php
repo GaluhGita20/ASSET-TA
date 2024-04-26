@@ -123,7 +123,7 @@
                                     @if(!empty($record->locations->name))
                                         <input type="text" class="form-control" value="{{ $record->locations->name }}" disabled>
                                     @else
-                                        <input type="text" class="form-control" value="-" disabled>
+                                        <input type="text" class="form-control" value="{{$record->non_room_location}}" disabled>
                                     @endif
                                 </div>
                             </div>

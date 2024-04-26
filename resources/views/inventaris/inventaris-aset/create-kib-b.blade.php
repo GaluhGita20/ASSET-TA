@@ -102,8 +102,16 @@
                                     <label class="col-form-label">{{ __('Bahan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input type="text"  class="form-control" placeholder="{{ __('Bahan') }}" name="material">
+                                    <select name="material" class="form-control base-plugin--select2-ajax"
+                                        data-url="{{ rut('ajax.selectBahanAset', [
+                                            'search'=>'all'
+                                        ]) }}"  data-placeholder="{{ __('Pilih Salah Satu Bahan Aset') }}">
+                                        <option value="" selected>{{ __('Pilih Salah Satu Bahan Aset') }}</option>
+                                    </select>
                                 </div>
+                                {{-- <div class="col-8 parent-group">
+                                    <input type="text"  class="form-control" placeholder="{{ __('Bahan') }}" name="material">
+                                </div> --}}
                             </div>
                         </div>
 
@@ -239,7 +247,7 @@
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source" id="source" class="form-control base-plugin--select2-ajax">
-                                        @if ($usulan->sumber_biaya_id)
+                                        @if ($usulan->source_fund_id)
                                             <option value="{{ $usulan->danad->name }}" selected>
                                                 {{ $usulan->danad->name }}
                                             </option>
@@ -347,7 +355,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Ruang') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Ruang') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <select name="room_location" class="form-control base-plugin--select2-ajax location"
@@ -356,6 +364,27 @@
                                     placeholder="{{ __('Pilih Salah Satu') }}">
                                     <option value="">{{ __('Pilih Salah Satu') }}</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 offset-md-4 col-md-7">
+                                    <span style="font-size: 11px">{{ __('* Nama Ruang Diisi Jika Aset Berada di Dalam Ruangan') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-4 pr-0">
+                                    <label class="col-form-label">{{ __('Lokasi Non Ruangan') }}</label>
+                                </div>
+                                <div class="col-8 parent-group">
+                                    <input type="text" class="form-control" id="non_room_location" name="non_room_location" placeholder="{{ __('Nama Lokasi') }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 offset-md-4 col-md-7">
+                                    <span style="font-size: 11px">{{ __('* Lokasi Non Ruang Diisi Jika Aset Berada di Luar Ruangan') }}</span>
                                 </div>
                             </div>
                         </div>

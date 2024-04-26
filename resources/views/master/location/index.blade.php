@@ -8,7 +8,7 @@
 		</div>
 		<div class="ml-4 pb-2" style="width: 350px">
 			<select class="form-control filter-control base-plugin--select2-ajax"
-			data-url="{{ rut('ajax.selectStruct', 'all') }}" data-post="departemen_id"
+			data-url="{{ rut('ajax.selectStruct', 'alls') }}" data-post="departemen_id"
 			data-placeholder="{{ __('Unit Organisasi') }}">
 		</select>
 	</div>
@@ -25,7 +25,8 @@
 @endsection --}}
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
+	@if (auth()->user()->hasRole('Administrator'))
+	{{-- @if (auth()->user()->checkPerms($perms.'.create')) --}}
 		@include('layouts.forms.btnAdd')
 	@endif
 @endsection

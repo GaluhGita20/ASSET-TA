@@ -26,7 +26,7 @@
     </div>
     <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6" id="location_id">
         <select name="location_id" id="location_id" class="form-control filter-control base-plugin--select2-ajax"
-            data-url="{{ route('ajax.selectStruct', ['search' => 'all']) }}"
+            data-url="{{ route('ajax.selectStruct', ['search' => 'alls']) }}"
             data-post="location_id"
             
             data-placeholder="{{ __('Struktur Organisasi') }}">

@@ -80,8 +80,14 @@ class RootController extends Controller
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show|id:'.$record->id,
-                    'type:edit|id:'.$record->id,
+                    // 'type:edit|id:'.$record->id,
                 ];
+                if (auth()->user()->hasRole('Administrator')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
+                }
                 return $this->makeButtonDropdown($actions);
             })
             ->rawColumns(['action','updated_by'])

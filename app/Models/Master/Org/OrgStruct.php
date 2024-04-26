@@ -75,8 +75,6 @@ class OrgStruct extends Model
         return $this->hasMany(OrgStruct::class, 'parent_id')->orderBy('level')->with('child');
     }
 
-   
-
     // public function childOfGroup()
     // {
     //     return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'group_id', 'struct_id');
@@ -272,14 +270,37 @@ class OrgStruct extends Model
     /** OTHER FUNCTIONS **/
     public function canDeleted()
     {
-        // if (in_array($this->type, [1, 2, 3, 4, 5])) return false;
-        if (in_array($this->level, ['root', 'bod'])) return false;
-        // if ($this->child()->exists()) return false;
-        // if ($this->structGroup()->exists()) return false;
-        if ($this->positions()->exists()) return false;
+        // Jika level adalah 'root' atau 'bod', maka tidak bisa dihapus
+        if (in_array($this->level, ['root', 'bod'])) {
+            return false;
+        }
 
-        return true;
+        // Jika terdapat posisi yang terkait dengan objek ini, maka tidak bisa dihapus
+        if ($this->positions()->exists()) {
+            return false;
+        }
+
+        // Jika pengguna saat ini adalah Administrator, maka bisa dihapus
+        if (auth()->user()->hasRole('Administrator')) {
+            return true;
+        }
+
+        // Kondisi default, seharusnya mengembalikan false jika tidak memenuhi kondisi di atas
+        return false;
     }
+
+    // public function canDeleted()
+    // {
+    //     // if (in_array($this->type, [1, 2, 3, 4, 5])) return false;
+    //     if (in_array($this->level, ['root', 'bod'])) return false;
+    //     // if ($this->child()->exists()) return false;
+    //     // if ($this->structGroup()->exists()) return false;
+    //     if ($this->positions()->exists()) return false;
+
+    //     if (auth()->user()->hasRole('Administrator')) {
+    //         return true;
+    //     }
+    // }
 
     public function getNewCode($level)
     {

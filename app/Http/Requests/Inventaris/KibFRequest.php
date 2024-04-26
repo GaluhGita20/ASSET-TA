@@ -30,7 +30,8 @@ class KibFRequest extends FormRequest
         $rules= [
             'wide'=>'required',
             // 'wide_bld' => 'required',
-            // 'land_status' => 'required',
+            'land_status' => 'required',
+            'address' =>'required',
             'tanah_id' => 'required',
             'coa_id' => 'required',
             'no_sertificate' => 'required',
@@ -46,8 +47,9 @@ class KibFRequest extends FormRequest
     {
         return [
             'wide.required'=> 'Luas Lantai Wajib Diisi',
-            'wide_bld.required' => 'Luas Bangunan Wajib Diisi.',
-            // 'land_status.required' => 'Status Tanah Wajib Diisi.',
+            // 'wide_bld.required' => 'Luas Bangunan Wajib Diisi.',
+            'address.required' => 'Alamat Wajib Diisi.',
+            'land_status.required' => 'Status Tanah Wajib Diisi.',
             'tanah_id.required' => 'Kode Aset Tanah Wajib Diisi',
             'coa_id.required' => 'Kode Aset Wajib Diisi',
             'no_sertificate.required' => 'Nomor Dokumen Wajib Diisi',

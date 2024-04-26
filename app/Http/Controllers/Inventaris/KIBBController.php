@@ -142,7 +142,7 @@ class KIBBController extends Controller
             )->addColumn(
                 'bahan',
                 function ($record) {
-                    return $record->material ? ucwords($record->material) : '-';
+                    return $record->materials->name ? $record->materials->name: '-';
                 }
             )->addColumn(
                 'source_acq',
@@ -256,7 +256,7 @@ class KIBBController extends Controller
             )->addColumn(
                 'location',
                 function ($record) {
-                    return $record->locations ? $record->locations->name : '-';
+                    return $record->locations ? $record->locations->name : $record->non_room_location;
                 }
             )
             ->addColumn(
@@ -316,7 +316,7 @@ class KIBBController extends Controller
 
         $perbaikan1 = Activity::where('module','perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%membuat%')->get();
         $perbaikan2 = Activity::where('module','pj-perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
-        $pemeliharaan = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->get();
+        $pemeliharaan = Activity::where('module','pemeliharaan-aset')->where('target_id',$pemeliharaan)->where('message', 'LIKE', '%Menyetujui Jadwal%')->get();
 
 
         $mergedRecords = collect([$perbaikan1,$perbaikan2,$records_inv,$pemeliharaan])->collapse();
@@ -405,8 +405,9 @@ class KIBBController extends Controller
         })->pluck('id')->toArray();
 
         $total_per = Activity::where('module','perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%membuat%')->count();     
-        $total_pem = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->count();
+        $total_pem = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->where('message', 'LIKE', '%menyetujui%')->count();
 
+        
         return $this->render('pelaporan.detail-aset.index',compact(['record','total_per','total_pem']));
     }
 

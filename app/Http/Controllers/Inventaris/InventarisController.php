@@ -61,7 +61,7 @@ class InventarisController extends Controller
                 return $detail->asetd->name ? $detail->asetd->name : '';
             })
             ->addColumn('struct', function ($detail) {
-                return $detail->perencanaan ? $detail->perencanaan->struct->name : '';
+                return $detail->perencanaan ? $detail->perencanaan->struct->name : '-';
             })
             ->addColumn('source_acq', function ($detail) {
                 if ($detail->trans->source_acq == 'Hibah' || $detail->trans->source_acq == 'Sumbangan' ) {
@@ -92,7 +92,8 @@ class InventarisController extends Controller
                 // $pembelianIds = $data->pluck('pembelian_id')->toArray();
                 // $receiptDates = PembelianTransaksi::where('id', $pembelianIds)->get('unit_cost');
                 // return number_format($receiptDates[0]['unit_cost'], 0, ',', ',');
-                return number_format($detail->trans->unit_cost, 0, ',', ',');
+                
+                return $detail->trans->unit_cost ? number_format($detail->trans->unit_cost, 0, ',', ',') : number_format($detail->HPS_unit_cost, 0, ',', ',');
             })
             ->editColumn(
                 'checkbox',
@@ -111,25 +112,47 @@ class InventarisController extends Controller
     
     public function index()
     {
-        $this->prepare([
-            'tableStruct' => [
-                'url' => route($this->routes . ".grid"),
-                'datatable_1' => [
-                    $this->makeColumn('name:num|label:#'),
-                    $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
-                    $this->makeColumn('name:desc_spesification|label:Spesifikasi|className:text-left|width:200px'),
-                    $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center|width:200px'),
-                    $this->makeColumn('name:tanggal_terima|label:Tanggal Terima|className:text-center|width:200px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah Belum Dicatat (Unit)|className:text-center|width:300px'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Harga Unit (Rupiah)|className:text-center|width:200px'),
-                   // $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:200px'),
-                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
-                   // @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create'))
-                    $this->makeColumn('name:checkbox|label:check|class:usulan|className:text-center|width:50px'),
-                   // @endif
+        if(auth()->user()->hasRole('Sarpras') && auth()->user()->position->location_id == 8){
+            $this->prepare([
+                'tableStruct' => [
+                    'url' => route($this->routes . ".grid"),
+                    'datatable_1' => [
+                        $this->makeColumn('name:num|label:#'),
+                        $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
+                        $this->makeColumn('name:desc_spesification|label:Spesifikasi|className:text-left|width:200px'),
+                        $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center|width:200px'),
+                        $this->makeColumn('name:tanggal_terima|label:Tanggal Terima|className:text-center|width:200px'),
+                        $this->makeColumn('name:qty_agree|label:Jumlah Belum Dicatat (Unit)|className:text-center|width:300px'),
+                        $this->makeColumn('name:HPS_unit_cost|label:Harga Unit (Rupiah)|className:text-center|width:200px'),
+                       // $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:200px'),
+                        $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                       // @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create'))
+                        $this->makeColumn('name:checkbox|label:check|class:usulan|className:text-center|width:50px'),
+                       // @endif
+                    ],
                 ],
-            ],
-        ]);
+            ]);
+        }else{
+            $this->prepare([
+                'tableStruct' => [
+                    'url' => route($this->routes . ".grid"),
+                    'datatable_1' => [
+                        $this->makeColumn('name:num|label:#'),
+                        $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
+                        $this->makeColumn('name:desc_spesification|label:Spesifikasi|className:text-left|width:200px'),
+                        $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center|width:200px'),
+                        $this->makeColumn('name:tanggal_terima|label:Tanggal Terima|className:text-center|width:200px'),
+                        $this->makeColumn('name:qty_agree|label:Jumlah Belum Dicatat (Unit)|className:text-center|width:300px'),
+                        $this->makeColumn('name:HPS_unit_cost|label:Harga Unit (Rupiah)|className:text-center|width:200px'),
+                       // $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui (Rupiah)|className:text-center|width:200px'),
+                        $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                       // @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create'))
+                        // $this->makeColumn('name:checkbox|label:check|class:usulan|className:text-center|width:50px'),
+                       // @endif
+                    ],
+                ],
+            ]);
+        }
         return $this->render($this->views . '.index');
     }
 

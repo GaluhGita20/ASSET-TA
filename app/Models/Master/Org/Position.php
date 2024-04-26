@@ -55,7 +55,10 @@ class Position extends Model
      *******************************/
     public function scopeGrid($query)
     {
-        return $query->latest();
+        return $query->orderBy('location_id');
+        // return $query->whereHas('struct', function  ($q){
+        //     $q->orderBy('code');
+        // });
     }
 
     public function scopeFilters($query)
@@ -77,7 +80,11 @@ class Position extends Model
         $this->beginTransaction();
         try {
             $this->fill($request->all());
-            $this->code = $this->code ?: $this->getNewCode();
+            // dd($request->all());
+            // if()
+            $root = $request->root_id;
+            $this->code = $this->code ? : $this->getNewCode($request);
+            
             $this->save();
             $this->saveLogNotify();
 
@@ -146,14 +153,21 @@ class Position extends Model
     public function canDeleted()
     {
         if ($this->users()->exists()) return false;
-
         return true;
     }
 
-    public function getNewCode()
+    public function getNewCode($request)
     {
-        $max = static::max('code');
-        return $max ? $max + 1 : 1001;
+        $instansi = OrgStruct::where('id',$request->root_id)->value('name');
+
+        if($instansi == 'RSUD Kabupaten Lombok Utara'){
+            $data =[1001,2000];
+            $max = static::whereBetween('code',$data)->max('code');
+            return $max ? $max + 1 : 1001;
+        }else{
+            $max = static::max('code');
+            return $max ? $max + 1 : 2001;
+        }
     }
 
     public function imAuditor()

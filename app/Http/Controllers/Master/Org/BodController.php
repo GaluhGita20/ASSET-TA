@@ -40,7 +40,7 @@ class BodController extends Controller
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:code|label:Kode|className:text-center'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
-                    $this->makeColumn('name:parent|label:Parent|className:text-center'),
+                    $this->makeColumn('name:parent|label:Instansi|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -73,9 +73,14 @@ class BodController extends Controller
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show|id:'.$record->id,
-                    'type:edit|id:'.$record->id,
+                    // 'type:edit|id:'.$record->id,
                 ];
-                if ($record->canDeleted()) {
+                
+                if ($record->canDeleted() || auth()->user()->hasRole('Administrator')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,

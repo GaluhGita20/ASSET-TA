@@ -27,7 +27,8 @@
                                     <label class="col-form-label">{{ __('Nama Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <input type="text" class="form-control" name="nama_aset" placeholder="{{ __('Nama Aset') }}" value="{{ $record->usulans->asetd->name }}" readonly>
+                                    <input type="text" class="form-control" name="nama_aset" placeholder="{{ __('Nama Aset') }}" value="Tanah Kebun" readonly>
+                                    {{-- <input type="text" class="form-control" name="nama_aset" placeholder="{{ __('Nama Aset') }}" value="{{ $record->usulans->asetd->name }}" readonly> --}}
                                 </div>
                             </div>
                         </div>
@@ -97,7 +98,7 @@
                                     <label class="col-form-label">{{ __('Hak Tanah') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input type="text"  class="form-control"  placeholder="{{ __('Hak Tanah') }}" name="land_rights"  value="{{ ucwords($record->land_rights) }}" readonly>
+                                    <input type="text"  class="form-control"  placeholder="{{ __('Hak Tanah') }}" name="land_rights"  value="{{$record->hakTanah->name}}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -275,9 +276,9 @@
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source" id="source" class="form-control base-plugin--select2-ajax">
-                                        @if ($record->usulan->sumber_biaya_id)
-                                            <option value="{{ $record->usulan->danad->name }}" selected>
-                                                {{ $record->usulan->danad->name }}
+                                        @if ($record->usulans->danad->name)
+                                            <option value="{{ $record->usulans->danad->name }}" selected>
+                                                {{ $record->usulans->danad->name }}
                                             </option>
                                         @endif
                                     </select>
@@ -294,7 +295,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->trans->unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->acq_value }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -312,7 +313,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->usulans->HPS_unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->acq_value }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah

@@ -167,7 +167,7 @@ class PerbaikanAsetController extends Controller
                 if(auth()->user()->hasRole('Sarpras') && $record->status =='approved' && $record->check_up_result == null && auth()->user()->checkPerms('perbaikan-aset.edit')){
                     $actions[] = [
                         'type' => 'edit',
-                        'label' => 'Update Check Up',
+                        'label' => 'Perbarui Hasil Pemeriksaan',
                         'icon' => 'fa fa-wrench text-success',
                         'page' => true,
                         'id' => $record->id,

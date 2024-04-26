@@ -148,24 +148,45 @@ class ListPembelianController extends Controller
     
     public function index()
     {
-        $this->prepare([
-            'tableStruct' => [
-                'url' => route($this->routes . ".grid"),
-                'datatable_1' => [
-                    $this->makeColumn('name:num|label:#'),
-                    $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
-                    $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:200px'),
-                    $this->makeColumn('name:tahun_usulan|label:Tahun Usulan|className:text-center|width:200px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center|width:300px'),
-                    $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:200px'),
-                    // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
-                    $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
-                    $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
-                    // $this->makeColumn('name:actionDetail|label:action|className:text-center|width:50px'),
+        if(auth()->user()->hasRole('PPK')){
+            $this->prepare([
+                'tableStruct' => [
+                    'url' => route($this->routes . ".grid"),
+                    'datatable_1' => [
+                        $this->makeColumn('name:num|label:#'),
+                        $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
+                        $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:200px'),
+                        $this->makeColumn('name:tahun_usulan|label:Tahun Usulan|className:text-center|width:200px'),
+                        $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center|width:300px'),
+                        $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:200px'),
+                        // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
+                        $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
+                        $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                        $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
+                        // $this->makeColumn('name:actionDetail|label:action|className:text-center|width:50px'),
+                    ],
                 ],
-            ],
-        ]);
+            ]);
+        }else{
+            $this->prepare([
+                'tableStruct' => [
+                    'url' => route($this->routes . ".grid"),
+                    'datatable_1' => [
+                        $this->makeColumn('name:num|label:#'),
+                        $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
+                        $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:200px'),
+                        $this->makeColumn('name:tahun_usulan|label:Tahun Usulan|className:text-center|width:200px'),
+                        $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center|width:300px'),
+                        $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:200px'),
+                        // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
+                        $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
+                        $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                        // $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
+                        // $this->makeColumn('name:actionDetail|label:action|className:text-center|width:50px'),
+                    ],
+                ],
+            ]);
+        }
     
         return $this->render($this->views . '.index');
     }
@@ -286,7 +307,6 @@ class ListPembelianController extends Controller
         $baseContentReplace = 'base-modal--render';
         return $this->render($this->views . '.edit-lainya', compact('detail','baseContentReplace','type'));
     }
-
 
     public function editDetail(PerencanaanDetail $detail)
     {

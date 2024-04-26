@@ -39,10 +39,10 @@ class LocationController extends Controller
             'tableStruct' => [
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
-                    $this->makeColumn('name:code|label:Kode|className:text-center'),
+                    $this->makeColumn('name:code|label:Kode|className:text-left'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
-                    $this->makeColumn('name:departemen|label:Unit|className:text-center'),
-                    $this->makeColumn('name:pic_id|label:PIC|className:text-center'),
+                    $this->makeColumn('name:departemen|label:Unit|className:text-left'),
+                    $this->makeColumn('name:pic_id|label:PIC|className:text-left'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -78,15 +78,26 @@ class LocationController extends Controller
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show|id:'.$record->id,
-                    'type:edit|id:'.$record->id,
+                    // 'type:edit|id:'.$record->id,
                 ];
-                if ($record->canDeleted()) {
+                if (auth()->user()->hasRole('Administrator')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,
                         'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                     ];
                 }
+                // if ($record->canDeleted()) {
+                //     $actions[] = [
+                //         'type' => 'delete',
+                //         'id' => $record->id,
+                //         'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
+                //     ];
+                // }
                 return $this->makeButtonDropdown($actions);
             })
             ->rawColumns(['action','updated_by', 'pic_id','departemen','name','code'])

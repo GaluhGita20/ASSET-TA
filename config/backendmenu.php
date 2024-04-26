@@ -237,13 +237,13 @@ return [
                         'title' => 'Aset KIB F',
                         'url' => '/laporan/inventaris/kib-f',
                     ],
-                    [
-                        'name' => 'laporan_perencanaan-aset',
-                        'perms' => 'perencanaan-aset',
-                        'title' => 'Usulan Aset',
-                        'url' => '/laporan/perencanaan-aset',
-                    ],
                 ]
+            ],
+            [
+                'name' => 'laporan_perencanaan-aset',
+                'perms' => 'perencanaan-aset',
+                'title' => 'Usulan Aset',
+                'url' => '/laporan/perencanaan-aset',
             ],
             [
                 'name' => 'laporan_penerimaan-aset',

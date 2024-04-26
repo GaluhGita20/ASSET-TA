@@ -153,17 +153,21 @@ class Pemeliharaan extends Model
 
     public function createDetail($request){
         $dep = $request->departemen_id;
-        $data = Aset::where('condition','baik')->where('status', 'actives')->whereHas('usulans', function ($q) use ($dep) {
-            $q->whereHas('perencanaan', function ($qq) use ($dep) {
-                $qq->where('struct_id', $dep);
-            })->whereHas('trans',function($qqq){
-                $qqq->where('unit_cost','>=',1000000);
-            });
-        })->orWhere('location_hibah_aset', $dep)->whereHas('usulans', function ($q){
-            $q->whereHas('trans', function ($qq){
-                $qq->where('unit_cost','>=', 1000000);
-            });
-        })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();;
+        // $data = Aset::where('condition','baik')->where('status', 'actives')->whereHas('usulans', function ($q) use ($dep) {
+        //     $q->whereHas('perencanaan', function ($qq) use ($dep) {
+        //         $qq->where('struct_id', $dep);
+        //     })->whereHas('trans',function($qqq){
+        //         $qqq->where('unit_cost','>=',1000000);
+        //     });
+        // })->orWhere('location_hibah_aset', $dep)->whereHas('usulans', function ($q){
+        //     $q->whereHas('trans', function ($qq){
+        //         $qq->where('unit_cost','>=', 1000000);
+        //     });
+        // })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
+
+
+        $data = Aset::where('condition','baik')->where('status', 'actives')->where('acq_value','>=',1000000)->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
+
         // $data = Aset::with('usulans')
         //     ->where('condition', 'baik')
         //     ->where('status', 'actives')

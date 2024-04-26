@@ -179,7 +179,7 @@
                     <label class="col-form-label">{{ __('Sumber Pendanaan') }}</label>
                 </div>
                 <div class="col-sm-12 col-md-7 parent-group">
-                    <select name="sumber_biaya_id" class="form-control base-plugin--select2-ajax"
+                    <select name="source_fund_id" class="form-control base-plugin--select2-ajax"
                         data-url="{{ rut('ajax.selectSSBiaya', [
                             'search'=>'all'
                         ]) }}" autofocus style="border: 1px solid #007bff;" data-placeholder="{{ __('Pilih Salah Satu Sumber Pendanaan') }}">

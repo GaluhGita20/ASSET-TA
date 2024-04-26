@@ -190,7 +190,7 @@
                                 <div class="col-8 parent-group">
                                     {{-- filter tanah --}}
                                     <input type="text" name="land_status" class="form-control"
-                                    placeholder="{{ __('Status Tanah') }}" value="{{ $record->land_status }}" readonly>
+                                    placeholder="{{ __('Status Tanah') }}" value="{{ $record->statusTanah->name }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +302,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->trans->unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->acq_value }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -320,7 +320,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->usulans->HPS_unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->acq_value }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah

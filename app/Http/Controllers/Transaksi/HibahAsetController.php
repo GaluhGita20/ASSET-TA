@@ -13,6 +13,7 @@ use App\Http\Requests\Transaksi\TransaksiPenerimaanRequest;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Transaksi\PembelianTransaksi;
+use App\Models\Transaksi\HibahTransaksi;
 use App\Models\Master\Org\Position;
 use App\Support\Base;
 use Illuminate\Http\Request;
@@ -410,9 +411,8 @@ class HibahAsetController extends Controller
 
     public function approve(PembelianTransaksi $record, Request $request)
     {
-        
-        
-            return $record->handleApprove($request);
+        // dd($request->all());
+        return $record->handleApproveHibah($request);
         
     }
 

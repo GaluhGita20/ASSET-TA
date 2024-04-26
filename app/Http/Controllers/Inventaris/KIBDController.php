@@ -49,6 +49,7 @@ class KIBDController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
                     $this->makeColumn('name:nama_kontruksi|label:Kontraktor|className:text-center'),
@@ -115,6 +116,10 @@ class KIBDController extends Controller
                 // return $record->no_register ? str_pad($record->no_register, $panjang_target, '0', STR_PAD_LEFT) : '-';
                 }
             )->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? $record->book_date : '-';
+            })->addColumn(
                 'nama_kontruksi',
                 function ($record) {
                     return $record->usulans? $record->usulans->trans->vendors->name : '-';
@@ -147,7 +152,7 @@ class KIBDController extends Controller
             )->addColumn(
                 'status_tanah',
                 function ($record) {
-                    return $record->land_status ? ucwords($record->land_status) : '-';
+                    return $record->statusTanah->name ? $record->statusTanah->name : '-';
                 }
             )->addColumn(
                 'nomor_dokumen',

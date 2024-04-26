@@ -22,7 +22,8 @@
 @endsection
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
+    @if(auth()->user()->hasRole('Sub Bagian Program Perencanaan')|| auth()->user()->hasRole('PPK'))
+	{{-- @if (auth()->user()->checkPerms($perms.'.create')) --}}
         <a href="{{ $urlAdd ?? (\Route::has($routes.'.create') ? route($routes.'.create') : 'javascript:;') }}"
             class="btn btn-info base-modal--render"
             data-modal-size="{{ $modalSize ?? 'modal-lg' }}"

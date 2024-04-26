@@ -5,7 +5,7 @@
             <input type="text" class="form-control filter-control" data-post="nama_akun" placeholder="{{ __('Nama Akun') }}">
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
+        {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <select class="form-control filter-control base-plugin--select2" name="tipe_akun"
                 data-post="tipe_akun"
                 data-placeholder="{{ __('Tipe Akun Utama') }}"
@@ -18,12 +18,16 @@
             <option value="KIB E">KIB E</option>
             <option value="KIB F">KIB F</option>
             </select>
-        </div>
+        </div> --}}
     </div>
 @endsection
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
+
+    @if (auth()->user()->hasRole('BPKAD'))
+	
+
+	{{-- @if (auth()->user()->checkPerms($perms.'.create')) --}}
         <a href="{{ $urlAdd ?? (\Route::has($routes.'.create') ? route($routes.'.create') : 'javascript:;') }}"
             class="btn btn-info base-modal--render"
             data-modal-size="{{ $modalSize ?? 'modal-lg' }}"

@@ -9,7 +9,7 @@
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col-4">
-                    <label class="col-form-label">{{ __('No Surat') }}</label>
+                    <label class="col-form-label">{{ __('No Surat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-8 parent-group">
                     <input class="form-control" name="code" placeholder="{{ __('No Surat') }}" value="{{ $record->code }}" readonly>
@@ -19,7 +19,7 @@
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col-4">
-                    <label class="col-form-label">{{ __('Tgl Surat') }}</label>
+                    <label class="col-form-label">{{ __('Tgl Surat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-8 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"
@@ -31,7 +31,7 @@
         <div class="col-sm-12">
             <div class="form-group row">
                 <div class="col-2">
-                    <label class="col-form-label">{{ __('Unit Kerja') }}</label>
+                    <label class="col-form-label">{{ __('Unit Kerja') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     {{-- @if($departemen->location->level == 'departement' || $departemen->location->level == 'bod' || $departemen->location->name == 'Sub Bagian Program Perencanaan') --}}

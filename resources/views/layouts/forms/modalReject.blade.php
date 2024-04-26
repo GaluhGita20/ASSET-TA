@@ -112,6 +112,60 @@
 </div>
 
 
+<div class="modal fade modal-loading" id="modalApprove2"
+	data-keyboard="false"
+	data-backdrop="static"
+	aria-hidden="true">
+	<div class="modal-dialog modal-md modal-dialog-centered">
+		<div class="modal-content">
+			
+			<form action="{{ rut($routes.'.approve', $record->id) }}" method="POST" autocomplete="off">
+				@csrf
+				{{-- {{ dd($record) }} --}}
+				@method('POST')
+				
+
+				<div class="modal-body text-left">
+					<div class="form-group">
+						<label>{{ __('Sumber Pendanaan') }}</label>
+						<div class="parent-group">
+							<select name="source_fund_id" class="form-control base-plugin--select2-ajax"
+								data-url="{{ rut('ajax.selectSSBiaya', [
+									'search'=>'all'
+								]) }}" autofocus style="border: 1px solid #007bff;" data-placeholder="{{ __('Pilih Salah Satu Sumber Pendanaan') }}">
+								<option value="" selected>{{ __('Pilih Salah Satu Sumber Pendanaan') }}</option>
+								@if ($record->source_fund_id != null)
+									<option value="{{ $record->source_fund_id }}" selected>{{ $record->danad->name }}</option>
+								@endif
+							</select>
+							{{-- @if($record->sp2d_code == null)
+								<input type="text" name="sp2d_code" class="form-control" placeholder="{{ __('Sumber Pendanaan') }}">
+							@else
+								<input type="text" name="sp2d_code" class="form-control" value="{{$record->sp2d_code}}" placeholder="{{ __('Kode SP2D') }}">
+							@endif --}}
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary base-form--submit-modal"
+						data-swal-confirm="true"
+						data-swal-text="{{ __('base.confirm.save.text') }}"
+						{{-- data-swal-ok="{{ __('base.confirm.reject.ok') }}" --}}
+						>
+						<i class="fa fa-check mr-1"></i>
+						{{ __('Approve') }}
+					</button>
+				</div>
+			</form>
+			<div class="modal-loader pt-6" style="display: none;">
+				<span class="spinner spinner-primary"></span>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 
 
 

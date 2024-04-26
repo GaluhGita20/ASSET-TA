@@ -48,7 +48,7 @@ class LaporanHibahAsetController extends Controller
     {
         $user = auth()->user();
 
-        $records = PembelianTransaksi::grid()->where('source_acq','<>','pembelian')->where('status','completed')->filters()->dtGet();
+        $records = PembelianTransaksi::where('status','completed')->where('source_acq','<>','pembelian')->filters()->dtGet();
         
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {

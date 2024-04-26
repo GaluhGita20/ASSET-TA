@@ -127,16 +127,27 @@ class VendorController extends Controller
                     if ($record->checkAction('show', $this->perms)) {
                         $actions[] = 'type:show|id:' . $record->id;
                     }
-                    if ($record->checkAction('edit', $this->perms)) {
-                        $actions[] = 'type:edit|id:' . $record->id;
-                    }
-                    if ($record->checkAction('delete', $this->perms)) {
+                    if (auth()->user()->hasRole('PPK') || auth()->user()->hasRole('Sarpras')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'id' => $record->id,
+                        ];
                         $actions[] = [
                             'type' => 'delete',
                             'id' => $record->id,
-                            'attrs' => 'data-confirm-text="' . __('Hapus Parameter Vendor') . ' ' . $record->name . '?"',
+                            'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                         ];
                     }
+                    // if ($record->checkAction('edit', $this->perms)) {
+                    //     $actions[] = 'type:edit|id:' . $record->id;
+                    // }
+                    // if ($record->checkAction('delete', $this->perms)) {
+                    //     $actions[] = [
+                    //         'type' => 'delete',
+                    //         'id' => $record->id,
+                    //         'attrs' => 'data-confirm-text="' . __('Hapus Parameter Vendor') . ' ' . $record->name . '?"',
+                    //     ];
+                    // }
                     return $this->makeButtonDropdown($actions);
                 }
             )

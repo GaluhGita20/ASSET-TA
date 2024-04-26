@@ -111,15 +111,26 @@ class PengadaanController extends Controller
             ->addColumn('action',function ($record) use ($user) {
                     $actions = [
                         'type:show|id:' . $record->id,
-                        'type:edit|id:' . $record->id,
+                        // 'type:edit|id:' . $record->id,
                     ];
-                    if ($record->canDeleted()) {
+                    if (auth()->user()->hasRole('PPK') || auth()->user()->hasRole('Sub Bagian Program Perencanaan')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'id' => $record->id,
+                        ];
                         $actions[] = [
                             'type' => 'delete',
                             'id' => $record->id,
-                            'attrs' => 'data-confirm-text="' . __('Hapus') . ' ' . $record->name . '?"',
+                            'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                         ];
                     }
+                    // if ($record->canDeleted()) {
+                    //     $actions[] = [
+                    //         'type' => 'delete',
+                    //         'id' => $record->id,
+                    //         'attrs' => 'data-confirm-text="' . __('Hapus') . ' ' . $record->name . '?"',
+                    //     ];
+                    // }
                     return $this->makeButtonDropdown($actions);
                 }
             )

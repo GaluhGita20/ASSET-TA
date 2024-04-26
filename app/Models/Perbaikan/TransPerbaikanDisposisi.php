@@ -10,6 +10,7 @@ use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use App\Models\Master\Vendor\Vendor;
 use App\Models\Model;
+use App\Models\Master\Dana\Dana;
 use App\Models\Pengajuan\Perbaikan;
 use App\Models\Perbaikan\PerbaikanDisposisiDetail;
 use App\Models\Master\Aset\AsetRs;
@@ -41,6 +42,7 @@ class TransPerbaikanDisposisi extends Model
         'tax_cost',
         'total_cost',
         'sp2d_code',
+        'source_fund_id',
         'sp2d_date',
         'sper_status',
         'status',
@@ -82,6 +84,17 @@ class TransPerbaikanDisposisi extends Model
         return $this->hasMany(UsulanSperpat::class, 'trans_perbaikan_id');
     }
 
+    public function danad()
+    {
+        return $this->belongsTo(Dana::class, 'source_fund_id');
+    }
+
+
+    // public function danad()
+    // {
+    //     return $this->hasMany(UsulanSperpat::class, 'trans_perbaikan_id');
+    // }
+
     /*******************************
      ** SCOPE
      *******************************/
@@ -89,7 +102,21 @@ class TransPerbaikanDisposisi extends Model
     public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(empty(array_intersect(['Sarpras','Keuangan'], $user->roles->pluck('name')->toArray())),
+        // return $query->when(empty(array_intersect(['Sarpras','BPKAD'], $user->roles->pluck('name')->toArray()))
+        // )->when(auth()->user()->roles->pluck('id')->contains(4), function ($query) {
+        //     $query->orWhereHas('approvals', function ($q) {
+        //         $q->where('order', 1)->whereIn('status', ['new','rejected']);
+        //     });
+        // })
+        // ->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+        //     $query->whereHas('approvals', function ($subQuery) {
+        //         $subQuery->where('module','trans-sperpat')->where('order', 1)->where('status', 'approved');
+        //     })
+        //     ->whereHas('approvals', function ($subQuery) {
+        //         $subQuery->where('module','trans-sperpat')->where('order', 2)->where('status', 'new');
+        //     });
+        // });
+        return $query->when(empty(array_intersect(['Sarpras','Keuangan','BPKAD'], $user->roles->pluck('name')->toArray())),
             function ($q) use ($user) { 
                 $q->WhereHas('approvals', function ($q) use ($user) {
                     $q->when($user->id, function ($qq) use ($user) {
@@ -102,6 +129,8 @@ class TransPerbaikanDisposisi extends Model
             }
         )
         ->latest();
+
+
         // return $query->when(empty(array_intersect(['Direksi','Keuangan','Sarpras'], $user->roles->pluck('name')->toArray())),
         //     function ($q) use ($user) { 
         //         $q->WhereHas('approvals', function ($q) use ($user) {
@@ -507,6 +536,16 @@ class TransPerbaikanDisposisi extends Model
                 } else {
                     $this->approveApproval($request->module);
                     if ($this->firstNewApproval($request->module)) {
+                        if($request->source_fund_id == null){
+                            return $this->rollback(
+                                [
+                                    'message' => 'Sumber Pendanaan Wajib Diisi !'
+                                ]
+                            );
+                        }else{
+                            $this->update(['source_fund_id' => $request->source_fund_id]);
+                        }
+
                         $this->update(['sper_status' => 'waiting.approval']);
                         $this->saveLogNotify();
                     } else {

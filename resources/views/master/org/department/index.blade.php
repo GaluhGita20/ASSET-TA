@@ -15,8 +15,7 @@
 @endsection
 
 @section('buttons')
-@if (auth()->user()->checkPerms($perms.'.create'))
-{{-- @include('layouts.forms.btnAddImport') --}}
-@include('layouts.forms.btnAdd')
+@if (auth()->user()->hasRole('Administrator'))
+	@include('layouts.forms.btnAdd')
 @endif
 @endsection

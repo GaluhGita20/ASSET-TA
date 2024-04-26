@@ -28,6 +28,7 @@
                                     <label class="col-form-label">{{ __('Nama Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
+                                    {{-- <input type="text" class="form-control" name="nama_aset" placeholder="{{ __('Nama Aset') }}" value="Jalan Paving Block" readonly> --}}
                                     <input type="text" class="form-control" name="nama_aset" placeholder="{{ __('Nama Aset') }}" value="{{ $record->usulans->asetd->name }}" readonly>
                                 </div>
                             </div>
@@ -147,7 +148,7 @@
                                     <label class="col-form-label">{{ __('Status Tanah') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input type="text" class="form-control" value="{{ $record->land_status }}"   placeholder="{{ __('Status Tanah') }}" name="land_status" readonly>
+                                    <input type="text" class="form-control" value="{{ $record->statusTanah->name }}"   placeholder="{{ __('Status Tanah') }}" name="land_status" readonly>
                                 </div>
                             </div>
                         </div>
@@ -290,7 +291,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->trans->unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->acq_value }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -308,7 +309,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->usulans->HPS_unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $record->acq_value }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah

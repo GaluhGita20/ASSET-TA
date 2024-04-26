@@ -58,9 +58,11 @@ class Location extends Model
 
     public function scopeGrid($query)
     {
-        //return $query->latest();
-        return $query->orderBy('space_code','DESC');
+        return $query->with(['orgLocation' => function($q){
+            $q->orderBy('code', 'DESC');
+        }])->orderBy('departemen_id');
     }
+
 
     /** SAVE DATA **/
     public function handleStoreOrUpdate($request)

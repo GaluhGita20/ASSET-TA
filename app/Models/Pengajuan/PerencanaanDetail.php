@@ -31,7 +31,7 @@ class PerencanaanDetail extends Model
         'HPS_unit_cost',
         'HPS_total_cost',
         'HPS_total_agree',
-        'sumber_biaya_id',
+        'source_fund_id',
         'reject_notes',
     ];
 
@@ -87,7 +87,7 @@ class PerencanaanDetail extends Model
 
     public function danad()
     {
-        return $this->belongsTo(Dana::class, 'sumber_biaya_id');
+        return $this->belongsTo(Dana::class, 'source_fund_id');
     }
     public function users()
     {

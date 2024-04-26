@@ -257,21 +257,21 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="row">
-                        @if(empty($record->repair_date))
-                            <div class="alert alert-custom alert-light-primary fade show py-4" role="alert">
-                                <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
-                                <div class="alert-text text-primary">
-                                    <div class="text-bold">{{ __('Catatan') }}:</div>
-                                    <div class="mb-10px" style="white-space: pre-wrap;">Sebelum Melakukan Verfikikasi , Pastikan Tanggal Pemanggilan Diisi</div>
-                                </div>
-                                <div class="alert-close">
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
-                                    </button>
-                                </div>
+                    @if(empty($record->repair_date))
+                        <div class="alert alert-custom alert-light-primary fade show py-5" role="alert">
+                            <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+                            <div class="alert-text text-primary">
+                                <div class="text-bold">{{ __('Catatan') }}:</div>
+                                <div class="mb-10px" style="white-space: pre-wrap;">Sebelum Melakukan Verfikikasi , Pastikan Tanggal Pemanggilan Diisi</div>
                             </div>
-                        @endif
+                            <div class="alert-close">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+                    <div class="row">
 
                         <div class="col-sm-12 mt-3">
                             <div class="form-group row mt-2">
@@ -310,7 +310,7 @@
                                     <div class="col-sm-10 col-form-label">
                                         @if(!empty($record->is_disposis))
                                             <select name="is_disposisi" class="form-control">
-                                                <option value="" selected>Pengajuan Disposisi</option>
+                                                <option value="" selected>Pilih Salah Satu Status Disposisi</option>
                                                 <option value="Yes" {{ $record->is_disposisi == "Yes" ? 'selected':'' }}>{{ __('YES') }}</option>
                                                 <option value="No" {{ $record->is_disposisi == "No" ? 'selected':'' }}>{{ __('NO') }}</option>
                                             </select>
@@ -321,6 +321,11 @@
                                                 <option value="No">{{__('NO') }}</option>
                                             </select>
                                         @endif
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-12 offset-md-2 col-md-9">
+                                        <span style="font-size: 11px">{{ __('* Perbaikan Jika Memerlukan Pembelian Sperpat Atau Bantuan Sewa Vendor Maka Pilih Status Diposisi "YES"') }}</span>
                                     </div>
                                 </div>
                             </div>

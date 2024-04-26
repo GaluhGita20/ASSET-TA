@@ -185,6 +185,7 @@ class PengadaanAsetController extends Controller
     public function index()
     {
         // $data = null;
+        
         $this->prepare([
             'tableStruct' => [
                 'url' => route($this->routes . ".grid"),

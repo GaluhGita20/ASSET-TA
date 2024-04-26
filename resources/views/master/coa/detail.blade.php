@@ -12,15 +12,15 @@
     @endif
     
 	<div class="form-group row">
-        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Kode Akun') }}</label>
+        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Kode Akun') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
-            <input type="number" name="kode_akun" class="form-control" placeholder="{{ __('Kode Akun') }}"
-        {{$page_action == "show" ? "readonly" : ""}} {{$page_action == "edit" ? "readonly" : ""}}
+            <input type="text" name="kode_akun" class="form-control" placeholder="{{ __('Kode Akun') }}"
+        {{$page_action == "show" ? "readonly" : ""}} 
                 value="{{$page_action != "create" ? $record->kode_akun : ""}}">
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Nama Akun') }}</label>
+        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Nama Akun') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
             <input type="text" name="nama_akun" class="form-control" placeholder="{{ __('Nama Akun') }}"
         {{$page_action == "show" ? "readonly" : ""}}
@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Tipe Akun Utama') }}</label>
+        <label class="col-sm-12 col-md-4 col-form-label">{{ __('Tipe Akun Utama') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
         <select class="form-control base-plugin--select2-ajax" name="tipe_akun" data-placeholder="Tipe Akun Utama"
         disabled>
@@ -47,12 +47,12 @@
         @endif
         </div>
     </div>
-    <div class="form-group row">
+    {{-- <div class="form-group row">
         <label class="col-sm-12 col-md-4 col-form-label">{{ __('Deskripsi') }}</label>
         <div class="col-sm-12 col-md-8 parent-group">
             <textarea type="text" name="deskripsi" class="form-control" placeholder="{{ __('Deskripsi') }}" {{$page_action == "show" ? "disabled" : ""}}  rows="3">{{ $record->deskripsi ?? "" }}</textarea>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @if (!in_array($page_action, ["edit", "create"]))

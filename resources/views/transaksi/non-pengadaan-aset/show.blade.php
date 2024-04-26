@@ -163,7 +163,7 @@
                 @if (request()->route()->getName() == $routes.'.approval')
                 <div class="card-footer">
                     <div class="d-flex justify-content-between">
-                        @if ($record->checkAction('approval', $perms) || auth()->user()->position->level == "kepala" &&  auth()->user()->position->location->level == "department" )
+                        @if ($record->checkAction('approval', $perms) || auth()->user()->position->location->level == "department" )
                             @include('layouts.forms.btnBack')
                             @include('layouts.forms.btnDropdownApproval')
                             @include('layouts.forms.modalReject')

@@ -41,7 +41,7 @@
             <input class="form-control filter-control base-plugin--datepicker" data-post="submission_date" placeholder="{{ __('Tanggal Pengajuan') }}">
         </div> --}}
     </div>
-    <div class="alert alert-custom alert-light-primary fade show py-4" style="left:-30pt; margin-right:118px;" role="alert">
+    <div class="alert alert-custom alert-light-primary fade show py-4"  role="alert">
         <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
         <div class="alert-text text-primary">
             <div class="text-bold">{{ __('Informasi') }}:</div>

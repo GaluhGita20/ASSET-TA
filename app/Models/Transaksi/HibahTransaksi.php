@@ -24,7 +24,7 @@ use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
-class PembelianTransaksi extends Model
+class HibahTransaksi extends Model
 {
     use HasFiles, HasApprovals;
     protected $table = 'trans_aset';
@@ -75,7 +75,7 @@ class PembelianTransaksi extends Model
      {
         $user = auth()->user();
        // dd($user->roles()->pluck('name'));
-        return $query->when(empty(array_intersect(['PPK','Keuangan'], $user->roles->pluck('name')->toArray())),
+        return $query->when(empty(array_intersect(['PPK','Keuangan','BPKAD'], $user->roles->pluck('name')->toArray())),
             function ($q) use ($user) { 
                 $q->WhereHas('approvals', function ($q) use ($user) {
                     $q->when($user->id, function ($qq) use ($user) {

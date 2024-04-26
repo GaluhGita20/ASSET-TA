@@ -5,9 +5,15 @@ namespace App\Http\Controllers\Laporan\Inventaris;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\Aset\AsetRequest;
 use App\Models\Globals\Menu;
+use App\Models\Globals\Activity;
 // use App\Models\Master\Aset\Aset;
 use App\Models\inventaris\Aset;
 use App\Support\Base;
+use App\Models\Pemeliharaan\Pemeliharaan;
+use App\Models\Pemeliharaan\PemeliharaanDetail;
+use App\Models\Pengajuan\Perbaikan;
+use App\Models\Pengajuan\Pemutihans;
+use App\Models\Pengajuan\Penghapusan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 //use Yajra\DataTables\Facades\DataTables;
@@ -332,8 +338,8 @@ class KIBEController extends Controller
         // // }
 
         $perbaikan1 = Activity::where('module','perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%membuat%')->get();
-        $perbaikan2 = Activity::where('module','pj-perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
-        $pemeliharaan = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->get();
+        $perbaikan2 = Activity::where('module','perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+        $pemeliharaan = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->where('message', 'LIKE', '%menyetujui%')->get();
         
         $penghapusan = Penghapusan::where('kib_id',$record->id)->where('status','completed')->pluck('id')->toArray();
         
@@ -367,10 +373,15 @@ class KIBEController extends Controller
             )
             ->addColumn(
                 'tindakan',
-                function ($sortedRecords) use ($penghapusan2,$pemutihan2) {
+                function ($sortedRecords) use ($penghapusan2,$pemutihan2,$perbaikan2) {
                     // dd($penghapusan2->first()->id);
                     if($sortedRecords->module == 'perbaikan-aset'){
-                        return $sortedRecords->module ? '<span class="badge bg-warning text-white"> Mengajukan Perbaikan </span>': '-';
+                        if($sortedRecords->message != $perbaikan2->first()->message){
+                            return '<span class="badge bg-warning text-white"> Mengajukan Perbaikan Aset</span>';
+                        }else{
+                            return '<span class="badge bg-warning text-white"> Melakukan Perbaikan Aset</span>';
+                        }
+                        // return $sortedRecords->module ? '<span class="badge bg-warning text-white"> Mengajukan Perbaikan </span>': '-';
                     }elseif($sortedRecords->module == 'pemeliharaan-aset'){
                         return $sortedRecords->module ? '<span class="badge bg-primary text-white"> Melakukan Pemeliharaan </span>': '-';
                     }elseif ($sortedRecords->module=='penghapusan-aset') {
@@ -385,8 +396,6 @@ class KIBEController extends Controller
                         }else{
                             return '<span class="badge bg-danger text-white"> Melakukan Pemutihan Aset</span>';
                         }
-                    }elseif ($sortedRecords->module =='pj-perbaikan-aset') {
-                        return '<span class="badge bg-warning text-white"> Melakukan Perbaikan Aset</span>';
                     }
                     else{
                         return $sortedRecords->module ? '<span class="badge bg-success text-white"> Melakukan '.$sortedRecords->module.'</span>' : '-';
@@ -395,14 +404,20 @@ class KIBEController extends Controller
             )
             ->addColumn(
                 'keterangan',
-                function ($sortedRecords) use ($record) {
+                function ($sortedRecords) use ($record,$perbaikan2) {
                     if($sortedRecords->module == 'perbaikan-aset'){
-                        $pesan = Perbaikan::find($sortedRecords->target_id)->problem;
-                        return $pesan ? $pesan : '-';
-                    }elseif ($sortedRecords->module == 'pj-perbaikan-aset') {
-                        $pesan = Perbaikan::find($sortedRecords->target_id)->action_repair;
-                        $hasil = Perbaikan::find($sortedRecords->target_id)->repair_results;
-                        return $pesan ? ucfirst(strtolower($pesan)).' dengan hasil perbaikan '.strtolower($hasil) : '-';
+                        if($sortedRecords->message == $perbaikan2->first()->message){
+                            $pesan1 = Perbaikan::find($sortedRecords->target_id)->action_repair;
+                            $pesan2 = Perbaikan::find($sortedRecords->target_id)->repair_results;
+                            return $pesan1 ? $pesan1.' dengan hasil '.ucfirst(strtolower($pesan2)) : '-';
+                            // return '<span class="badge bg-warning text-white"> Mengajukan Perbaikan Aset</span>';
+                        }else{
+                            // return '<span class="badge bg-warning text-white"> Melakukan Perbaikan Aset</span>';
+                            $pesan = Perbaikan::find($sortedRecords->target_id)->problem;
+                            return $pesan ? $pesan : '-';
+                        }
+                    // }
+                    //     return $pesan ? ucfirst(strtolower($pesan)).' dengan hasil perbaikan '.strtolower($hasil) : '-';
                     }elseif ($sortedRecords->module == 'pemeliharaan-aset'){
                         $pesan = PemeliharaanDetail::where('pemeliharaan_id',$sortedRecords->target_id)->where('kib_id',$record->id)->value('maintenance_action');
                         return $pesan ? $pesan : '-';
@@ -446,7 +461,7 @@ class KIBEController extends Controller
         })->pluck('id')->toArray();
 
         $total_per = Activity::where('module','perbaikan-aset')->whereIn('target_id',$perbaikan)->where('message', 'LIKE', '%membuat%')->count();     
-        $total_pem = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->count();
+        $total_pem = Activity::where('module','pemeliharaan-aset')->whereIn('target_id',$pemeliharaan)->where('message', 'LIKE', '%menyetujui%')->count();
 
         return $this->render('pelaporan.detail-aset.index',compact(['record','total_per','total_pem']));
     }

@@ -54,6 +54,23 @@
 
                         <div class="col-sm-12">
                             <div class="form-group row">
+                                {{-- <div class="col-2"> --}}
+                                    <label class="col-sm-2 col-form-label">{{ __('Sumber Pendanaan') }}</label>
+                                {{-- </div> --}}
+                                <div class="col-sm-10 col-form-label">
+                                    <select name="source_fund_id" id="source_fund_id" class="form-control base-plugin--select2-ajax">
+                                        @if ($record->source_fund_id)
+                                            <option value="{{ $record->source_fund_id }}" selected>
+                                                {{ $record->danad->name }}
+                                            </option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">{{ __('Vendor') }}</label>
                                 <div class="col-sm-10 col-form-label">
                                     <select name="vendor_id" class="form-control base-plugin--select2-ajax vendor_id"
@@ -74,6 +91,25 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if($record->repair_type == 'vendor')
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Sewa Vendor') }}</label>
+                                    <div class="col-sm-10 col-form-label">
+                                        <div class="input-group">
+                                            <input type="text" min=0 id="total_cost" name="total_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                                placeholder="{{ __('Biaya Sewa Vendor') }}"  value="{{$record->total_cost}}" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" >
+                                                    Rupiah
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -104,11 +140,19 @@
                 @if (request()->route()->getName() == $routes.'.approval')
                 <div class="card-footer">
                     <div class="d-flex justify-content-between">
-                        @if (auth()->user()->hasRole('Sub Bagian Program Perencanaan') || auth()->user()->hasRole('Direksi'))
+                        @include('layouts.forms.btnBack')
+                        @if(auth()->user()->hasRole('Sub Bagian Program Perencanaan'))
+                            @include('layouts.forms.btnTrxAset2')
+                        @else
+                        {{-- @include('layouts.forms.btnTrxAset2') --}}
+                            @include('layouts.forms.btnDropdownApproval')
+                        @endif
+                        @include('layouts.forms.modalReject')
+                        {{-- @if (auth()->user()->hasRole('Sub Bagian Program Perencanaan') || auth()->user()->hasRole('Direksi'))
                             @include('layouts.forms.btnBack')
                             @include('layouts.forms.btnDropdownApproval')
                             @include('layouts.forms.modalReject')
-                        @endif
+                        @endif --}}
                     </div>
                 </div>
                 @endif

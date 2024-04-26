@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Master\Coa;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Master\Coa\CoaTanahRequest;
+use App\Http\Requests\Master\Coa\CoaRequest;
 use App\Models\Globals\Menu;
 use App\Models\Master\Coa\COA;
 use App\Support\Base;
@@ -80,16 +80,27 @@ class CoaPeralatanController extends Controller
                 if ($record->checkAction('show', $this->perms)) {
                     $actions[] = 'type:show|id:' . $record->id;
                 }
-                if ($record->checkAction('edit', $this->perms)) {
-                    $actions[] = 'type:edit|id:' . $record->id;
-                }
-                if ($record->checkAction('delete', $this->perms) && ($record->nama_akun != "Bank" && $record->nama_akun != "Ump")) {
+                if (auth()->user()->hasRole('BPKAD')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,
-                        'attrs' => 'data-confirm-text="' . __('Hapus Parameter Chart of Accounts (COA) ') .$record->kode_akun . '?"',
+                        'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                     ];
                 }
+                // if ($record->checkAction('edit', $this->perms)) {
+                //     $actions[] = 'type:edit|id:' . $record->id;
+                // }
+                // if ($record->checkAction('delete', $this->perms) && ($record->nama_akun != "Bank" && $record->nama_akun != "Ump")) {
+                //     $actions[] = [
+                //         'type' => 'delete',
+                //         'id' => $record->id,
+                //         'attrs' => 'data-confirm-text="' . __('Hapus Parameter Chart of Accounts (COA) ') .$record->kode_akun . '?"',
+                //     ];
+                // }
                 // if ($record->checkAction('show', $this->perms)) {
                 //     $actions[] = 'type:show|id:' . $record->id;
                 // }
@@ -148,7 +159,7 @@ class CoaPeralatanController extends Controller
 
     public function edit(COA $record)
     {
-        $page_action = "show";
+        $page_action = "edit";
         $tipe_akun = "KIB B";
         return $this->render($this->views.'.detail', compact("record","page_action","tipe_akun"));
     }

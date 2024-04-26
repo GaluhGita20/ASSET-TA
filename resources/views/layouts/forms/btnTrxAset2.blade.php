@@ -15,7 +15,7 @@
 		</button> --}}
         <button type="button" class="dropdown-item"
 			data-toggle="modal"
-			data-target="#modalApprove">
+			data-target="#modalApprove2">
 			<i class="mr-3 fa fa-check text-primary"></i> {{ __('Approve') }}
 		</button>
 

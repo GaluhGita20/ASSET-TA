@@ -231,7 +231,7 @@ class PemeliharaanAsetController extends Controller
             ->addColumn(
                 'lokasi',
                 function ($detail) {
-                    return $detail->asetd->locations ? $detail->asetd->locations->name : '-';
+                    return $detail->asetd->locations ? $detail->asetd->locations->name : $detail->asetd->non_room_location;
                 }
             )
             ->addColumn(
@@ -259,7 +259,13 @@ class PemeliharaanAsetController extends Controller
             ->addColumn(
                 'action',
                 function ($detail) use ($user, $record) {
-                    if($detail->pemeliharaan->status == 'draft' || $detail->pemeliharaan->status == 'rejected'){
+                    // dd($detail->pemeliharaan->status);
+                    $actions = [];
+                    $actions[] = [
+                        'type' => 'show',
+                        'url' => route($this->routes . '.detailShow', $detail->id),
+                    ];
+                    if($detail->pemeliharaan->status === 'draft' || $detail->pemeliharaan->status == 'rejected'){
                         $actions[] = [
                             'type' => 'edit',
                             'label' => 'Perbarui Pemeliharaan',
@@ -272,11 +278,9 @@ class PemeliharaanAsetController extends Controller
                             'url' => route($this->routes . '.detailDestroy', $detail->id),
                         ];
                     }
-                    $actions = [];
-                    $actions[] = [
-                        'type' => 'show',
-                        'url' => route($this->routes . '.detailShow', $detail->id),
-                    ];
+                    
+    
+                    
                     return $this->makeButtonDropdown($actions, $detail->id);
                 }
             )

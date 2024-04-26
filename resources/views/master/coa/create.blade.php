@@ -6,7 +6,7 @@
 	<div class="form-group row">
         <label class="col-sm-12 col-md-4 col-form-label">{{ __('Kode Akun') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
-            <input type="number" name="kode_akun" class="form-control" placeholder="{{ __('Kode Akun') }}">
+            <input type="text" name="kode_akun" class="form-control" placeholder="{{ __('Kode Akun') }}">
         </div>
     </div>
     <div class="form-group row">
@@ -29,12 +29,12 @@
         </select>
         </div>
     </div>
-    <div class="form-group row">
+    {{-- <div class="form-group row">
         <label class="col-sm-12 col-md-4 col-form-label">{{ __('Deskripsi') }}<span style=" color: red;margin-left: 5px;">*</span></label>
         <div class="col-sm-12 col-md-8 parent-group">
             <textarea type="text" name="deskripsi" class="form-control" placeholder="{{ __('Deskripsi') }}" rows="3"></textarea>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @push('scripts')

@@ -126,8 +126,17 @@
                     <div class="d-flex justify-content-between">
                         @if ($record->checkAction('approval', $perms))
                             @include('layouts.forms.btnBack')
-                            @include('layouts.forms.btnDropdownApproval')
+                            {{-- btnTrxAset --}}
+                            @if(auth()->user()->hasRole('Sub Bagian Program Perencanaan'))
+                                @include('layouts.forms.btnTrxAset')
+                            @else
+                                @include('layouts.forms.btnDropdownApproval')
+                            @endif
                             @include('layouts.forms.modalReject')
+
+                            {{-- @include('layouts.forms.btnBack')
+                            @include('layouts.forms.btnDropdownApproval')
+                            @include('layouts.forms.modalReject') --}}
                         @endif
                     </div>
                 </div>

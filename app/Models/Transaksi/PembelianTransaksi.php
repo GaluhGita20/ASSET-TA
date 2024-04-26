@@ -170,19 +170,40 @@ class PembelianTransaksi extends Model
 
         $user = auth()->user();
        // dd($user->roles()->pluck('name'));
-        return $query->when(empty(array_intersect(['PPK','Keuangan'], $user->roles->pluck('name')->toArray())),
-            function ($q) use ($user) { 
-                $q->WhereHas('approvals', function ($q) use ($user) {
-                    $q->when($user->id, function ($qq) use ($user) {
-                        $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
-                    },function ($qq) use ($user) {
-                        $qq->orWhereIn('role_id', $user->getRoleIds())
-                        ->orWhere('position_id', $user->position->id);
-                    });
-                });
-            }
-        )
-        ->latest();
+        return $query->when(empty(array_intersect(['PPK','BPKAD'], $user->roles->pluck('name')->toArray()))
+        )->when(auth()->user()->roles->pluck('id')->contains(4), function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+                $q->where('order', 1)->whereIn('status', ['new','rejected']);
+            });
+        })
+        ->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+            $query->whereHas('approvals', function ($subQuery) {
+                $subQuery->where('order', 1)->where('status', 'approved');
+            })
+            ->whereHas('approvals', function ($subQuery) {
+                $subQuery->where('order', 2)->where('status', 'new');
+            });
+        });
+
+        // ->latest();
+
+        //=====================
+        // return $query->when(!in_array($user->position->location->id, [13,55,19]), 
+        // function ($q) use ($user) { 
+        //     return $q->when($user->position->imKepalaDeparetemen(), 
+        //         function ($qq) use ($user) {
+        //             return $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+        //         },
+        //         function ($qq) use ($user) {
+        //             return $qq->where('struct_id', $user->position->location->id); 
+        //         }
+        //     );
+        // })->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+        //     $query->orWhereHas('approvals', function ($q) {
+        //     $q->where('order', 2)->where('status', 'approved');
+        //     });
+        // });
+        //=====================
     }
 
     public function scopeFilters($query)
@@ -464,6 +485,7 @@ class PembelianTransaksi extends Model
             }
 
             if ($request->is_submit == 1) {
+                // dd($request->all);
                 $this->handleSubmitSave($request);
             }else{
                 $module='transaksi_waiting-purchase';
@@ -471,7 +493,7 @@ class PembelianTransaksi extends Model
                 $this->logs()->whereModule($module)->latest()->update(['module'=>'transaksi_pengadaan-aset']);
             }
             
-            
+        
             $redirect = route('transaksi.pengadaan-aset' . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -485,7 +507,6 @@ class PembelianTransaksi extends Model
         try {
             // dd('tes');
             $this->update(['status' => 'waiting.approval']);
-
             $this->generateApproval($request->module);
             $this->saveLogNotify();
             $redirect = route(request()->get('routes') . '.index');
@@ -580,6 +601,61 @@ class PembelianTransaksi extends Model
             return $this->commitDeleted();
         } catch (\Exception $e) {
             return $this->rollbackDeleted($e);
+        }
+    }
+
+    public function handleApproveHibah($request)
+    {
+        $this->beginTransaction();
+        try {
+            //dd($request);
+            
+                if ($this->status === 'waiting.approval.revisi') {
+                    $this->approveApproval($request->module . '_upgrade');
+                    if ($this->firstNewApproval($request->module . '_upgrade')) {
+                        $this->update(['status' => 'waiting.approval.revisi']);
+                        $this->saveLogNotify();
+                    } else {
+                        $this->update(
+                            [
+                                'status' => 'draft',
+                                'version' => $this->version + 1,
+                            ]
+                        );
+                        $this->saveLogNotify();
+                    }
+                } else {
+                    $this->approveApproval($request->module);
+                    if ($this->firstNewApproval($request->module)) {
+                        $this->update(['status' => 'waiting.approval']);
+                        $this->saveLogNotify();
+                    } else {
+                        PerencanaanDetail::where('trans_id',$this->id)->update(['status' => 'waiting register']);
+                        $this->update(['status' => 'completed']);
+                        $this->saveLogNotify();
+                       // $this->_generateReport('completed');
+                    }
+                }
+
+                // $user = auth()->user();
+                // $flag =  $this->whereHas('approvals',function($q){
+                //     $q->where('target_id',$this->id)->where('role_id',2)->where('status','approved');
+                // })->count();
+                
+                // if($flag == 1){
+                //     $data = $this->perencanaanPengadaan('detail_usulan_id');
+                //     $detailUsulan = $this->perencanaanPengadaan()->where('pembelian_id', $this->id)->get()->pluck('pivot.detail_usulan_id')->toArray();
+                //     PerencanaanDetail::whereIn('id',$detailUsulan)->update(['status' => 'waiting register']);
+                // }
+    
+                $redirect = route(request()->get('routes') . '.index');
+                return $this->commitSaved(compact('redirect'));
+
+        } catch (\Exception $e) {
+            $customMessage = 'This is a custom error message';
+            return $this->rollback($customMessage);
+          //  return $this->rollbackSaved($e);
+            
         }
     }
 

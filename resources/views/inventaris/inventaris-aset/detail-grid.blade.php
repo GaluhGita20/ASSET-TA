@@ -1,12 +1,14 @@
 
 <table id="dataFilters" class="width-full">
-    <div class="alert alert-custom alert-light-primary fade show py-4" role="alert">
-        <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
-        <div class="alert-text text-primary">
-            <div class="text-bold">{{ __('Informasi') }}:</div>
-            <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Checklist 1 Aset Untuk Diinventarisasikan Sesusai Jenis Aset</div>
+    @if(auth()->user()->hasRole('Sarpras') && auth()->user()->position->location_id == 8)
+        <div class="alert alert-custom alert-light-primary fade show py-4" role="alert">
+            <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+            <div class="alert-text text-primary">
+                <div class="text-bold">{{ __('Informasi') }}:</div>
+                <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Checklist 1 Aset Untuk Diinventarisasikan Sesusai Jenis Aset</div>
+            </div>
         </div>
-    </div>
+    @endif
     <tbody>
         <tr>
             <td class="pb-2 valign-top td-filter-reset width-80px">
@@ -42,7 +44,7 @@
 
             </td>
 
-        @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create') || auth()->user()->hasRole('Sarpras') )
+        @if (auth()->user()->checkPerms('registrasi.inventaris-aset.create') && auth()->user()->hasRole('Sarpras') && auth()->user()->position->location_id == 8)
             <div style="display: flex; justify-content: flex-end; margin-right: 2px;">
                 <input type="hidden" id="customValue" name="customValue" value="">
 

@@ -68,7 +68,7 @@ class PjPerbaikanAsetController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Perbaikan::grid()->where('status', 'Approved') // Atur urutan tambahan jika diperlukan
+        $records = Perbaikan::grid()->where('status', 'Approved')->where('check_up_result','<>',null) // Atur urutan tambahan jika diperlukan
         ->filters()
         ->dtGet();
 
@@ -173,7 +173,7 @@ class PjPerbaikanAsetController extends Controller
                 if(auth()->user()->hasRole('Sarpras') && $record->status =='approved' && ($record->repair_results == 'BELUM') && auth()->user()->checkPerms('perbaikan-aset.edit')){
                     $actions[] = [
                         'type' => 'edit',
-                        'label' => 'Update Repair',
+                        'label' => 'Perbarui Hasil Perbaikan',
                         'icon' => 'fa fa-wrench text-success',
                         'page' => true,
                         'id' => $record->id,

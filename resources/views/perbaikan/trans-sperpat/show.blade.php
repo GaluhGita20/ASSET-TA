@@ -54,6 +54,23 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">{{ __('Sumber Pendanaan') }}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <select name="source_fund_id" class="form-control base-plugin--select2-ajax"
+                                        data-url="{{ rut('ajax.selectSSBiaya', [
+                                            'search'=>'all'
+                                        ]) }}" autofocus style="border: 1px solid #007bff;" data-placeholder="{{ __('Pilih Salah Satu Sumber Pendanaan') }}" disabled>
+                                        <option value="" selected>{{ __('Pilih Salah Satu Sumber Pendanaan') }}</option>
+                                        @if ($record->source_fund_id != null)
+                                            <option value="{{ $record->source_fund_id }}" selected>{{ $record->danad->name }}</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Vendor') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     <select name="vendor_id" id="vendor_id" class="form-control base-plugin--select2-ajax vendor_id"

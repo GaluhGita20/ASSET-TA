@@ -11,7 +11,7 @@ class LevelPositionRequest extends FormRequest
         $id = $this->record->id ?? 0;
         
         $rules = [
-            'name' => 'required|string|unique:ref_level_positions,name,'.$id,
+            'name' => 'required|string|unique:ref_positions,name,'.$id.',id,level',
             'description' => 'nullable|string',
         ];
 

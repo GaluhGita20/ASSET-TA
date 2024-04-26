@@ -9,7 +9,8 @@
 @endsection
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
+	{{-- @if (auth()->user()->checkPerms($perms.'.create')) --}}
+	@if(auth()->user()->hasRole('Sarpras') || auth()->user()->hasRole('PPK'))
 		@include('layouts.forms.btnAdd')
 	@endif
 @endsection

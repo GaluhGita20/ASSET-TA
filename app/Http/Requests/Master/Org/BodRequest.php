@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Master\Org;
 
 use App\Http\Requests\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BodRequest extends FormRequest
 {
@@ -18,17 +19,19 @@ class BodRequest extends FormRequest
             ],
         // 'code_manual'  => 'required|unique:ref_org_structs,code_manual,'.$id.',id',
         
-            'name'      => [
+            'name' => [
                 'required',
                 'max:255',
-                'unique:ref_org_structs,name,'.$id.',id,level,bod'
+                Rule::unique('ref_org_structs')->where(function ($query) use ($id) {
+                    return $query->where('parent_id', $this->parent_id)
+                    ->where('id', '!=', $id);
+                }),
             ],
         ];
                 // 'code' =>[
                 //     'required',
                 //     'unique:ref_org_structs,code,'.$id.',id,level,bod'
                 // ]
-      
         return $rules;
     }
 
@@ -37,7 +40,7 @@ class BodRequest extends FormRequest
         return [
             'different' => 'zxc',
             'parent_id.required' => 'Nama Induk Perusahaan Harus Diisi',
-            'name.unique' => 'Nama Departemen Ini Sudah Dgunakan',
+            'parent_id.unique' => 'Nama Departemen Ini Sudah Tersedia',
             'name.required' => 'Nama Departemen Diperlukan',
         ];
     }

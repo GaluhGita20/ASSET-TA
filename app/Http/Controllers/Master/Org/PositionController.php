@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master\Org;
 use App\Exports\GenerateExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\Org\PositionRequest;
+use App\Http\Requests\Master\Org\PositionUpdateRequest;
 use App\Models\Master\Org\Position;
 use Illuminate\Http\Request;
 // use App\Support\Base;
@@ -40,8 +41,9 @@ class PositionController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:num'),
                     $this->makeColumn('name:name|label:Nama|className:text-left'),
-                    $this->makeColumn('name:location|label:Struktur|className:text-center'),
                     $this->makeColumn('name:level|label:Level|className:text-center'),
+                    $this->makeColumn('name:location|label:Struktur|className:text-center'),
+                    $this->makeColumn('name:instansi|label:Instansi|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -71,16 +73,35 @@ class PositionController extends Controller
             ->addColumn('level', function ($record) {
                 return $record->level ?? '';
             })
+            ->addColumn('instansi', function ($record) {
+                if($record->code >=1001 && $record->code <=2000){
+                    return "RSUD Kabupaten Lombok Utara";
+                }else{
+                    return "BPKAD Kabupaten Lombok Utara";
+                }
+                // return $record->code ?? '';
+            })
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [
                     'type:show|id:' . $record->id,
-                    'type:edit|id:' . $record->id,
+                    // 'type:edit|id:' . $record->id,
                 ];
-                if ($record->canDeleted()) {
+                // if ($record->canDeleted()) {
+                //     $actions[] = [
+                //         'type' => 'delete',
+                //         'id' => $record->id,
+                //         'attrs' => 'data-confirm-text="' . __('Hapus') . ' ' . $record->name . '?"',
+                //     ];
+                // }
+                if ($record->canDeleted() || auth()->user()->hasRole('Administrator')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,
-                        'attrs' => 'data-confirm-text="' . __('Hapus') . ' ' . $record->name . '?"',
+                        'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                     ];
                 }
                 return $this->makeButtonDropdown($actions);

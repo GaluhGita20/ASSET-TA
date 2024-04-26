@@ -320,9 +320,9 @@ class PerencanaanAsetController extends Controller
             ->addColumn(
                 'status',
                 function ($detail) use ($record) {
-                    if($detail->reject_notes == null && $detail->sumber_biaya_id == null){
+                    if($detail->reject_notes == null && $detail->source_fund_id == null){
                         return '<span class="badge bg-primary text-white">'.'Waiting Approval'.'</span>';
-                    }elseif(($detail->sumber_biaya_id == null && $detail->reject_notes != null) || ($detail->sumber_biaya_id != null && $detail->reject_notes == null) ){
+                    }elseif(($detail->source_fund_id == null && $detail->reject_notes != null) || ($detail->source_fund_id != null && $detail->reject_notes == null) ){
                         return '<span class="badge bg-success text-white">'.'completed'.'</span>';
                     }else{
                         return '<span class="badge bg-success text-white">'.'completed'.'</span>';

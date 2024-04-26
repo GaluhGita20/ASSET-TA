@@ -84,23 +84,27 @@ class Perencanaan extends Model
     public function scopeGrid($query)
     {
         $user = auth()->user();
-        return $query->when(!in_array($user->position->location->id, [13]), 
+        return $query->when(!in_array($user->position->location->id, [13,55,19]), 
         function ($q) use ($user) { 
-        return $q->when($user->position->imKepalaDeparetemen(), 
-            function ($qq) use ($user) {
-                return $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
-            },
-            function ($qq) use ($user) {
-                return $qq->where('struct_id', $user->position->location->id); 
-            }
-        );
-    })->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
-        $query->orWhereHas('approvals', function ($q) {
-            $q
-                ->where('order', 2)
-                ->where('status', 'approved');
+            return $q->when($user->position->imKepalaDeparetemen(), 
+                function ($qq) use ($user) {
+                    return $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+                },
+                function ($qq) use ($user) {
+                    return $qq->where('struct_id', $user->position->location->id); 
+                }
+            );
+        })->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+            $q->where('order', 2)->where('status', 'approved');
+            });
         });
-    });
+        
+        // ->when(auth()->user()->roles->pluck('id')->contains(3), function ($query) {
+        //     $query->orWhereHas('approvals', function ($q) {
+        //     $q->where('order', 1)->where('status', 'approved');
+        //     });
+        // });
         // return $query->latest();
     }
     // public function scopeGrid($query)
@@ -421,7 +425,7 @@ class Perencanaan extends Model
 
             
             if($request->is_submit == 1){
-                if($value6 > 0 && $value6 != $value5 && $request->sumber_biaya_id == null){
+                if($value6 > 0 && $value6 != $value5 && $request->source_fund_id == null){
                     return $this->rollback(
                         [
                             'message' => 'Silahkan isi Sumber Pembiayaan !'
@@ -429,7 +433,7 @@ class Perencanaan extends Model
                     );
                 }
     
-                if($value6 == $value5 && $request->sumber_biaya_id == null){
+                if($value6 == $value5 && $request->source_fund_id == null){
                     return $this->rollback(
                         [
                             'message' => 'Silahkan isi Sumber Pembiayaan !'
@@ -451,7 +455,7 @@ class Perencanaan extends Model
                     }
 
                     if($value6 == 0){
-                        $detail->sumber_biaya_id = null;
+                        $detail->source_fund_id = null;
                     }
 
                     $this->details()->save($detail);
@@ -462,7 +466,7 @@ class Perencanaan extends Model
                 }
             }else{
                 $detail->reject_notes = null;
-                $detail->sumber_biaya_id = null;
+                $detail->source_fund_id = null;
                 $this->details()->save($detail);
                 $this->save();
                 $this->saveLogNotify();

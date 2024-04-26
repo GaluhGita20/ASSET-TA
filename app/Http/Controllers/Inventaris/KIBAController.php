@@ -49,8 +49,10 @@ class KIBAController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left|width:400px'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
+
                     // $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-center|width:300px'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
                     $this->makeColumn('name:luas_tanah|label:Luas (m2)|className:text-center'),
                     $this->makeColumn('name:provinsi|label:Provinsi|className:text-center'),
                     $this->makeColumn('name:kota|label:Kota|className:text-center'),
@@ -110,6 +112,11 @@ class KIBAController extends Controller
                 // return $record->no_register ? str_pad($record->no_register, $panjang_target, '0', STR_PAD_LEFT) : '-';
                 }
             )->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? $record->book_date : '-';
+            })
+            ->addColumn(
                 'luas_tanah',
                 function ($record) {
                     return $record->wide ? number_format($record->wide, 0, ',', ',') : '-';
@@ -152,7 +159,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'hak_tanah',
                 function ($record) {
-                    return $record->land_rights ? ucwords($record->land_rights) : '-';
+                    return $record->hakTanah->name ? $record->hakTanah->name : '-';
                 }
             )->addColumn(
                 'kegunaan_tanah',

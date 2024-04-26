@@ -83,7 +83,8 @@ class COA extends Model
      *******************************/
     public function scopeGrid($query)
     {
-        return $query->orderBy('id');
+        // return $query->orderBy('id');
+        return $query->orderBy('kode_akun','DESC');
     }
 
     public function scopeFilters($query)
@@ -103,6 +104,20 @@ class COA extends Model
             $data = $request->all();
             // $data['module'] = $request->module;
             $this->fill($data);
+            if($request->module == 'master_coa_tanah'){
+                $this->tipe_akun = 'KIB A';
+            }elseif($request->module == 'master_coa_peralatan'){
+                $this->tipe_akun = 'KIB B';
+            }elseif($request->module == 'master_coa_bangunan'){
+                $this->tipe_akun = 'KIB C';
+            }elseif($request->module == 'master_coa_jalan_irigasi'){
+                $this->tipe_akun = 'KIB D';
+            }elseif($request->module == 'master_coa_aset_lainya'){
+                $this->tipe_akun = 'KIB E';
+            }elseif($request->module == 'master_coa_kontruksi_pembangunan'){
+                $this->tipe_akun = 'KIB F';
+            }
+            
             $this->save();
             $this->saveLogNotify();
 

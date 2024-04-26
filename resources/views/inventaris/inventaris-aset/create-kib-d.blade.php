@@ -42,7 +42,7 @@
                                     <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="spesifikasi" value="{{ $usulan->desc_spesification }}">{{ $usulan->desc_spesification }}"</textarea>
+                                    <textarea class="form-control" name="spesifikasi" value="{{ $usulan->desc_spesification }}">{{ $usulan->desc_spesification }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -136,8 +136,16 @@
                                     <label class="col-form-label">{{ __('Status Tanah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input type="text" class="form-control"  placeholder="{{ __('Status Tanah') }}" name="land_status">
+                                    <select name="land_status" class="form-control base-plugin--select2-ajax"
+                                        data-url="{{ rut('ajax.selectStatusTanah', [
+                                            'search'=>'all'
+                                        ]) }}"  data-placeholder="{{ __('Pilih Salah Satu Status Tanah') }}">
+                                        <option value="" selected>{{ __('Pilih Salah Satu Status Tanah') }}</option>
+                                    </select>
                                 </div>
+                                {{-- <div class="col-8 parent-group">
+                                    <input type="text" class="form-control"  placeholder="{{ __('Status Tanah') }}" name="land_status">
+                                </div> --}}
                             </div>
                         </div>
 
@@ -238,7 +246,7 @@
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source" id="source" class="form-control base-plugin--select2-ajax">
-                                        @if ($usulan->sumber_biaya_id)
+                                        @if ($usulan->source_fund_id)
                                             <option value="{{ $usulan->danad->name }}" selected>
                                                 {{ $usulan->danad->name }}
                                             </option>
@@ -310,7 +318,7 @@
                             <div class="form-group row">
                 
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Lokasi Hibah Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Unit Lokasi Hibah Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="departemen_id" id="departemen_id_h" class="form-control base-plugin--select2-ajax departemen_id"

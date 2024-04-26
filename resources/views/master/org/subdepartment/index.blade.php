@@ -16,7 +16,7 @@
 @endsection
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
+	@if (auth()->user()->hasRole('Administrator'))
 		@include('layouts.forms.btnAdd')
 	@endif
 @endsection

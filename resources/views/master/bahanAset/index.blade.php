@@ -8,7 +8,8 @@
 @endsection
 
 @section('buttons')
-	@if (auth()->user()->checkPerms($perms.'.create'))
+	
+    @if (auth()->user()->hasRole('Sarpras'))
         <a href="{{ $urlAdd ?? (\Route::has($routes.'.create') ? route($routes.'.create') : 'javascript:;') }}"
             class="btn btn-info base-modal--render"
             data-modal-size="{{ $modalSize ?? 'modal-lg' }}"
@@ -16,5 +17,6 @@
             data-modal-v-middle="false">
             <i class="fa fa-plus"></i> Data
         </a>
-	@endif
+    @endif
+	
 @endsection

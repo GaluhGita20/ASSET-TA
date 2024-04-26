@@ -9,6 +9,7 @@ use App\Models\Globals\MenuFlow;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\Org\Position;
 use App\Models\Model;
+use App\Models\Globals\Activity;
 use App\Models\Perbaikan\TransPerbaikanDisposisi;
 use App\Models\Traits\ResponseTrait;
 use App\Models\Master\Aset\AsetRs;
@@ -244,6 +245,9 @@ class Perbaikan extends Model
 
             if($request->repair_results != null){
                 // dd('tes');
+                
+
+
                 $this->addLog('Update Hasil Perbaikan Aset'.$this->code);
                 $this->addNotify([
                     'message' => 'Melakukan Update Hasil Perbaikan Aset ',$this->code,
@@ -253,7 +257,16 @@ class Perbaikan extends Model
 
                 $pesan = ($user.' Melakukan Update Hasil Perbaikan Aset ' . $this->code);
                 $this->sendNotification($pesan);
+
+                $data = Activity::where('module', 'pj-perbaikan-aset')
+                    ->where('target_id', $this->id)
+                    ->first();
+
+                if ($data) {
+                    $data->update(['module' => 'perbaikan-aset']);
+                }
             }
+
 
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));

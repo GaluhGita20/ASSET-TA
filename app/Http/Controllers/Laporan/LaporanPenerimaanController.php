@@ -44,7 +44,7 @@ class LaporanPenerimaanController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = PembelianTransaksi::where('status','completed')->filters()->dtGet();
+        $records = PembelianTransaksi::where('source_acq','pembelian')->filters()->dtGet();
         
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {

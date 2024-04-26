@@ -413,22 +413,24 @@ class Pemutihans extends Model
                         $this->update(['status' => 'waiting.approval']);
                         $this->saveLogNotify();
                     } else {
-                        $this->update(['status' => 'completed']);
                         $coa = Aset::where('id',$this->kib_id)->value('coa_id');
-                        $merek = Aset::where('coa_id', $coa)->pluck('merek_type_item')->first(); 
-
+                        $merek = Aset::where('coa_id', $coa)->where('id',$this->kib_id)->where('status','in cleaned')->pluck('merek_type_item')->first();
+                        $no_frame = Aset::where('coa_id', $coa)->where('id',$this->kib_id)->where('status','in cleaned')->pluck('no_frame')->first(); 
+                        $no_factory_item = Aset::where('coa_id', $coa)->where('id',$this->kib_id)->where('status','in cleaned')->pluck('no_factory_item')->first();
+                        $no_machine_item = Aset::where('coa_id', $coa)->where('id',$this->kib_id)->where('status','in cleaned')->pluck('no_machine_item')->first();   
+                        
                         Aset::where('coa_id', $coa)
-                                ->where('merek_type_item', $merek)
-                                ->where('condition', 'rusak berat')
-                                ->where('status', 'notactive')
-                                ->where('no_frame',$this->no_frame)
-                                ->where('no_factory_item', $this->no_factory_item)
-                                ->where('no_machine_item',$this->no_machine_item)
-                                ->limit($this->qty)
-                                ->update(['condition'=>'rusak berat','status'=>'clean']);
-                        // Aset::where('coa_id',$coa)->where('merek_type_item',$merek)->where('condition','rusak berat')->where('status','notactive')->limit($this->qty)->update(['status'=>'notactive']);
-                        // Aset::where('id',$this->kib_id)->update(['condition'=>'rusak berat']);
-                        // Aset::where('id',$this->kib_id)->update(['status'=>'clean']);
+                        ->where('merek_type_item', $merek)
+                        ->where('condition', 'rusak berat')
+                        ->where('status', 'in cleaned')
+                        ->where('no_frame',$no_frame)
+                        ->where('no_factory_item', $no_factory_item)
+                        ->where('no_machine_item',$no_machine_item)
+                        ->limit($this->qty)
+                        ->update(['condition'=>'rusak berat','status'=>'clean']);
+
+                        // dd('tes');
+                        $this->update(['status' => 'completed']);
                         $this->saveLogNotify();
                     }
                 }

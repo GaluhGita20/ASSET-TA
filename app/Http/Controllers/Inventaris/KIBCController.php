@@ -49,6 +49,7 @@ class KIBCController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
                     $this->makeColumn('name:luas_lantai|label:Luas Lantai (m2)|className:text-center'),
@@ -56,7 +57,7 @@ class KIBCController extends Controller
                     $this->makeColumn('name:alamat|label:Alamat|className:text-center'),
                     $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
-                    $this->makeColumn('name:status_tanah|label:Hak Tanah|className:text-center'),
+                    $this->makeColumn('name:status_tanah|label:Status Tanah|className:text-center'),
                     $this->makeColumn('name:nomor_dokumen|label:Nomor Sertifikat|className:text-center'),
                     $this->makeColumn('name:tgl_dokumen|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:tanah_id|label:Kode Tanah|className:text-center'),
@@ -108,6 +109,10 @@ class KIBCController extends Controller
                 return $record->no_register ? str_pad($record->no_register, 3, '0', STR_PAD_LEFT) : '-';
                 }
             )->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? $record->book_date : '-';
+            })->addColumn(
                 'bertingkat',
                 function ($record) {
                     return $record->is_graded_bld ? $record->is_graded_bld : '-';
@@ -140,7 +145,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'status_tanah',
                 function ($record) {
-                    return $record->land_status ? ucwords($record->land_status) : '-';
+                    return $record->statusTanah->name ? $record->statusTanah->name : '-';
                 }
             )->addColumn(
                 'nomor_dokumen',

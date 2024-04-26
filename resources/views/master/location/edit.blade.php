@@ -33,8 +33,8 @@
 		<label class="col-3 col-form-label">{{ __('Struktur') }}<span style=" color: red;margin-left: 5px;">*</span></label>
 		<div class="col-9 parent-group">
 			<select name="departemen_id" class="form-control base-plugin--select2-ajax departemen_id"
-				data-url="{{ route('ajax.selectStruct', ['all']) }}"
-                data-url-origin="{{ route('ajax.selectStruct', ['all']) }}"
+				data-url="{{ route('ajax.selectStruct', ['alls']) }}"
+                data-url-origin="{{ route('ajax.selectStruct', ['alls']) }}"
 				data-placeholder="{{ __('Pilih Struktur Organisasi') }}"
 				@if($record->departemen_id == NULL) disabled @endif>
 				<option value="">{{ __('Pilih Struktur Organisasi') }}</option>

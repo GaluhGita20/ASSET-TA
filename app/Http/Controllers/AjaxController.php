@@ -326,12 +326,6 @@ class AjaxController extends Controller
             $q->whereMonth('maintenance_date', $time->month);
         })->pluck('id')->toArray(); 
 
-        //$arr = array_diff($allOrg, $org);
-
-        //$items = $items->whereIn('id', $arr)->get();
-        //dd($arr);
-        //dd($departmentsToDisplay);
-
         $items = $items->when(
             $not = $org,
             function ($q) use ($not) {
@@ -372,8 +366,209 @@ class AjaxController extends Controller
         }
         
         return response()->json(compact('results', 'more'));
+    }
 
 
+
+    //=========================================
+
+    public function selectDepsRSUD(){
+        $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
+        $items = $items->whereIn('level', ['bod', 'department', 'subdepartment', 'subsection']);
+        $items = $items->when(
+            $not = null,
+            function ($q) use ($not) {
+                $q->where('id', '!=', $not);
+            }
+        )->get();
+        
+        $filteredItems = [];
+        foreach ($items as $item) {
+            $childId = $item->id;
+            
+            while ($childId !== null) {
+                $parentItem = OrgStruct::where('id', $childId)->first();  // Mengambil data berdasarkan ID
+                
+                if ($parentItem && $parentItem->parent_id == 1) {
+                    $filteredItems[] = $item;  // Menambahkan item ke dalam array hasil
+                    break;
+                }
+        
+                $childId = $parentItem ? $parentItem->parent_id : null;
+            }
+        }
+
+        $results = [];
+        $more = false;
+        // Mengubah array $filteredItems menjadi koleksi Eloquent
+        $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
+        $i = 0;
+        
+        $filteredItemsCollection = collect($filteredItems);
+
+        foreach ($levels as $level) {
+            $filteredItemsForLevel = $filteredItemsCollection->where('level', $level);
+
+            if ($filteredItemsForLevel->count() > 0) {
+                foreach ($filteredItemsForLevel as $item) {
+                    $results[$i]['text'] = strtoupper($item->show_level);
+                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                }
+                $i++;
+            }
+        }
+        
+        return response()->json(compact('results', 'more'));
+    }
+
+
+
+
+    //++++++++++++++++++++++++++++
+
+
+    public function selectDepsBPKAD(){
+        $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
+        $items = $items->whereIn('level', ['bod', 'department', 'subdepartment', 'subsection']);
+        $items = $items->when(
+            $not = null,
+            function ($q) use ($not) {
+                $q->where('id', '!=', $not);
+            }
+        )->get();
+        
+        $filteredItems = [];
+        foreach ($items as $item) {
+            $childId = $item->id;
+            
+            while ($childId !== null) {
+                $parentItem = OrgStruct::where('id', $childId)->first();  // Mengambil data berdasarkan ID
+                
+                if ($parentItem && $parentItem->parent_id == 18) {
+                    $filteredItems[] = $item;  // Menambahkan item ke dalam array hasil
+                    break;
+                }
+        
+                $childId = $parentItem ? $parentItem->parent_id : null;
+            }
+        }
+
+        $results = [];
+        $more = false;
+        // Mengubah array $filteredItems menjadi koleksi Eloquent
+        $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
+        $i = 0;
+        
+        $filteredItemsCollection = collect($filteredItems);
+
+        foreach ($levels as $level) {
+            $filteredItemsForLevel = $filteredItemsCollection->where('level', $level);
+
+            if ($filteredItemsForLevel->count() > 0) {
+                foreach ($filteredItemsForLevel as $item) {
+                    $results[$i]['text'] = strtoupper($item->show_level);
+                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                }
+                $i++;
+            }
+        }
+        
+        return response()->json(compact('results', 'more'));
+    }
+
+    //===========================================================================
+
+    public function selectDeps($search, Request $request){
+        $req = $request->input('root_id');
+
+        $data = OrgStruct::where('id',$req)->where('name','RSUD Kabupaten Lombok Utara')->first();
+
+        if($req ==1 ){
+            $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
+            $items = $items->whereIn('level', ['bod', 'department', 'subdepartment', 'subsection']);
+            $items = $items->when(
+                $not = $request->not,
+                function ($q) use ($not) {
+                    $q->where('id', '!=', $not);
+                }
+            )->get();
+            
+            $filteredItems = [];
+            foreach ($items as $item) {
+                $childId = $item->id;
+                
+                while ($childId !== null) {
+                    $parentItem = OrgStruct::where('id', $childId)->first();  // Mengambil data berdasarkan ID
+                    
+                    if ($parentItem && $parentItem->parent_id == $req) {
+                        $filteredItems[] = $item;  // Menambahkan item ke dalam array hasil
+                        break;
+                    }
+            
+                    $childId = $parentItem ? $parentItem->parent_id : null;
+                }
+            }
+            
+        }elseif($req==18){
+            // dd('tes');
+            $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
+            $items = $items->whereIn('level', ['bod', 'department', 'subdepartment', 'subsection']);
+            $items = $items->when(
+                $not = $request->not,
+                function ($q) use ($not) {
+                    $q->where('id', '!=', $not);
+                }
+            )->get();
+            
+            $filteredItems = [];
+            foreach ($items as $item) {
+                $childId = $item->id;
+                
+                while ($childId !== null) {
+                    $parentItem = OrgStruct::where('id', $childId)->first();  // Mengambil data berdasarkan ID
+                    
+                    if ($parentItem && $parentItem->parent_id == $req) {
+                        $filteredItems[] = $item;  // Menambahkan item ke dalam array hasil
+                        break;
+                    }
+            
+                    $childId = $parentItem ? $parentItem->parent_id : null;
+                }
+            }
+            // $data =[2001,3000];
+            // $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
+            // $items = $items->whereIn('level', ['bod', 'department', 'subdepartment', 'subsection'])->whereHas('positions', function ($q) use ($data){
+            //     $q->whereBetween('code', $data);
+            // });
+        }
+
+        // $items = $items->when(
+        //     $not = $request->not,
+        //     function ($q) use ($not) {
+        //         $q->where('id', '!=', $not);
+        //     }
+        // )->get();
+        $results = [];
+        $more = false;
+        // Mengubah array $filteredItems menjadi koleksi Eloquent
+        $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
+        $i = 0;
+        
+        $filteredItemsCollection = collect($filteredItems);
+
+        foreach ($levels as $level) {
+            $filteredItemsForLevel = $filteredItemsCollection->where('level', $level);
+
+            if ($filteredItemsForLevel->count() > 0) {
+                foreach ($filteredItemsForLevel as $item) {
+                    $results[$i]['text'] = strtoupper($item->show_level);
+                    $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                }
+                $i++;
+            }
+        }
+        
+        return response()->json(compact('results', 'more'));
     }
 
     public function selectStruct($search, Request $request)
@@ -388,8 +583,11 @@ class AjaxController extends Controller
             case 'all':
                 $items = $items;
                 break;
+            case 'alls':
+                $items = $items->whereIn('level', ['bod','department', 'subdepartment', 'subsection']);
+                break;
             case 'object_aset':
-                $items = $items->whereIn('level', ['department', 'subdepartment', 'subsection']);
+                $items = $items->whereIn('level', ['department', 'subdepartment', 'subsection'])->where('parent_id','<>',19);
                 break;
             case 'parent_bod':
                 $items = $items->whereIn('level', ['root']);
@@ -402,6 +600,12 @@ class AjaxController extends Controller
                 break;
             case 'parent_subsection':
                 $items = $items->whereIn('level', ['subdepartment']);
+                break;
+            case 'by_root':
+                $req = $request->input('root_id');
+                $items = $items->whereHas('positions', function ($q) use ($req){
+                    $q->where('id',$req);
+                });
                 break;
             case 'by_level':
                 $req = $request->input('level_id');

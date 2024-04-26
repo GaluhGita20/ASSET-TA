@@ -54,7 +54,7 @@ class CoaTanahController extends Controller
             ->addColumn(
                 'kode_akun',
                 function ($record) {
-                   return $record->kode_akun;
+                    return $record->kode_akun;
                 }
             )
             ->addColumn(
@@ -80,16 +80,27 @@ class CoaTanahController extends Controller
                 if ($record->checkAction('show', $this->perms)) {
                     $actions[] = 'type:show|id:' . $record->id;
                 }
-                if ($record->checkAction('edit', $this->perms)) {
-                    $actions[] = 'type:edit|id:' . $record->id;
-                }
-                if ($record->checkAction('delete', $this->perms) && ($record->nama_akun != "Bank" && $record->nama_akun != "Ump")) {
+                if (auth()->user()->hasRole('BPKAD')) {
+                    $actions[] = [
+                        'type' => 'edit',
+                        'id' => $record->id,
+                    ];
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,
-                        'attrs' => 'data-confirm-text="' . __('Hapus Parameter Chart of Accounts (COA) ') .$record->kode_akun . '?"',
+                        'attrs' => 'data-confirm-text="'.__('Hapus').' '.$record->name.'?"',
                     ];
                 }
+                // if ($record->checkAction('edit', $this->perms)) {
+                //     $actions[] = 'type:edit|id:' . $record->id;
+                // }
+                // if ($record->checkAction('delete', $this->perms) && ($record->nama_akun != "Bank" && $record->nama_akun != "Ump")) {
+                //     $actions[] = [
+                //         'type' => 'delete',
+                //         'id' => $record->id,
+                //         'attrs' => 'data-confirm-text="' . __('Hapus Parameter Chart of Accounts (COA) ') .$record->kode_akun . '?"',
+                //     ];
+                // }
                 // if ($record->checkAction('show', $this->perms)) {
                 //     $actions[] = 'type:show|id:' . $record->id;
                 // }

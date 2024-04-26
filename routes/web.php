@@ -286,6 +286,9 @@ Route::middleware('auth')->group(function () {
                 Route::get('child-struct-options', 'AjaxController@childStructOptions')->name('child-struct-options');
                 Route::post('{search}/selectPosition', 'AjaxController@selectPosition')->name('selectPosition');
                 Route::post('{search}/selectUser', 'AjaxController@selectUser')->name('selectUser');
+                Route::post('{search}/selectDeps', 'AjaxController@selectDeps')->name('selectDeps');
+                Route::post('selectDepsRSUD', 'AjaxController@selectDepsRSUD')->name('selectDepsRSUD');
+                Route::post('selectDepsBPKAD', 'AjaxController@selectDepsBPKAD')->name('selectDepsBPKAD');
                 Route::post('{search}/selectCity', 'AjaxController@selectCity')->name('selectCity');
                 Route::post('{search}/selectDistrict', 'AjaxController@selectDistrict')->name('selectDistrict');
                 Route::post('{search}/selectProvince', 'AjaxController@selectProvince')->name('selectProvince');
@@ -690,3 +693,10 @@ Route::get(
 
 //aset yang ditaruh di tempat halaman parkir
 // data double Kepala Seksi Sarana dan Prasarana Logistik belum ada
+
+// jabatan kepala badan
+// jabatan filter direksi muncul dua kali di data master jabatan
+
+
+//sumber pendanaan usulan sperpat aset
+

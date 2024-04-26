@@ -9,6 +9,9 @@ use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Pengajuan\Penghapusan;
 use App\Models\Transaksi\PembelianTransaksi;
 use App\Models\Master\Org\OrgStruct;
+use App\Models\Master\BahanAset\BahanAset;
+use App\Models\Master\StatusTanah\StatusTanah;
+use App\Models\Master\HakTanah\HakTanah;
 use App\Models\Master\Location\Location;
 use App\Models\Auth\User;
 use App\Models\Master\Geografis\City;
@@ -74,6 +77,7 @@ class Aset extends Model
     'acq_value',
     'dates_depreciation',
     'tanah_id',
+    'non_room_location',
     'location_hibah_aset',
     'book_date',
     ];
@@ -87,6 +91,21 @@ class Aset extends Model
     public function coad()
     {
         return $this->belongsTo(Coa::class, 'coa_id'); // Sesuaikan dengan kunci asing yang sesuai
+    }
+
+    public function materials()
+    {
+        return $this->belongsTo(BahanAset::class, 'material'); // Sesuaikan dengan kunci asing yang sesuai
+    }
+
+    public function hakTanah()
+    {
+        return $this->belongsTo(HakTanah::class, 'land_rights'); // Sesuaikan dengan kunci asing yang sesuai
+    }
+
+    public function statusTanah()
+    {
+        return $this->belongsTo(StatusTanah::class, 'land_status'); // Sesuaikan dengan kunci asing yang sesuai
     }
 
     public function asetData()
@@ -284,6 +303,16 @@ class Aset extends Model
             return $this->rollback(__('Jumlah Tidak Boleh Kosong'));
         }
 
+        if($request->non_room_location == null && $request->room_location == null){
+            return $this->rollback(__('Lokasi Aset Wajib Diisi (Didalam Ruangan Atau Diluar Ruangan)'));
+        }
+
+        if($request->non_room_location != null && $request->room_location != null){
+            return $this->rollback(__('Pilih Salah Satu Lokasi Aset (Didalam Ruangan Atau Diluar Ruangan)'));
+        }
+
+
+
         $value6 = str_replace(['.', ','],'',$request->residual_value);
         $residu = (int)$value6;
 
@@ -334,6 +363,7 @@ class Aset extends Model
                     $aset->residual_value= $value6;
                     $aset->status = 'actives';
                     $aset->save();
+                    $aset->saveLogNotify();
                     // tanggal akhir masa manfaat
                     // $tanggalDuaTahunKemudian = date('Y-m-d', strtotime($tanggalSaatIni . ' +2 years'));
                 }
@@ -356,6 +386,7 @@ class Aset extends Model
             $this->book_value = $cost;
             $this->status = 'actives';
             $this->save();
+            $this->saveLogNotify();
         }
 
         if($flagInv == 0){
@@ -364,7 +395,7 @@ class Aset extends Model
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         }else{
-            $this->saveLogNotify();
+            // $this->saveLogNotify();
             $d= new Aset;
             $usulan = $request->usulan_id;
             $data = ['usulan_id' => $usulan, 'customValue'=>'B'];
@@ -376,15 +407,29 @@ class Aset extends Model
     public function handleStoreOrUpdateKibE($request){
 
         //    dd($request->all());
-           $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
-           $flagInv = $jumlah_item - $request->qty;
-           $data = $request->all();
-           if($request->qty > $jumlah_item ){
-                return $this->rollback(__('Jumlah Tidak Sesuai'));
-           }
-           if($request->qty == 0){
+            $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
+            $flagInv = $jumlah_item - $request->qty;
+            $data = $request->all();
+            if($request->qty == null){
+                $qtys = 1;
+            }elseif($request->qty == 0){
                 return $this->rollback(__('Jumlah Tidak Boleh Kosong'));
-           }
+            }else{
+                $qtys = $request->qty;
+            }
+
+            if($qtys > $jumlah_item ){
+                return $this->rollback(__('Jumlah Tidak Sesuai'));
+            }
+
+        if($request->non_room_location == null && $request->room_location == null){
+            return $this->rollback(__('Lokasi Aset Wajib Diisi (Didalam Ruangan Atau Diluar Ruangan)'));
+            }
+
+            if($request->non_room_location != null && $request->room_location != null){
+                return $this->rollback(__('Pilih Salah Satu Lokasi Aset (Didalam Ruangan Atau Diluar Ruangan)'));
+            }
+
             $value6 = str_replace(['.', ','],'',$request->residual_value);
             $residu = (int)$value6;
     
@@ -392,7 +437,7 @@ class Aset extends Model
             $cost = (int)$value7;
     
     
-            if($request->qty > 1){
+            if($qtys > 1){
                 if($request->no_factory_item !=null || $request->no_police_item !=null || $request->no_BPKB_item !=null || $request->no_machine_item != null || $request->no_frame != null){
                     if($request->no_factory_item !=null){
                         $flags = 'No Pabrik';
@@ -437,7 +482,7 @@ class Aset extends Model
                         $aset->residual_value= $value6;
                         $aset->status = 'actives';
                         $aset->save();
-                        // $aset->saveLogNotify();
+                        $aset->saveLogNotify();
                         // tanggal akhir masa manfaat
                         // $tanggalDuaTahunKemudian = date('Y-m-d', strtotime($tanggalSaatIni . ' +2 years'));
                     }
@@ -463,6 +508,7 @@ class Aset extends Model
                 $this->book_value = $cost;
                 $this->status = 'actives';
                 $this->save();
+                $this->saveLogNotify();
             }
     
             if($flagInv == 0){
@@ -470,7 +516,7 @@ class Aset extends Model
                 $redirect = route(request()->get('routes') . '.index');
                 return $this->commitSaved(compact('redirect'));
             }else{
-                $this->saveLogNotify();
+                //$this->saveLogNotify();
                 $d= new Aset;
                 $usulan = $request->usulan_id;
                 $data = ['usulan_id' => $usulan, 'customValue'=>'E'];
@@ -510,12 +556,13 @@ class Aset extends Model
         $this->status = 'actives';
         $this->save();
         $this->saveLogNotify();
+
         if($flagInv == 0){
             PerencanaanDetail::where('id',$request->usulan_id)->update(['status'=>'completed']);
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         }else{
-            $this->saveLogNotify();
+            //$this->saveLogNotify();
             $d= new Aset;
             $usulan = $request->usulan_id;
             $data = ['usulan_id' => $usulan, 'customValue'=>'A'];
@@ -576,7 +623,7 @@ class Aset extends Model
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         }else{
-            $this->saveLogNotify();
+           // $this->saveLogNotify();
             $d= new Aset;
             $usulan = $request->usulan_id;
             $data = ['usulan_id' => $usulan, 'customValue'=> $request->cst_val];
@@ -633,7 +680,7 @@ class Aset extends Model
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
         }else{
-            $this->saveLogNotify();
+           // $this->saveLogNotify();
             $d= new Aset;
             $usulan = $request->usulan_id;
             $data = ['usulan_id' => $usulan, 'customValue'=>'KIB D'];

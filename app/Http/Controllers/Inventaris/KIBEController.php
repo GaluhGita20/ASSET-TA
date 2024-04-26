@@ -49,6 +49,7 @@ class KIBEController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
                     // $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-center|width:300px'),
@@ -120,6 +121,10 @@ class KIBEController extends Controller
                 return $record->no_register ? str_pad($record->no_register, 3, '0', STR_PAD_LEFT) : '-';
                 }
             )->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? $record->book_date : '-';
+            })->addColumn(
                 'judul',
                 function ($record) {
                     return $record->title ? ucwords($record->title) : '-';
@@ -137,7 +142,7 @@ class KIBEController extends Controller
             )->addColumn(
                 'bahan',
                 function ($record) {
-                    return $record->material ? ucwords($record->material) : '-';
+                    return $record->materials->name ? $record->materials->name : '-';
                 }
             )->addColumn(
                 'jenis',
@@ -240,7 +245,7 @@ class KIBEController extends Controller
             )->addColumn(
                 'location',
                 function ($record) {
-                    return $record->locations ? $record->locations->name : '-';
+                    return $record->locations ? $record->locations->name : $record->non_room_location;
                 }
             )
             ->addColumn(
