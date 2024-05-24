@@ -75,6 +75,10 @@ class TransPerbaikanDisposisiController extends Controller
                 return $record->spk_start_date ? Carbon::parse($record->spk_start_date)->format('Y/m/d'):'-';
             })
 
+            ->addColumn('procurement_year', function ($record) {
+                return $record->procurement_year;
+            })
+
             ->addColumn('spk_end_date', function ($record) {
                 return $record->spk_start_date ? Carbon::parse($record->spk_start_date)->format('Y/m/d'):'-';
             })
@@ -88,7 +92,13 @@ class TransPerbaikanDisposisiController extends Controller
             })
 
             ->addColumn('status', function ($record) use ($user) {
-                return $record->labelStatus($record->status ?? 'new');
+                if($record->status == 'completed'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($record->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $record->labelStatus($record->status ?? 'new');
+                }
             })
 
             ->addColumn('updated_by', function ($record) {
@@ -134,14 +144,14 @@ class TransPerbaikanDisposisiController extends Controller
                 
                 if($record->status === 'waiting.approval'){
                     if ($record->checkAction('tracking', $this->perms)) {
-                        $actions[] = 'type:tracking';
+                        $actions[] = ['type'=>'tracking','label'=>'Tracking Verify'];
                     }
                     
 
                     if ($record->checkAction('approval', $this->perms)) {
                         $actions[] = [
                             'type' => 'approval',
-                            'label' => 'Approval',
+                            'label' => 'Verify',
                             'page' => true,
                             'id' => $record->id,
                             'url' => route($this->routes . '.approval', $record->id)

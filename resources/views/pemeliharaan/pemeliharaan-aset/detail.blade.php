@@ -53,6 +53,7 @@
                                 </div>
                             </div>
                         </div> 
+                        
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label class="col-2 col-form-label">{{ __('Bukti Pemeliharaan') }}</label>
@@ -181,7 +182,7 @@
                     <div class="d-flex justify-content-between">
                         @if ($record->checkAction('approval', $perms))
                             @include('layouts.forms.btnBack')
-                            @include('layouts.forms.btnDropdownApproval')
+                            @include('layouts.forms.btnDropdownApproval2')
                             @include('layouts.forms.modalReject')
                         @endif
                     </div>

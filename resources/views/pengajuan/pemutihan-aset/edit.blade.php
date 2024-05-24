@@ -69,7 +69,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Tanggal Pemutihan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 <div class="col-sm-8 col-form-label">
-                                    <input class="form-control base-plugin--datepicker" name="submmission_date" placeholder="{{ __('Tanggal Pemutihan') }}" value="{{ $record->submmission_date->format('d/m/Y') }}">
+                                    <input class="form-control base-plugin--datepicker" name="submission_date" placeholder="{{ __('Tanggal Pemutihan') }}" value="{{ $record->submission_date->format('d/m/Y') }}">
                                 </div>
                             </div>
                         </div>

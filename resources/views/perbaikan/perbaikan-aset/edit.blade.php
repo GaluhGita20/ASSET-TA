@@ -306,17 +306,17 @@
                             
                             <div class="col-sm-12">
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">{{ __('Perlu Pengajuan Disposisi Perbaikan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-sm-2 col-form-label">{{ __('Perlu Pengajuan Sperpat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                     <div class="col-sm-10 col-form-label">
                                         @if(!empty($record->is_disposis))
                                             <select name="is_disposisi" class="form-control">
-                                                <option value="" selected>Pilih Salah Satu Status Disposisi</option>
+                                                <option value="" selected>Pilih Salah Satu Status Usulan Sperpat</option>
                                                 <option value="Yes" {{ $record->is_disposisi == "Yes" ? 'selected':'' }}>{{ __('YES') }}</option>
                                                 <option value="No" {{ $record->is_disposisi == "No" ? 'selected':'' }}>{{ __('NO') }}</option>
                                             </select>
                                         @else
                                             <select name="is_disposisi" class="form-control">
-                                                <option value="" selected>Pengajuan Disposisi</option>
+                                                <option value="" selected>Pengajuan Usulan Sperpat</option>
                                                 <option value="Yes">{{ __('YES') }}</option>
                                                 <option value="No">{{__('NO') }}</option>
                                             </select>

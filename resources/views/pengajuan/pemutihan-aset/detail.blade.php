@@ -88,7 +88,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Tanggal Pemutihan') }}</label>
                                 <div class="col-sm-8 col-form-label">
-                                    <input class="form-control base-plugin--datepicker" name="submmission_date" placeholder="{{ __('Tanggal Pemutihan') }}" value="{{$record->submmission_date->format('d/m/Y')}}" readonly>
+                                    <input class="form-control base-plugin--datepicker" name="submission_date" placeholder="{{ __('Tanggal Pemutihan') }}" value="{{$record->submission_date->format('d/m/Y')}}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -234,7 +234,6 @@
         </div>
     </div>
 
-
     <!-- card 3 -->
     <div class="row mb-3">
         <div class="col-sm-12">
@@ -244,7 +243,7 @@
                     <div class="d-flex justify-content-between">
                         @if ($record->checkAction('approval', $perms))
                             @include('layouts.forms.btnBack')
-                            @include('layouts.forms.btnDropdownApproval')
+                            @include('layouts.forms.btnDropdownApproval2')
                             @include('layouts.forms.modalReject')
                         @endif
                     </div>

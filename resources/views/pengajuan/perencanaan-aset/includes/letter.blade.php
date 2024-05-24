@@ -21,9 +21,10 @@
             </div>
             <div class="col-10 parent-group">
                 <textarea name="sentence_start" class="base-plugin--summernote" placeholder="{{ __('Pembukaan') }}" data-height="200">
-                    @if(isset($record->sentence_start)) {!! $record->sentence_start !!}
+                    @if(isset($record->sentence_start)) 
+                        {!! $record->sentence_start !!}
                     @else
-                    <p>Dengan hormat,<br>Dalam rangka meningkatkan kualitas mutu pelayanan di {{ Config::get("base.company.name") }}, kami mengajukan pembelian aset di {{ $record->struct->name }}. Adapun daftar kebutuhan aset yang kami ajukan terlampir.</p>
+                        <p>Dengan hormat,<br>Dalam rangka meningkatkan kualitas mutu pelayanan di {{ Config::get("base.company.name") }}, kami mengajukan pembelian aset di {{ $record->struct->name }}. Adapun daftar kebutuhan aset yang kami ajukan terlampir.</p>
                     @endif
                 </textarea>
             </div>

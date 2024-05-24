@@ -49,7 +49,7 @@ class HibahAsetController extends Controller
     {
         $user = auth()->user();
 
-        $records = PembelianTransaksi::grid()->where('source_acq','<>','pembelian')->filters()->dtGet();
+        $records = PembelianTransaksi::grid()->where('source_acq','<>','pembelian')->filterHibah()->dtGet();
         
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {
@@ -69,7 +69,13 @@ class HibahAsetController extends Controller
             })
 
             ->addColumn('status', function ($detail) {
-                return $detail->labelStatus($detail->status ?? 'draft');
+                if($detail->status == 'completed'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($detail->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $detail->labelStatus($detail->status ?? 'draft');
+                }
             })
             ->addColumn('updated_by', function ($detail) use ($user) {
                 if ($detail->status === 'draf') {
@@ -121,7 +127,7 @@ class HibahAsetController extends Controller
                 if ($record->checkAction('approval', $this->perms)) {
                     $actions[] = [
                         'type' => 'approval',
-                        'label' => 'Approval',
+                        'label' => 'Verify',
                         'page' => true,
                         'id' => $record->id,
                         'url' => route($this->routes . '.approval', $record->id)
@@ -129,7 +135,10 @@ class HibahAsetController extends Controller
                 }
 
                 if ($record->checkAction('tracking', $this->perms)) {
-                    $actions[] = 'type:tracking';
+                    $actions[] = [
+                        'type'=>'tracking',
+                        'label'=>'Tracking Verify']; 
+                   // $actions[] = 'type:tracking';
                 }
 
                 if ($record->checkAction('history', $this->perms)) {
@@ -172,8 +181,6 @@ class HibahAsetController extends Controller
     
         return $this->render($this->views . '.index');
     }
-
-    
 
     public function create()
     {
@@ -462,6 +469,7 @@ class HibahAsetController extends Controller
         if ($record->status === 'waiting.approval.revisi') {
             $module = $module . '_upgrade';
         }
+
         return $this->render('globals.tracking', compact('record', 'module'));
     }
 

@@ -10,8 +10,21 @@
                 data-placeholder="{{ __('Unit Kerja') }}" data-post="struct_id">
             </select>
         </div>
-        <div class="col-4 col-sm-6 col-xl-3 pb-2 mr-n6">
-            <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Tahun Pengadaan') }}">
+        <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
+            <select class="form-control base-plugin--select2-ajax filter-control"
+                data-post="procurement_year"
+                data-placeholder="{{ __('Periode Usulan') }}">
+                <option value="" selected>{{ __('Periode Usulan') }}</option>
+                @php
+                    $startYear = 2020;
+                    $currentYear = date('Y');
+                    $endYear = $currentYear + 5;
+                @endphp
+                @for ($year = $startYear; $year <= $endYear; $year++)
+                    <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
+                @endfor
+            </select>
+            {{-- <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Periode Perencanaan') }}"> --}}
         </div>
         <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
 			<select class="form-control base-plugin--select2-ajax filter-control"

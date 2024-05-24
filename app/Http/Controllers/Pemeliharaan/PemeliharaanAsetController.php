@@ -80,11 +80,17 @@ class PemeliharaanAsetController extends Controller
             })
 
             ->addColumn('tanggal_pemeliharaan', function ($record) {
-                return Carbon::parse($record->maintenance_date)->format('Y-m-d');
+                return Carbon::parse($record->maintenance_date)->formatLocalized('%d/%B/%Y');
             })
 
             ->addColumn('status', function ($record) {
-                return $record->status ?  $record->labelStatus($record->status) : '-';
+                if($record->status == 'completed'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($record->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $record->status ?  $record->labelStatus($record->status) : '-';
+                }
             })
 
             ->addColumn('updated_by', function ($record) {
@@ -115,7 +121,7 @@ class PemeliharaanAsetController extends Controller
                     if ($record->checkAction('approval', $this->perms)) {
                             $actions[] = [
                                 'type' => 'approval',
-                                'label' => 'Approval',
+                                'label' => 'Verify',
                                 'page' => true,
                                 'id' => $record->id,
                                 'url' => route($this->routes . '.approval', $record->id)
@@ -144,7 +150,10 @@ class PemeliharaanAsetController extends Controller
                 }
 
                 if ($record->checkAction('tracking', $this->perms)) {
-                    $actions[] = 'type:tracking';
+                    $actions[] = [
+                        'type'=>'tracking',
+                        'label'=>'Tracking Verify'];
+                //    $actions[] = 'type:tracking';
                 }
 
                 if(auth()->user()->hasRole('Sarpras') && auth()->user()->checkPerms('pemeliharaan-aset.delete')){

@@ -76,7 +76,37 @@ class PermissionSeeder extends Seeder
             
             /** REPORT **/
             [
-                'name'          => 'report',
+                'name'          => 'report-perencanaan',
+                'action'        => ['view'],
+            ],
+
+            [
+                'name'          => 'report-transaksi',
+                'action'        => ['view'],
+            ],
+
+            [
+                'name'          => 'report-inventaris',
+                'action'        => ['view'],
+            ],
+
+            [
+                'name'          => 'report-pemeliharaan',
+                'action'        => ['view'],
+            ],
+
+            [
+                'name'          => 'report-perbaikan',
+                'action'        => ['view'],
+            ],
+
+            [
+                'name'          => 'report-penghapusan',
+                'action'        => ['view'],
+            ],
+
+            [
+                'name'          => 'report-pemutihan',
                 'action'        => ['view'],
             ],
 
@@ -100,6 +130,13 @@ class PermissionSeeder extends Seeder
                     'dashboard'                    => ['view'],
                     'master'                       => ['view', 'create', 'edit', 'delete'],
                     'setting'                      => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                 ],
             ],
             [
@@ -117,6 +154,13 @@ class PermissionSeeder extends Seeder
                     'pemutihan-aset'               => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                 ],
             ],
             [
@@ -133,6 +177,13 @@ class PermissionSeeder extends Seeder
                     'penghapusan-aset'             => ['view','edit','delete'],
                     'pemutihan-aset'               => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                     //'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],
             ],
@@ -149,6 +200,13 @@ class PermissionSeeder extends Seeder
                     'penghapusan-aset'             => ['view','edit','delete'],
                     'pemutihan-aset'               => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                   //  'setting'                   => ['view', 'create', 'edit', 'delete'],
                 ],
             ],
@@ -162,6 +220,13 @@ class PermissionSeeder extends Seeder
                     'perbaikan-aset'               => ['view','edit','delete'],
                     'penghapusan-aset'             => ['view','edit','delete'],
                     'pemutihan-aset'               => ['view'],
+                    'report-perencanaan'           => ['view'],
+                    // 'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    // 'report-perbaikan'             => ['view'],
+                    // 'report-pemeliharaan'          => ['view'],
+                    // 'report-penghapusan'           => ['view'],
+                    // 'report-pemutihan'             => ['view'],
                 ],
             ],
             [
@@ -178,6 +243,13 @@ class PermissionSeeder extends Seeder
                     'penghapusan-aset'             => ['view','create','edit','delete','approve'],
                     'pemutihan-aset'               => ['view','create','edit','delete','approve'],
                     'master'                       => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                 ],
             ],
             [
@@ -193,6 +265,13 @@ class PermissionSeeder extends Seeder
                     'pemutihan-aset'               => ['view','edit','delete'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
                     'setting'                   => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                 ],
             ],
             [
@@ -203,6 +282,13 @@ class PermissionSeeder extends Seeder
                     'transaksi.pengadaan-aset'     => ['view','create','edit','delete'],
                     'registrasi.inventaris-aset'   => ['view'],
                     'master'                    => ['view', 'create', 'edit', 'delete'],
+                    'report-perencanaan'           => ['view'],
+                    'report-transaksi'             => ['view'],
+                    'report-inventaris'            => ['view'],
+                    'report-perbaikan'             => ['view'],
+                    'report-pemeliharaan'          => ['view'],
+                    'report-penghapusan'           => ['view'],
+                    'report-pemutihan'             => ['view'],
                 ],
             ],
         ];

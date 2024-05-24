@@ -67,25 +67,38 @@
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Tgl Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                    <label class="col-form-label">{{ __('Tanggal Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"
-                        placeholder="{{ __('Tgl Surat') }}" value="{{ now()->format('Y-m-d') }}" data-date-end-date="{{ now() }}" disabled>
+                        placeholder="{{ __('Tanggal Pengajuan Surat') }}" value="{{ now()->format('Y-m-d') }}" data-date-end-date="{{ now() }}" disabled>
                 </div>
             </div>
 
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Tahun Perencanaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                    <label class="col-form-label">{{ __('Periode Perencanaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
-                    <input class="form-control" type="number" min="{{ now()->format('Y') }}" max="2100" name="procurement_year" placeholder="{{ __('Tahun Perencanaan') }}">
+                    <select class="form-control base-plugin--select2-ajax filter-control"
+                        name="procurement_year"
+                        data-placeholder="{{ __('Periode Perencanaan') }}">
+                        <option value="" selected>{{ __('Periode Perencanaan') }}</option>
+                        @php
+                            $startYear = 2020;
+                            $currentYear = date('Y');
+                            $endYear = $currentYear + 5;
+                        @endphp
+                        @for ($year = $startYear; $year <= $endYear; $year++)
+                            <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
+                        @endfor
+                    </select>
+                    {{-- <input class="form-control" type="number" min="{{ now()->format('Y') }}" max="2100" name="procurement_year" placeholder="{{ __('Periode Perencanaan') }}"> --}}
                 </div>
             </div>
 
-            <div class="form-group row">
+            {{-- <div class="form-group row">
                 <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
                 <div class="col-10 parent-group">
                     <div class="custom-file">
@@ -104,7 +117,7 @@
                     </div>
                     <div class="form-text text-muted">*Maksimal 20MB</div>
                 </div>
-            </div>
+            </div> --}}
 
         </div>
     </div>

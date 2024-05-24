@@ -68,7 +68,13 @@ class LaporanHibahAsetController extends Controller
             })
 
             ->addColumn('status', function ($detail) {
-                return $detail->labelStatus($detail->status ?? 'draft');
+                if($detail->status == 'Approved'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($detail->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $detail->labelStatus($detail->status ?? 'draft');
+                }
             })
             ->addColumn('updated_by', function ($detail) use ($user) {
                 if ($detail->status === 'draf') {

@@ -88,9 +88,18 @@ class Aset extends Model
 
     /** RELATION **/
 
+    // public function users(){
+    //     return $this->belongsTo(User::class,'updated_by');
+    // }
+
     public function coad()
     {
         return $this->belongsTo(Coa::class, 'coa_id'); // Sesuaikan dengan kunci asing yang sesuai
+    }
+
+    public function tanahs()
+    {
+        return $this->belongsTo(Coa::class, 'tanah_id'); // Sesuaikan dengan kunci asing yang sesuai
     }
 
     public function materials()
@@ -180,8 +189,77 @@ class Aset extends Model
                     });
                 });
             }
-        );
-    })->latest();       
+        )->orWhere(
+            function ($q) use ($user) {
+                $q->when($user->position->imKepalaDeparetemen(), // tambahan orWhere condition
+                function ($qq) use ($user) {
+                    $structIds = $user->position->location->getIdsWithChild();
+                    $qq->whereHas('deps', function ($qUsulan) use ($structIds) {
+                        $qUsulan->whereIn('location_hibah_aset', $structIds);
+                    });
+                },
+                function ($qq) use ($user) {
+                    $qq->whereHas('deps', function ($qUsulan) use ($user) {
+                        $qUsulan->where('location_hibah_aset', $user->position->location->id);
+                    });
+                });
+        });
+    })->latest();
+    // })->latest();       
+    }
+
+    public function scopeLap($query)
+    {
+        $user = auth()->user();
+
+        return $query->when(
+            empty(array_intersect(['Keuangan', 'PPK', 'Direksi', 'Sarpras', 'BPKAD'], $user->roles->pluck('name')->toArray())),
+                function ($q) use ($user) {
+                $q->when($user->position->imKepalaDeparetemen(),  // pastikan metode ini benar
+                    function ($qq) use ($user) {
+                        $structIds = $user->position->location->getIdsWithChild();
+                        $qq->whereHas('usulans', function ($qUsulan) use ($structIds) {
+                            $qUsulan->whereHas('perencanaan', function ($qPerencanaan) use ($structIds) {
+                                $qPerencanaan->whereIn('struct_id', $structIds);
+                            });
+                        });
+                    },
+                    function ($qq) use ($user) {
+                        $qq->whereHas('usulans', function ($qUsulan) use ($user) {
+                            $qUsulan->whereHas('perencanaan', function ($qPerencanaan) use ($user) {
+                                $qPerencanaan->where('struct_id', $user->position->location->id);
+                            });
+                        });
+                    },
+                    // function ($qq) use ($user) {
+                    //     $structIds = $user->position->location->getIdsWithChild();
+                    //     $qq->whereHas('deps', function ($qUsulan) use ($structIds) {
+                    //         $qUsulan->whereIn('location_hibah_aset', $structIds);
+                    //     });
+                    // },
+                    // function ($qq) use ($user) {
+                    //     $qq->whereHas('deps', function ($qUsulan) use ($user) {
+                    //         $qUsulan->where('location_hibah_aset', $user->position->location->id);
+                    //     });
+                    // },
+                )
+                ->orWhere(
+                    function ($q) use ($user) {
+                        $q->when($user->position->imKepalaDeparetemen(), // tambahan orWhere condition
+                        function ($qq) use ($user) {
+                            $structIds = $user->position->location->getIdsWithChild();
+                            $qq->whereHas('deps', function ($qUsulan) use ($structIds) {
+                                $qUsulan->whereIn('location_hibah_aset', $structIds);
+                            });
+                        },
+                        function ($qq) use ($user) {
+                            $qq->whereHas('deps', function ($qUsulan) use ($user) {
+                                $qUsulan->where('location_hibah_aset', $user->position->location->id);
+                            });
+                        });
+                });
+            })->latest();
+
     }
 
     public function scopeFilters($query)
@@ -219,22 +297,27 @@ class Aset extends Model
                 $qq->whereHas('perencanaan', function ($qqq) use ($loc) {
                     $qqq->where('struct_id', $loc);
                 });
+            })->orWhere(function ($q) use ($loc){
+                $q->whereHas('deps', function ($qq) use ($loc) {
+                    // $qq->whereHas('perencanaan', function ($qqq) use ($loc) {
+                        $qq->where('location_hibah_aset', $loc);
+                    // });
             });
+        });
         })->when(
             $type = request()->source,
             function ($q) use ($type){
             $q->whereHas('trans', function ($qq) use ($type) {
                 $qq->where('source_acq','LIKE','%'.$type.'%');
             });
-        // })->when(
-        //     $loc = request()->room_location,
-        //     function ($q) use ($loc){
-        //     $q->where('room_location', $loc);
-        })
+        // })
+            })->when(
+            $loc = request()->room_location,
+            function ($q) use ($loc){
+            $q->where('room_location', $loc);
+            })
         ->filterBy(['status','condition'])
         ->latest();
-      //room location
-        
     }
 
     public function handleSubmitKib($request){
@@ -249,7 +332,7 @@ class Aset extends Model
                 $usulan = PerencanaanDetail::where('id',$usulan_id)->get();
             }else{
                 // dd('tes');
-                if( count($request->usulan_id) > 1 ){
+                if(count($request->usulan_id) > 1 ){
                     return $this->rollback(__('Pilih Satu Data Untuk Di Inventarisasikan'));
                 }
                 $customValue = $request->customValue;
@@ -277,10 +360,17 @@ class Aset extends Model
                 $redirect = route(request()->get('routes') . '.create', $data );
                 return $this->commitSaved(compact('redirect'));
             }else{
-                // dd($request->usulan_id);
-                PerencanaanDetail::where('id',$request->usulan_id)->update(['status'=>'completed']);
-                $redirect = route(request()->get('routes') . '.index');
-                return $this->commitSaved(compact('redirect'));
+               
+                if($request['usulan_id']){
+                    PerencanaanDetail::where('id',$request['usulan_id'])->update(['status'=>'completed']);
+                    $redirect = route(request()->get('routes') . '.index');
+                    return $this->commitSaved(compact('redirect'));
+                }else{
+                    PerencanaanDetail::where('id',$request->usulan_id)->update(['status'=>'completed']);
+                    $redirect = route(request()->get('routes') . '.index');
+                    return $this->commitSaved(compact('redirect'));
+                }
+                
             }
         }else{
             return $this->rollback(__('Silahkan Checklist 1 Data Untuk Diinventarisasikan'));
@@ -310,8 +400,6 @@ class Aset extends Model
         if($request->non_room_location != null && $request->room_location != null){
             return $this->rollback(__('Pilih Salah Satu Lokasi Aset (Didalam Ruangan Atau Diluar Ruangan)'));
         }
-
-
 
         $value6 = str_replace(['.', ','],'',$request->residual_value);
         $residu = (int)$value6;
@@ -530,6 +618,7 @@ class Aset extends Model
 
         //$jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
         //$flagInv = $jumlah_item - $request->qty;
+
         $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
         $flagInv = $jumlah_item - $request->qty;
 
@@ -568,6 +657,8 @@ class Aset extends Model
             $data = ['usulan_id' => $usulan, 'customValue'=>'A'];
             return $d->handleSubmitKib($data);
         }
+
+        
         // PerencanaanDetail::where('id',$request->usulan_id)->update(['status'=>'completed']);
     }
 

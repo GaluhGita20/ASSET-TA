@@ -76,7 +76,7 @@
 @endsection
 
 @section('buttons')
-    @if(auth()->user()->hasRole('Sarpras'))
+    @if(auth()->user()->hasRole('Sarpras') && auth()->user()->position->location_id == 17)
         @include('layouts.forms.btnAdd')
     @endif
 

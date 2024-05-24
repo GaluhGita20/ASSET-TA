@@ -60,14 +60,14 @@ class KIBEController extends Controller
                     $this->makeColumn('name:jenis|label:Jenis|className:text-center'),
                     $this->makeColumn('name:ukuran|label:Ukuran (M)|className:text-center'),
                     $this->makeColumn('name:bahan|label:Bahan|className:text-center'),
-                    $this->makeColumn('name:tahun_beli|label:Tahun Pembelian|className:text-center'),
+                    $this->makeColumn('name:tahun_beli|label:Tahun Perolehan|className:text-center'),
                     // $this->makeColumn('name:no_BPKB|label:Nomor BPKB|className:text-center'),
                     $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
                     // $this->makeColumn('name:nilai_beli|label:Harga|className:text-center'),
                     // $this->makeColumn('name:masa_manfaat|label:Masa Manfaat|className:text-center'),
                     // $this->makeColumn('name:nilai_residu|label:Nilai Penyusutan|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan(Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
@@ -123,7 +123,7 @@ class KIBEController extends Controller
             )->addColumn(
                 'tgl_register',
                 function ($record) {
-                return $record->book_date ? $record->book_date : '-';
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
             })->addColumn(
                 'judul',
                 function ($record) {
@@ -157,7 +157,7 @@ class KIBEController extends Controller
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : $record->usulans->trans->receipt_date->format('Y');
                 }
             )->addColumn(
                 'asal_usul',

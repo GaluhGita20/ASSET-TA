@@ -8,6 +8,7 @@ use App\Models\Globals\Notification;
 use App\Models\Globals\TempFiles;
 use App\Models\Master\Coa\COA;
 use App\Models\Master\Aset\AsetRs;
+use App\Models\Transaksi\PembelianTransaksi;
 use App\Models\Pemeliharaan\PemeliharaanDetail;
 use App\Models\Perbaikan\TransPerbaikanDisposisi;
 use App\Models\Perbaikan\UsulanSperpat;
@@ -17,6 +18,9 @@ use App\Models\Master\Pengadaan\Pengadaan;
 use App\Models\Master\Pemutihan\Pemutihan;
 use App\Models\Pengajuan\Perbaikan;
 use App\Models\Pengajuan\PerencanaanDetail;
+use App\Models\Pemeliharaan\Pemeliharaan;
+use App\Models\Pengajuan\Penghapusan;
+use App\Models\Pengajuan\Pemutihans;
 use App\Models\Master\Dana\Dana;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Geografis\Province;
@@ -144,7 +148,6 @@ class AjaxController extends Controller
     }
     
     $results = $unique_items->map(function ($item) {
-        
         return ['id' => $item->id, 'text' => $item->usulans->asetd->name. ' - ' . $item->merek_type_item];
     });
     
@@ -159,6 +162,320 @@ class AjaxController extends Controller
         $item = Aset::with('asetData')->where('id',$request->id)->where('status','notactive')->where('condition','rusak berat')->get();
         // $item = AsetRs::where('id')
         return $item;
+    }
+
+    public function getLapRencana2(Request $request)
+    {
+        if (isset($request->val2) && isset($request->val1)) {
+            $jumlah = PerencanaanDetail::with('perencanaan')
+                ->whereHas('perencanaan', function ($q) use ($request) {
+                    $q->where('struct_id', $request->val2)
+                    ->where('procurement_year', $request->val1)
+                    ->where('status','completed');
+                })->sum('qty_req');
+
+                $realisasi = PerencanaanDetail::with('perencanaan')
+                ->whereHas('perencanaan', function ($q) use ($request) {
+                    $q->where('struct_id', $request->val2)
+                    ->where('procurement_year', $request->val1)
+                    ->where('status','completed');
+                })->sum('qty_agree');
+
+                $not_realisasi = $jumlah - $realisasi;
+
+                $biaya = PerencanaanDetail::with('perencanaan')
+                ->whereHas('perencanaan', function ($q) use ($request) {
+                    $q->where('struct_id', $request->val2)
+                    ->where('procurement_year', $request->val1)
+                    ->where('status','completed');
+                })->sum('HPS_total_cost');
+        
+                return response()->json([
+                    'jumlah' => $jumlah,
+                    'realisasi' => $realisasi,
+                    'not_realisasi' => $not_realisasi,
+                    'biaya' =>$biaya,
+                ]);
+
+        } else {
+            // Tangani kesalahan jika $request->val2 atau $request->val1 tidak diset
+            return response()->json(['error' => 'Invalid request parameters'], 400);
+        }
+    }
+
+    public function getLapPemutihan(Request $request)
+    {
+        //val 1 = year
+        if (isset($request->val1)) {
+            $jumlah = Pemutihans::whereYear('submission_date',$request->val1)->where('status','completed')
+            ->count('id');  // Include the related asets
+
+            $value = Pemutihans::whereYear('submission_date',$request->val1)->where('status','completed')
+            ->sum('valued');  // Include the related asets
+            
+        }else {
+            // Tangani kesalahan jika $request->val2 atau $request->val1 tidak diset
+            return response()->json(['error' => 'Invalid request parameters'], 400);
+        }
+
+        return response()->json([
+            'jumlah' => $jumlah,
+            'value' =>$value,
+        ]);
+    }
+
+    public function getLapPemeliharaan(Request $request)
+    {
+        //val 1 = year
+        //val 2 = org
+        //val 3 = mon
+    
+        if (isset($request->val1) && isset($request->val2) && $request->val3 == null) {
+            $jumlah = Pemeliharaan::whereYear('maintenance_date',$request->val1)->where('status','completed')
+            ->where('departemen_id',$request->val2)->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereYear('maintenance_date',$request->val1)->where('departemen_id',$request->val2)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+
+        }elseif (isset($request->val1) && isset($request->val2) && $request->val3 != null) {
+            $jumlah = Pemeliharaan::whereYear('maintenance_date',$request->val1)->whereMonth('maintenance_date',$request->val3)->where('status','completed')
+            ->where('departemen_id',$request->val2)->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereYear('maintenance_date',$request->val1)->whereMonth('maintenance_date',$request->val3)->where('departemen_id',$request->val2)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+
+        }elseif ($request->val1 == null && isset($request->val2) && $request->val3 != null) {
+            $jumlah = Pemeliharaan::whereMonth('maintenance_date',$request->val3)->where('status','completed')
+            ->where('departemen_id',$request->val2)->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereMonth('maintenance_date',$request->val3)->where('departemen_id',$request->val2)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+
+        }elseif ($request->val1 != null && $request->val2 == null && $request->val3 != null) {
+            $jumlah = Pemeliharaan::whereYear('maintenance_date',$request->val1)->where('status','completed')
+            ->whereMonth('maintenance_date',$request->val3)->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereYear('maintenance_date',$request->val1)->whereMonth('maintenance_date',$request->val3)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+
+        }elseif ($request->val1 == null && $request->val2 == null && $request->val3 != null) {
+            $jumlah = Pemeliharaan::whereMonth('maintenance_date',$request->val3)->where('status','completed')
+            ->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereMonth('maintenance_date',$request->val3)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+
+        }elseif ($request->val1 == null && $request->val2 != null && $request->val3 == null) {
+            $jumlah = Pemeliharaan::where('departemen_id',$request->val2)->where('status','completed')
+            ->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request) {
+                $q->where('departemen_id',$request->val2)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+
+        }elseif ($request->val1 != null && $request->val2 == null && $request->val3 == null) {
+            $jumlah = Pemeliharaan::whereYear('maintenance_date',$request->val1)->where('status','completed')
+            ->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereYear('maintenance_date',$request->val1)->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+        }else{
+            $jumlah = Pemeliharaan::whereYear('maintenance_date',date('Y'))->where('status','completed')
+            ->count('id');  // Include the related asets
+            
+            $value = PemeliharaanDetail::whereHas('pemeliharaan',function($q) use ($request){
+                $q->whereYear('maintenance_date',date('Y'))->where('status','completed');
+            })->select('kib_id')->distinct()->count('kib_id');
+        }
+
+        return response()->json([
+            'jumlah' => $jumlah,
+            'value' =>$value,
+        ]);
+
+    }
+
+    public function getLapPenghapusan(Request $request)
+    {
+        //val 1 = year
+       
+
+        if (isset($request->val1) && isset($request->val2)) {
+            $jumlah = Penghapusan::whereYear('submission_date',$request->val1)->where('status','completed')
+            ->where('departemen_id',$request->val2)->count('id');  // Include the related asets
+            
+            $kib_ids = Penghapusan::where('status', 'completed')
+            ->whereYear('submission_date', $request->val1)
+            ->pluck('kib_id');
+
+            $value = Penghapusan::whereYear('submission_date',$request->val1)->where('status','completed')
+            ->where('departemen_id',$request->val2)->with('asets')  // Include the related asets
+            ->get()
+            ->sum(function($q) use($kib_ids) {
+                return $q->asets->whereIn('id',$kib_ids)->sum('book_value');
+            });
+
+
+        }elseif($request->val1 !=  null && $request->val2 ==  null ){
+            $jumlah = Penghapusan::whereYear('submission_date',$request->val1)->where('status','completed')
+            ->count('id');  // Include the related asets
+            
+            $kib_ids = Penghapusan::where('status', 'completed')
+            ->whereYear('submission_date', $request->val1)
+            ->pluck('kib_id');
+
+            $value = Penghapusan::whereYear('submission_date',$request->val1)->where('status','completed')
+            ->with('asets')  // Include the related asets
+            ->get()
+            ->sum(function($q) use($kib_ids) {
+                return $q->asets->whereIn('id',$kib_ids)->sum('book_value');
+            });
+        }elseif($request->val1 ==  null && $request->val2 !=  null ){
+            $jumlah = Penghapusan::where('status','completed')
+            ->where('departemen_id',$request->val2)->count('id');  // Include the related asets
+            
+
+            $kib_ids = Penghapusan::where('status', 'completed')
+            ->where('departemen_id',$request->val2)
+            ->pluck('kib_id');
+
+            $value = Penghapusan::where('status','completed')
+            ->where('departemen_id',$request->val2)->with('asets')  // Include the related asets
+            ->get()
+            ->sum(function($q) use($kib_ids) {
+                return $q->asets->whereIn('id',$kib_ids)->sum('book_value');
+            });
+        }
+
+        return response()->json([
+            'jumlah' => $jumlah,
+            'value' =>$value,
+        ]);
+    }
+
+    public function getLapAsetKIBB(Request $request)
+    {
+        //val 1 = org
+        if (isset($request->val1) && isset($request->val2)) {
+            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
+                $q->whereHas('perencanaan', function ($qqq) use ($request) {
+                    $qqq->where('struct_id', $request->val1);
+                });
+            })->where('room_location',$request->val2)->count('id');
+
+            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
+                $q->whereHas('perencanaan', function ($qqq) use ($request) {
+                    $qqq->where('struct_id', $request->val1);
+                });
+            })->where('room_location',$request->val2)->sum('book_value');
+
+                return response()->json([
+                    'jumlah' => $jumlah,
+                    'value' =>$value,
+                ]);
+
+        }elseif(isset($request->val1)  && $request->val2 == null){
+            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
+                $q->whereHas('perencanaan', function ($qqq) use ($request) {
+                    $qqq->where('struct_id', $request->val1);
+                });
+            })->count('id');
+
+            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
+                $q->whereHas('perencanaan', function ($qqq) use ($request) {
+                    $qqq->where('struct_id', $request->val1);
+                });
+            })->sum('book_value');
+
+                return response()->json([
+                    'jumlah' => $jumlah,
+                    'value' =>$value,
+                ]);
+        }elseif(isset($request->val2) && $request->val1 == null){
+            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            ->where('room_location',$request->val2)->count('id');
+
+            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            ->where('room_location',$request->val2)->sum('book_value');
+
+                return response()->json([
+                    'jumlah' => $jumlah,
+                    'value' =>$value,
+                ]);
+        }else {
+            // Tangani kesalahan jika $request->val2 atau $request->val1 tidak diset
+            return response()->json(['error' => 'Invalid request parameters'], 400);
+        }
+    }
+
+
+    public function getLapRencana1(Request $request)
+    {
+        if (isset($request->val1)) {
+            $jumlah = PerencanaanDetail::with('perencanaan')
+                ->whereHas('perencanaan', function ($q) use ($request) {
+                    $q->where('procurement_year', $request->val1)
+                    ->where('status','completed');
+                })->sum('qty_req');
+
+                $realisasi = PerencanaanDetail::with('perencanaan')
+                ->whereHas('perencanaan', function ($q) use ($request) {
+                    $q->where('procurement_year', $request->val1)
+                    ->where('status','completed');
+                })->sum('qty_agree');
+
+                $biaya = PerencanaanDetail::with('perencanaan')
+                ->whereHas('perencanaan', function ($q) use ($request) {
+                    $q->where('procurement_year', $request->val1)
+                    ->where('status','completed');
+                })->sum('HPS_total_cost');
+
+                $not_realisasi = $jumlah - $realisasi;
+        
+                return response()->json([
+                    'jumlah' => $jumlah,
+                    'realisasi' => $realisasi,
+                    'not_realisasi' => $not_realisasi,
+                    'biaya' =>$biaya,
+                ]);
+
+        } else {
+            // Tangani kesalahan jika $request->val2 atau $request->val1 tidak diset
+            return response()->json(['error' => 'Invalid request parameters'], 400);
+        }
+    }
+
+    public function getLapPengadaan1(Request $request)
+    {
+        if (isset($request->val1)) {
+            $jumlah = PembelianTransaksi::whereYear('spk_start_date', $request->val1)
+                ->where('status','completed')->sum('qty');
+
+            $realisasi = PembelianTransaksi::whereYear('spk_start_date', $request->val1)
+            ->where('status','completed')->sum('total_cost');
+
+                // $not_realisasi = $jumlah - $realisasi;
+        
+                return response()->json([
+                    'jumlah' => $jumlah,
+                    'biaya' => $realisasi,
+                    // 'not_realisasi' => $not_realisasi,
+                ]);
+
+        } else {
+            // Tangani kesalahan jika $request->val2 atau $request->val1 tidak diset
+            return response()->json(['error' => 'Invalid request parameters'], 400);
+        }
     }
 
     public function cekSperpat(Request $request)

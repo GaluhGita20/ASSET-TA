@@ -40,7 +40,7 @@ class FlowController extends Controller
                     $this->makeColumn('name:menu|label:Menu|className:text-left|sortable:false'),
                     $this->makeColumn('name:flows|label:Flow Approval|className:text-center|sortable:false'),
                     $this->makeColumn('name:updated_by'),
-                    $this->makeColumn('name:action'),
+                    // $this->makeColumn('name:action'),
                 ],
             ],
         ]);
@@ -73,6 +73,10 @@ class FlowController extends Controller
                     foreach ($flows as $j => $flow) {
                         if($flow->role->name == 'Umum'){
                             $flowd = 'Departemen';
+                        }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
+                            $flowd = 'Kepala Badan BPKAD';
+                        }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
+                            $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
                         }else{
                             $flowd = $flow->role->name;
                         }
@@ -109,7 +113,7 @@ class FlowController extends Controller
                 }
                 return $this->makeButtonDropdown($actions);
             })
-            ->rawColumns(['action','updated_by','menu','flows'])
+            ->rawColumns(['updated_by','menu','flows'])
             ->make(true);
     }
 

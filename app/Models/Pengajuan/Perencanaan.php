@@ -244,7 +244,7 @@ class Perencanaan extends Model
             if($request->procurement_year < now()->format('Y')){
                 return $this->rollback(
                     [
-                        'message' => 'Tahun Usulan Sudah Lewat!'
+                        'message' => 'Periode Usulan Sudah Lewat!'
                     ]
                 );
             }
@@ -262,7 +262,7 @@ class Perencanaan extends Model
             $data = $request->all();
             $this->fill($data);
             $this->save();
-            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+            // $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
             // dd($this->struct);
             // dd($data);
             $this->saveLogNotify();
@@ -286,35 +286,25 @@ class Perencanaan extends Model
                     ]
                 );
             }
+
             if($request->note != null){
               //  dd($request->all());
                 $this->update(['note' => $request->note]);
             }
+
             
             if($request->is_submit == 0 && $request->regarding != null){
                 $data = $request->all();
                 $this->fill($data);
-                
+                // $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $this->save();
-                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                // $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $this->saveLogNotify();
             }
 
             $data = PerencanaanDetail::Where('perencanaan_id',$this->id)->count();
             if ($request->is_submit == 1) {
-                // if($data > 0){
-                //     if($request->note != null){
-                //         $this->update(['note',$request->note]);
-                //     }
-                //     $this->handleSubmitSave($request);
-                // }else{
-                //     return $this->rollback(
-                //         [
-                //             'message' => 'Detail Usulan Tidak Boleh Kosong!'
-                //         ]
-                //     );
-                // }
-
+                
                 if($data == 0){
                     return $this->rollback(
                         [
@@ -322,12 +312,26 @@ class Perencanaan extends Model
                         ]
                     );
                 }
+
                 if($request->note != null){
                     $this->update(['note',$request->note]);
                 }
+
+                if($request->sentence_start !=null){
+                    $this->update(['sentence_start'=> $request->sentence_start]);
+                    $this->update(['sentence_end' => $request->sentence_end]);
+                }
+                
                 $this->handleSubmitSave($request);
                 
             }
+            if($request->sentence_start !=null){
+                //dd($request->sentence_start);
+                $this->update(['sentence_start' => $request->sentence_start]);
+                $this->update(['sentence_end' => $request->sentence_end]);
+            }
+            
+            
 
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));

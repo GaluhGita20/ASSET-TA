@@ -36,6 +36,8 @@ class TransPerbaikanDisposisi extends Model
         'vendor_id',
         'spk_start_date',
         'spk_end_date',
+        'submission_date',
+        'procurement_year',
         'spk_range_time',
         'no_spk',
         'shiping_cost',
@@ -54,6 +56,7 @@ class TransPerbaikanDisposisi extends Model
         'spk_start_date' => 'date',
         'spk_end_date' => 'date',
         'receipt_date' => 'date',
+        'submission_date' => 'date',
         // 'sp2d_date' => 'date',
     ];
 
@@ -165,14 +168,18 @@ class TransPerbaikanDisposisi extends Model
     public function scopeFilters($query)
     {
         return $query
-        ->filterBy(['vendor_id','repair_type','status','sper_status'])->when(
-            $codes = request()->code,
+        ->filterBy(['vendor_id','repair_type','status','sper_status'])
+        ->when($codes = request()->code,
             function ($q) use ($codes){
                 $q->whereHas('codes', function ($qq) use ($codes){
                         $qq->where('code',$codes);
             });
+        })
+        ->when(
+            $tahun_usulan = request()->procurement_year,
+            function ($q) use ($tahun_usulan){
+                $q->where('procurement_year',$tahun_usulan);
         })->latest();
-        
     }
 
     /*******************************
@@ -181,6 +188,14 @@ class TransPerbaikanDisposisi extends Model
     public function handleStore($request,$statusOnly = false){
         $this->beginTransaction();
         try {
+
+            if($request->procurement_year < now()->format('Y')){
+                return $this->rollback(
+                    [
+                        'message' => 'Periode Usulan Sperpat Sudah Lewat!'
+                    ]
+                );
+            }
 
             $data = $request->all();
             $flag = TransPerbaikanDisposisi::where('perbaikan_id',$request->perbaikan_id)->where('repair_type',$request->repair_type)->where('vendor_id',$request->vendor_id)->count();
@@ -192,6 +207,8 @@ class TransPerbaikanDisposisi extends Model
                 );
             }
             $this->fill($data);
+            $time = now()->format('Y-m-d');
+            $this->submission_date =  $time;
             $this->save();
 
             $this->saveLogNotify();
@@ -206,23 +223,33 @@ class TransPerbaikanDisposisi extends Model
     {
         $this->beginTransaction();
         try {
-            
+            // if($request->procurement_year < now()->format('Y')){
+            //     return $this->rollback(
+            //         [
+            //             'message' => 'Periode Usulan Sperpat Sudah Lewat!'
+            //         ]
+            //     );
+            // }
+
             $data = $request->all();
             // dd($data);
             $this->fill($data);
 
             // dd($request->all());
-            if($this->repair_type == 'vendor'){
-                if($request->total_cost == null){
-                    return $this->rollback(
-                        [
-                            'message' => 'Biaya Total Sewa Vendor Wajib Diisi!'
-                        ]
-                    );
-                }
+            if($request->is_submit == 1){
 
-                $total = str_replace(['.', ','], '', $request->total_cost);
-                $this->total_cost= (int)$total;
+                if($this->repair_type == 'vendor'){
+                    if($request->total_cost == null){
+                        return $this->rollback(
+                            [
+                                'message' => 'Biaya Total Sewa Vendor Wajib Diisi!'
+                            ]
+                        );
+                    }
+    
+                    $total = str_replace(['.', ','], '', $request->total_cost);
+                    $this->total_cost= (int)$total;
+                }
             }
 
 
@@ -567,7 +594,11 @@ class TransPerbaikanDisposisi extends Model
     public function saveLogNotify()
     {
         $user = auth()->user()->name;
-        $data = 'Pengajuan Transaksi Sperpat Aset dengan No Surat : ' . $this->codes->code;
+        if($this->status == 'draft'){
+            $data = 'Pengajuan Usulan Sperpat Aset dengan No Surat : ' . $this->codes->code;
+        }else{
+            $data = 'Pengajuan Transaksi Sperpat Aset dengan No Surat : ' . $this->codes->code;
+        }
         $routes = request()->get('routes');
       //  dd(request()->route()->getName());
         switch (request()->route()->getName()) {
@@ -575,35 +606,70 @@ class TransPerbaikanDisposisi extends Model
                 $this->addLog('Membuat ' . $data);
                 $pesan = $user.' Membuat ' . $data;
                 $this->sendNotification($pesan);
-                if (request()->is_submit) {
-                    $this->addLog('Submit ' . $data);
-                    
-                    $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
-                        'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
-                    ]);
-
-                    $pesan = $user.' Menunggu Approval ' . $data;
-                    $this->sendNotification($pesan);
+                if($this->status == 'draft'){
+                    if (request()->is_submit) {
+                        $this->addLog('Submit ' . $data);
+                        
+                        $this->addNotify([
+                            'message' => 'Waiting Approval ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+    
+                        $pesan = $user.' Menunggu Approval ' . $data;
+                        $this->sendNotification($pesan);
+                    }
+                    break;
+                }else{
+                    if (request()->is_submit) {
+                        $this->addLog('Submit ' . $data);
+                        
+                        $this->addNotify([
+                            'message' => 'Waiting Verify ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+    
+                        $pesan = $user.' Menunggu Verifikasi ' . $data;
+                        $this->sendNotification($pesan);
+                    }
+                    break;
                 }
-                break;
             case $routes . '.update':
+
                 $this->addLog('Memperbarui ' . $data);
-                if (request()->is_submit == 1) {
-                    $this->addLog('Submit ' . $data);
-                    $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
-                        'url' => route($routes . '.approval', $this->id),
-                        // dd('tes'),
-
-                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
-                    ]);
-
-                    $pesan = $user.' Menunggu Approval ' . $data;
-                    $this->sendNotification($pesan);
+                if($this->status == 'draft'){
+                    
+                    if (request()->is_submit == 1) {
+                        $this->addLog('Submit ' . $data);
+                        $this->addNotify([
+                            'message' => 'Waiting Approval ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            // dd('tes'),
+    
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+    
+                        $pesan = $user.' Menunggu Approval ' . $data;
+                        $this->sendNotification($pesan);
+                    }
+                    break;
+                }else{
+                    if (request()->is_submit == 1) {
+                        $this->addLog('Submit ' . $data);
+                        $this->addNotify([
+                            'message' => 'Waiting Verify ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            // dd('tes'),
+    
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+    
+                        $pesan = $user.' Menunggu Verifikasi ' . $data;
+                        $this->sendNotification($pesan);
+                    }
+                    break;
                 }
-                break;
             case $routes . '.destroy':
                 $this->addLog('Menghapus ' . $data);
                 break;
@@ -615,30 +681,59 @@ class TransPerbaikanDisposisi extends Model
                 ]);
                 break;
             case $routes . '.approve':
-                if (in_array($this->status, ['draft', 'waiting.approval.revisi'])) {
-                    $this->addLog('Menyetujui Revisi ' . $data);
-
-                    $this->addNotify([
-                        'message' => 'Waiting Approval Revisi ' . $data,
-                        'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
-                    ]);
-
-                    $pesan = $user. ' Waiting Approval Revisi ' . $data;
-                    $this->sendNotification($pesan);
-
-                } else {
-                    $this->addLog('Menyetujui ' . $data);
-
-                    $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
-                        'url' => route($routes . '.approval', $this->id),
-                        'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
-                    ]);
-                    $pesan = $user. ' Menyetujui ' . $data;
-                    $this->sendNotification($pesan);
+                if($this->status == 'draft'){
+                    if (in_array($this->status, ['draft', 'waiting.approval.revisi'])) {
+                        $this->addLog(' Menyetujui  ' . $data);
+    
+                        $this->addNotify([
+                            'message' => ' Menyetujui ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+    
+                        $pesan = $user. ' Menyetujui ' . $data;
+                        $this->sendNotification($pesan);
+    
+                    } else {
+                        $this->addLog(' Menyetujui ' . $data);
+    
+                        $this->addNotify([
+                            'message' => ' Menyetujui ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+                        $pesan = $user. ' Menyetujui ' . $data;
+                        $this->sendNotification($pesan);
+                    }
+                    break;
+                }else{
+                    if (in_array($this->status, ['draft', 'waiting.approval.revisi'])) {
+                        $this->addLog(' Memverifikasi  ' . $data);
+    
+                        $this->addNotify([
+                            'message' => ' Memverifikasi ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+    
+                        $pesan = $user. ' Memverifikasi ' . $data;
+                        $this->sendNotification($pesan);
+    
+                    } else {
+                        $this->addLog(' Memverifikasi ' . $data);
+    
+                        $this->addNotify([
+                            'message' => ' Memverifikasi ' . $data,
+                            'url' => route($routes . '.approval', $this->id),
+                            'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
+                        ]);
+                        $pesan = $user. ' Memverifikasi ' . $data;
+                        $this->sendNotification($pesan);
+                    }
+                    break;
                 }
-                break;
+
+                
             case $routes . '.reject':
                 if (in_array($this->status, ['rejected'])) {
                     $this->addLog('Menolak ' . $data . ' dengan alasan: ' . request()->get('note'));
@@ -674,7 +769,7 @@ class TransPerbaikanDisposisi extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
+        $chatId = '-4136008848'; // Ganti dengan chat ID penerima notifikasi
 
         Telegram::sendMessage([
             'chat_id' => $chatId,

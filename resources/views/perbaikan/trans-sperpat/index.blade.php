@@ -27,11 +27,27 @@
 				data-placeholder="{{ __('Status') }}">
 				<option value="" selected>{{ __('Status') }}</option>
 				<option value="Draft">Draft</option>
-				<option value="waiting.approval">Waiting Approval</option>
-                <option value="completed">Completed</option>
+				<option value="waiting.approval">Waiting Verify</option>
+                <option value="completed">Verified</option>
                 <option value="rejected">Rejected</option>
 			</select>
 		</div>
+        <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
+            <select class="form-control base-plugin--select2-ajax filter-control"
+                data-post="procurement_year"
+                data-placeholder="{{ __('Periode Transaksi') }}">
+                <option value="" selected>{{ __('Periode Transaksi') }}</option>
+                @php
+                    $startYear = 2020;
+                    $currentYear = date('Y');
+                    $endYear = $currentYear + 5;
+                @endphp
+                @for ($year = $startYear; $year <= $endYear; $year++)
+                    <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
+                @endfor
+            </select>
+            {{-- <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Periode Perencanaan') }}"> --}}
+        </div>
         {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
             <select class="form-control filter-control base-plugin--select2-ajax" name="departemen_id" data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
                 data-placeholder="{{ __('Unit Kerja') }}" data-post="departemen_id">

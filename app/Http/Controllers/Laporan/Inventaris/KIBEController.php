@@ -55,6 +55,8 @@ class KIBEController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
+
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
                     // $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-center|width:300px'),
@@ -72,7 +74,7 @@ class KIBEController extends Controller
                     // $this->makeColumn('name:nilai_beli|label:Harga|className:text-center'),
                     // $this->makeColumn('name:masa_manfaat|label:Masa Manfaat|className:text-center'),
                     // $this->makeColumn('name:nilai_residu|label:Nilai Penyusutan|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
@@ -86,13 +88,16 @@ class KIBEController extends Controller
                 ],
             ],
         ]);
-        return $this->render($this->views . '.index');
+        $jumlah = Aset::where('type','KIB E')->where('status',['actives','in repair','in deletion'])->count('id');
+        $value = Aset::where('type','KIB E')->where('status',['actives','in repair','in deletion'])->sum('book_value');
+        return $this->render($this->views . '.index', compact(['jumlah','value']));
+        // return $this->render($this->views . '.index');
     }
     
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::with('coad')->where('type','KIB E')->grid()->filters()->dtGet();
+        $records = Aset::with('coad')->where('type','KIB E')->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn(
@@ -117,7 +122,15 @@ class KIBEController extends Controller
                 function ($record) {
                     return $record->coad ? $record->coad->nama_akun : '-';
                 }
-            )->addColumn(
+            )
+
+            ->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
+            })
+
+            ->addColumn(
                 'nomor_register',
                 function ($record) {
                 // $max_no = $record->where('coa_id',$record->coa_id)->max('no_register');
@@ -143,7 +156,7 @@ class KIBEController extends Controller
             )->addColumn(
                 'bahan',
                 function ($record) {
-                    return $record->material ? ucwords($record->material) : '-';
+                    return $record->materials->name ? $record->materials->name: '-';
                 }
             )->addColumn(
                 'jenis',

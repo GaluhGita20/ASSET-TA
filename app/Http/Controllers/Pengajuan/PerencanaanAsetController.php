@@ -17,6 +17,8 @@ use App\Support\Base;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Dompdf\Dompdf;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -54,9 +56,9 @@ class PerencanaanAsetController extends Controller
                     $this->makeColumn('name:struct|label:Unit Kerja|className:text-center|width:250px'),
                     $this->makeColumn('name:perihal|label:Perihal|className:text-center|width:300px'),
                 // $this->makeColumn('name:is_repair|label:Jenis Usulan|className:text-center|width:300px'),
-                    $this->makeColumn('name:procurement_year|label:Tahun Pengadaan|className:text-center|width:300px'),
-                //   $this->makeColumn('name:version|label:Revisi|className:text-center'),
+                    $this->makeColumn('name:procurement_year|label:Periode Perencanaan|className:text-center|width:300px'),
                     $this->makeColumn('name:status'),
+                    $this->makeColumn('name:nilai_usulan|label:Total Biaya Perencanaan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
                 ],
@@ -110,6 +112,23 @@ class PerencanaanAsetController extends Controller
                 return $record->labelStatus($record->status ?? 'new');
             })
 
+            ->addColumn('nilai_usulan', function ($record) {
+                $total = PerencanaanDetail::where('perencanaan_id',$record->id)->sum('HPS_total_cost');
+                $agree = PerencanaanDetail::where('perencanaan_id',$record->id)->sum('HPS_total_agree');
+                $stat = PerencanaanDetail::where('perencanaan_id',$record->id)->pluck('status');
+                if($total == null){
+                    return 0;
+                }else{
+                    // dd($stat);
+                    if($stat[0] == 'draf'){
+                        return number_format($total, 0, ',', ',');
+                    }else{
+                        return number_format($agree, 0, ',', ',');
+                    }
+                }
+                // return $record->procurement_year ?  $record->procurement_year : '-';
+            })
+
             ->addColumn('updated_by', function ($record) {
                 if ($record->status === 'new') {
                     return "";
@@ -128,6 +147,7 @@ class PerencanaanAsetController extends Controller
                         'url' => route($this->routes . '.show', $record->id),
                     ];
                 }
+
 
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
@@ -197,6 +217,7 @@ class PerencanaanAsetController extends Controller
             'procurement_year',
             'is_repair',
             'version',
+            'nilai_usulan',
             'status','updated_by','action'])
             ->make(true);
     }
@@ -673,7 +694,16 @@ class PerencanaanAsetController extends Controller
 
     public function print(Perencanaan $record, $title = '')
     {
-
+        $title ='Laporan Perencanaan Aset';
+        // $dompdf = new Dompdf();
+        // $html = $this->render($this->views.'.cetak',compact('record','title'));
+        // $dompdf->loadHtml($html);
+        // $dompdf->setPaper('A4', 'portrait'); // Set kertas dan orientasi
+        // $dompdf->render();
+        // return $dompdf->stream('two_page_pdf.pdf');
+        // $detail = PerencanaanDetail::where('perencanaan_id',$record->id)->get();
+        // return $this->render($this->views.'.cetakDetail',compact('detail','record'));
+        return $this->render($this->views.'.cetak',compact('record','title'));
     }
 
 }

@@ -59,13 +59,14 @@ class PengadaanAsetController extends Controller
                 return $detail->vendors->name ? $detail->vendors->name : '';
             })
             ->addColumn('no_spk', function ($detail) {
-                return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->format('Y-m-d').'/'.Carbon::parse($detail->spk_end_date)->format('Y-m-d') : '';
+                // return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->formatLocalized('%d/%B/%Y').'/'.Carbon::parse($detail->spk_end_date)->formatLocalized('%d/%B/%Y'): '';
+                return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->formatLocalized('%d/%B/%Y'):'';
             })
             ->addColumn('spk_start_date', function ($detail) {
-                return  Carbon::parse($detail->spk_start_date)->format('Y-m-d');
+                return  Carbon::parse($detail->spk_start_date)->formatLocalized('%d/%B/%Y');
             })
             ->addColumn('spk_end_date', function ($detail) {
-                return  Carbon::parse($detail->spk_end_date)->format('Y-m-d');
+                return  Carbon::parse($detail->spk_end_date)->formatLocalized('%d/%B/%Y');;
             })
             ->addColumn('spk_range_time', function ($detail) {
                 return $detail->spk_range_time ? $detail->spk_range_time .' Hari': '';
@@ -100,7 +101,13 @@ class PengadaanAsetController extends Controller
                 return number_format($detail->total_cost, 0, ',', ',');
             })
             ->addColumn('status', function ($detail) {
-                return $detail->labelStatus($detail->status ?? 'draft');
+                if($detail->status == 'completed'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($detail->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $detail->labelStatus($detail->status ?? 'draft');
+                }
             })
             ->addColumn('updated_by', function ($detail) use ($user) {
                 if ($detail->status === 'draf') {
@@ -120,6 +127,13 @@ class PengadaanAsetController extends Controller
                         'url' => route($this->routes . '.show', $record->id),
                     ];
                 }
+
+                // if($record->status == 'completed'){
+                //     $actions[] = [
+                //         'type' => 'print',
+                //         'url' => route($this->routes . '.print', $record->id),
+                //     ];
+                // }
 
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
@@ -144,7 +158,7 @@ class PengadaanAsetController extends Controller
                 if ($record->checkAction('approval', $this->perms)) {
                     $actions[] = [
                         'type' => 'approval',
-                        'label' => 'Approval',
+                        'label' => 'Verify',
                         'page' => true,
                         'id' => $record->id,
                         'url' => route($this->routes . '.approval', $record->id)
@@ -152,7 +166,9 @@ class PengadaanAsetController extends Controller
                 }
 
                 if ($record->checkAction('tracking', $this->perms)) {
-                    $actions[] = 'type:tracking';
+                    $actions[] = [
+                    'type'=>'tracking',
+                    'label'=>'Tracking Verify'];
                 }
 
                 if ($record->checkAction('history', $this->perms)) {
@@ -341,12 +357,14 @@ class PengadaanAsetController extends Controller
         if ($record->status === 'waiting.approval.revisi') {
             $module = $module . '_upgrade';
         }
+   
         return $this->render('globals.tracking', compact('record', 'module'));
     }
 
     public function print(PembelianTransaksi $record, $title = '')
     {
-
+        $detailData = PerencanaanDetail::where('trans_id',$record->id)->first();
+        return $this->render($this->views.'.cetak',compact('record','detailData','title'));
     }
 
 }

@@ -129,7 +129,7 @@ class AsetController extends Controller
     }
 
     public function store(AsetRequest $request){
-        $record = new Aset;
+        $record = new AsetRs;
         return $record->handleStoreOrUpdate($request);
     }
 

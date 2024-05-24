@@ -55,6 +55,8 @@ class KIBCController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
+
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
                     $this->makeColumn('name:luas_lantai|label:Luas Lantai (m2)|className:text-center'),
@@ -66,7 +68,7 @@ class KIBCController extends Controller
                     $this->makeColumn('name:nomor_dokumen|label:Nomor Sertifikat|className:text-center'),
                     $this->makeColumn('name:tgl_dokumen|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:tanah_id|label:Kode Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Biaya Pembangunan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
@@ -77,13 +79,16 @@ class KIBCController extends Controller
                 ],
             ],
         ]);
-        return $this->render($this->views . '.index');
+        $jumlah = Aset::where('type','KIB C')->where('status',['actives','in repair','in deletion'])->count('id');
+        $value = Aset::where('type','KIB C')->where('status',['actives','in repair','in deletion'])->sum('book_value');
+        return $this->render($this->views . '.index', compact(['jumlah','value']));
+        // return $this->render($this->views . '.index');
     }
     
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::with('coad')->where('type','KIB C') ->grid()->filters()->dtGet();
+        $records = Aset::with('coad')->where('type','KIB C')->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn(
@@ -108,7 +113,13 @@ class KIBCController extends Controller
                 function ($record) {
                     return $record->coad ? $record->coad->nama_akun : '-';
                 }
-            )->addColumn(
+            )
+            ->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
+            })
+            ->addColumn(
                 'nomor_register',
                 function ($record) {
                 return $record->no_register ? str_pad($record->no_register, 3, '0', STR_PAD_LEFT) : '-';
@@ -143,12 +154,12 @@ class KIBCController extends Controller
                 function ($record) {
                     return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
                 }
-            )->addColumn(
-                'status_tanah',
-                function ($record) {
-                    return $record->land_status ? ucwords($record->land_status) : '-';
-                }
-            )->addColumn(
+                )->addColumn(
+                    'status_tanah',
+                    function ($record) {
+                        return $record->statusTanah->name ? $record->statusTanah->name : '-';
+                    }
+                )->addColumn(
                 'nomor_dokumen',
                 function ($record) {
                     return $record->no_sertificate ? $record->no_sertificate : '-';
@@ -156,7 +167,7 @@ class KIBCController extends Controller
             )->addColumn(
                 'tgl_dokumen',
                 function ($record) {
-                    return $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-';
+                    return $record->sertificate_date ? Carbon::parse($record->sertificate_date)->formatLocalized('%d/%B/%Y')  : '-';
                 }
             )->addColumn(
                 'asal_usul',
@@ -204,12 +215,12 @@ class KIBCController extends Controller
                         return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
                 }
-            )->addColumn(
-                'tanah_id',
-                function ($record) {
-                    return $record->tanah_id ? $record->tanah_id : '-';
-                }
-            )->addColumn(
+                )->addColumn(
+                    'tanah_id',
+                    function ($record) {
+                        return $record->tanahs->nama_akun ? $record->tanahs->kode_akun.'/'.$record->tanahs->nama_akun : '-';
+                    }
+                )->addColumn(
                 'kondisi',
                 function ($record) {
                     if ($record->condition == 'baik') {

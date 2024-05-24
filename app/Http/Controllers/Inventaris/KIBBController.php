@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\Aset\AsetRequest;
 use App\Models\Globals\Menu;
 use App\Models\Globals\Activity;
+
 // use App\Models\Master\Aset\Aset;
 use App\Models\inventaris\Aset;
 use App\Models\Pemeliharaan\Pemeliharaan;
@@ -14,6 +15,9 @@ use App\Models\Pengajuan\Perbaikan;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+//use App\Exports\Setting\ActivityExport;
+use App\Exports\Setting\KibBExport;
+use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
 class KIBBController extends Controller
@@ -69,11 +73,11 @@ class KIBBController extends Controller
                     $this->makeColumn('name:no_BPKB|label:Nomor BPKB|className:text-center'),
                     $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan(Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Penyusutan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
-                    $this->makeColumn('name:nilai_buku|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
                     $this->makeColumn('name:unit|label:Unit|className:text-center'),
                     $this->makeColumn('name:location|label:Lokasi|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
@@ -122,7 +126,7 @@ class KIBBController extends Controller
             )->addColumn(
                 'tgl_register',
                 function ($record) {
-                return $record->book_date ? $record->book_date : '-';
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
                 }
             )->addColumn(
                 'merek_tipe',
@@ -157,7 +161,7 @@ class KIBBController extends Controller
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : $record->usulans->trans->receipt_date->format('Y');
                 }
             )->addColumn(
                 'no_pabrik',
@@ -521,6 +525,13 @@ class KIBBController extends Controller
         ]);
 
         return $this->render('pelaporan.penyusutan.index',compact('record'));
+    }
+
+
+    public function export(){
+        //dd('tes');
+       // return Excel::download(new ActivityExport, date('Y-m-d') . ' Audit Trail.xlsx');
+        return Excel::download(new KibBExport, date('Y-m-d') . ' KIBB.xlsx');
     }
 
 }

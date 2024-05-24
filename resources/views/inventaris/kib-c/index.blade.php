@@ -10,10 +10,13 @@
             data-placeholder="{{ __('Status') }}">
             <option value="" selected>{{ __('Status') }}</option>
             <option value="actives">Active</option>
+            <option value="in repair">Dalam Perbaikan</option>
+            <option value="in deletion">Dalam Penghapusan</option>
             <option value="notactive">Not active</option>
-            <option value="diputihkan">Diputihkan</option>
+            <option value="clean">Diputihkan</option>
         </select>
     </div>
+
     <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
         <select class="form-control base-plugin--select2-ajax filter-control"
             data-post="condition"
@@ -24,27 +27,8 @@
             <option value="rusak sedang">Rusak Sedang</option>
         </select>
     </div>
-    <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6" id="location_id">
-        <select name="location_id" id="location_id" class="form-control filter-control base-plugin--select2-ajax"
-            data-url="{{ route('ajax.selectStruct', ['search' => 'alls']) }}"
-            data-post="location_id"
-            
-            data-placeholder="{{ __('Struktur Organisasi') }}">
-        </select>
-    </div>
-
-    <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
-        <select name="room_location" class="form-control filter-control base-plugin--select2-ajax locations"
-            data-url="{{ rut('ajax.selectRooms', ['all']) }}"
-            data-post="room_location"
-            data-url-origin="{{ rut('ajax.selectRooms', ['all']) }}"
-            placeholder="{{ __('Pilih Ruangan') }}">
-            <option value="">{{ __('Pilih Salah Satu') }}</option>
-        </select>
-    </div>
-
-    
 </div>
+
 <div class="alert alert-custom alert-light-primary fade show py-4" style="left:-30pt; margin-right:35px;" role="alert">
     <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
     <div class="alert-text text-primary">

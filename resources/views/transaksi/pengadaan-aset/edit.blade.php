@@ -324,6 +324,7 @@
                                 </div>
                             </div>
                         </div> -->
+                        
                     </div>
                 </div>
             </div>
@@ -483,9 +484,10 @@
         
         if(quantity > 0 && unit_cost > 0){
             console.log(quantity);
+            var total_unit = parseInt(quantity) * parseInt(unit_cost);
             var total = parseInt(quantity) * parseInt(unit_cost) + tax + shiping;
-            if(total > pagu){
-                alert("Nilai total melebihi batas anggaran!");
+            if(total_unit > pagu){
+                alert("Nilai Harga Unit Melebihi Pagu Anggaran!");
                 document.getElementById('total_cost').value = 0;
             }else{
                 document.getElementById('total_cost').value = parseInt(total);

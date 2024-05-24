@@ -4,7 +4,7 @@
 		data-toggle="dropdown"
 		aria-haspopup="true"
 		aria-expanded="false">
-		<i class="mr-1 fa fa-save"></i> {{ __('Approval') }}
+		<i class="mr-1 fa fa-save"></i> {{ __('Verify') }}
 	</button>
 	
 	<div class="dropdown-menu dropdown-menu-right">
@@ -16,7 +16,7 @@
         <button type="button" class="dropdown-item"
 			data-toggle="modal"
 			data-target="#modalApprove">
-			<i class="mr-3 fa fa-check text-primary"></i> {{ __('Approve') }}
+			<i class="mr-3 fa fa-check text-primary"></i> {{ __('Verify') }}
 		</button>
 
 		<button type="button" class="dropdown-item"

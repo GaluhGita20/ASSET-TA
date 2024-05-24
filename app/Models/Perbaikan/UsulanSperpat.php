@@ -89,8 +89,6 @@ class UsulanSperpat extends Model
         //     });
         // });
 
-
-
         return $query->when(empty(array_intersect(['Sarpras','BPKAD'], $user->roles->pluck('name')->toArray())),
         function ($q) use ($user) { 
             $q->WhereHas('approvals', function ($q) use ($user) {
@@ -168,6 +166,8 @@ class UsulanSperpat extends Model
             $this->qty = (int)$qty;
             $this->unit_cost = (int)$unit_cost;
             $this->total_cost = (int)$unit_cost * (int)$qty;
+          
+
             $this->save();
 
             $this->saveLogNotify();
@@ -183,6 +183,14 @@ class UsulanSperpat extends Model
         $this->beginTransaction();
         try {
             
+            if($request->procurement_year < now()->format('Y')){
+                return $this->rollback(
+                    [
+                        'message' => 'Periode Usulan Sperpat Sudah Lewat!'
+                    ]
+                );
+            }
+
             $data = $request->all();
             $this->fill($data);
 
@@ -296,7 +304,7 @@ class UsulanSperpat extends Model
     public function saveLogNotify()
     {
         $user = auth()->user()->name;
-        $data = 'Pengajuan Transaksi Sperpat dengan No Surat : ' . $this->code;
+        $data = 'Pengajuan Usulan Sperpat dengan No Surat : ' . $this->code;
         $routes = request()->get('routes');
       //  dd(request()->route()->getName());
         switch (request()->route()->getName()) {
@@ -349,19 +357,19 @@ class UsulanSperpat extends Model
                     $this->addLog('Menyetujui Revisi ' . $data);
 
                     $this->addNotify([
-                        'message' => 'Waiting Approval Revisi ' . $data,
+                        'message' => 'Menyetujui ' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
 
-                    $pesan = $user. ' Waiting Approval Revisi ' . $data;
+                    $pesan = $user. ' Menyetujui ' . $data;
                     $this->sendNotification($pesan);
 
                 } else {
                     $this->addLog('Menyetujui ' . $data);
 
                     $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
+                        'message' => 'Menyetujui ' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);

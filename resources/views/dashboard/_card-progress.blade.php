@@ -46,7 +46,12 @@
 			</div>
 		@endforeach
 	</div>
+
+
+	
+	
 </div>
+
 
 @push('scripts')
 	<script>

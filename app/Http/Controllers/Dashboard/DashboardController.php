@@ -95,7 +95,10 @@ class DashboardController extends Controller
             ]);
         }
 
-        return $this->render($this->views.'.index', ['progress' => $progress, 'is_auditor' => $is_auditor]);
+        $jumlah = Aset::whereIn('status',['actives','in repair','in deletion'])->count('id');
+        $value = Aset::whereIn('status',['actives','in repair','in deletion'])->sum('book_value');
+
+        return $this->render($this->views.'.index', ['progress' => $progress, 'is_auditor' => $is_auditor, 'value' => $value, 'jumlah' =>$jumlah]);
     }
 
     public function setLang($lang)

@@ -142,6 +142,12 @@ class PerencanaanDetail extends Model
                 $q->whereHas('asetd', function ($qq) use ($jenis_jenis_aset){
                 $qq->where('name','LIKE', '%' . $jenis_jenis_aset . '%');
             });
+        })->when(
+                $tahun_usulan = request()->procurement_year,
+                function ($q) use ($tahun_usulan){
+                    $q->whereHas('perencanaan', function ($qq) use ($tahun_usulan){
+                    $qq->where('procurement_year',$tahun_usulan);
+            });
         })->latest();
             
     }
@@ -151,16 +157,30 @@ class PerencanaanDetail extends Model
         $tahun_pengadaan = request()->procurement_year;
         $departemen = request()->struct_id;
 
-       return $query->when($jenis_jenis_aset, function ($q) use ($jenis_jenis_aset) {
+        return $query->when($jenis_jenis_aset, function ($q) use ($jenis_jenis_aset) {
             $q->whereHas('asetd', function ($qq) use ($jenis_jenis_aset) {
                 $qq->where('name', 'LIKE', '%' . $jenis_jenis_aset . '%');
             });
         })
-        ->when($tahun_pengadaan && $departemen, function ($q) use ($tahun_pengadaan, $departemen) {
-            $q->whereHas('perencanaan', function ($qq) use ($tahun_pengadaan, $departemen) {
-                $qq->where('procurement_year', $tahun_pengadaan)->where('struct_id', $departemen);
+        ->when(
+                $tahun_usulan = request()->procurement_year,
+                function ($q) use ($tahun_usulan){
+                    $q->whereHas('perencanaan', function ($qq) use ($tahun_usulan){
+                    $qq->where('procurement_year',$tahun_usulan);
             });
         })
+        ->when(
+            $deps = request()->struct_id,
+            function ($q) use ($deps){
+                $q->whereHas('perencanaan', function ($qq) use ($deps){
+                $qq->where('struct_id',$deps);
+            });
+        })
+        // ->when($tahun_pengadaan && $departemen, function ($q) use ($tahun_pengadaan, $departemen) {
+        //     $q->whereHas('perencanaan', function ($qq) use ($tahun_pengadaan, $departemen) {
+        //         $qq->where('procurement_year', $tahun_pengadaan)->where('struct_id', $departemen);
+        //     });
+        // })
         ->latest();
     }
 

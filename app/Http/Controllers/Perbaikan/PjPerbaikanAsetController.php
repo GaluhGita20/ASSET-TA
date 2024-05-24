@@ -52,6 +52,7 @@ class PjPerbaikanAsetController extends Controller
                     $this->makeColumn('name:no_surat|label:Nomor Surat|className:text-center|width:300px'),
                     $this->makeColumn('name:nama_aset|label:Nama Aset|className:text-center|width:250px'),
                     $this->makeColumn('name:type_aset|label:Tipe Aset|className:text-center|width:300px'),
+                    // $this->makeColumn('name:procurement_year|label:Periode Usulan|className:text-center|width:300px'),
                     $this->makeColumn('name:departemen|label:Departemen|className:text-center|width:300px'),
                     $this->makeColumn('name:is_disposisi|label:Status Diposisi|className:text-center'),
                     $this->makeColumn('name:status|label:Verifikasi Kerusakan'),
@@ -90,16 +91,19 @@ class PjPerbaikanAsetController extends Controller
                 }
             )
 
+
             ->addColumn('no_surat', function ($record) {
                 return $record->code;
             })
+
+
 
             ->addColumn('departemen', function ($record) {
                 return $record->deps->name;
             })
 
             ->addColumn('tanggal_panggil', function ($record) {
-                return $record->repair_date ?  $record->repair_date->format('d/m/Y') : '-';
+                return $record->repair_date ?  $record->repair_date->formatLocalized('%d/%B/%Y') : '-';
             })
             ->addColumn('is_disposisi', function ($record) use ($user) {
                 if($record->is_disposisi == 'yes'){
@@ -110,7 +114,12 @@ class PjPerbaikanAsetController extends Controller
             })
 
             ->addColumn('status', function ($record) use ($user) {
-                return $record->labelStatus($record->status ?? 'new');
+                if($record->status == 'approved'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }else{
+                    return $record->labelStatus($record->status ?? 'new');
+                }
+                //return $record->labelStatus($record->status ?? 'new');
             })
 
             ->addColumn('tanggal_pengajuan', function ($record) {
@@ -171,14 +180,16 @@ class PjPerbaikanAsetController extends Controller
                 }
 
                 if(auth()->user()->hasRole('Sarpras') && $record->status =='approved' && ($record->repair_results == 'BELUM') && auth()->user()->checkPerms('perbaikan-aset.edit')){
-                    $actions[] = [
-                        'type' => 'edit',
-                        'label' => 'Perbarui Hasil Perbaikan',
-                        'icon' => 'fa fa-wrench text-success',
-                        'page' => true,
-                        'id' => $record->id,
-                        'url' => route($this->routes . '.edit', $record->id)
-                    ];
+                    if(auth()->user()->position->location_id == 17){
+                        $actions[] = [
+                            'type' => 'edit',
+                            'label' => 'Perbarui Hasil Perbaikan',
+                            'icon' => 'fa fa-wrench text-success',
+                            'page' => true,
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.edit', $record->id)
+                        ];
+                    }
                 }
                 return $this->makeButtonDropdown($actions, $record->id);
             })

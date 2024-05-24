@@ -497,7 +497,7 @@
                                             @if(auth()->user()->hasRole('Keuangan'))
                                                 @include('layouts.forms.btnTrxAset')
                                             @else
-                                                @include('layouts.forms.btnDropdownApproval')
+                                                @include('layouts.forms.btnDropdownApproval2')
                                             @endif
                                             @include('layouts.forms.modalReject')
                                         @endif

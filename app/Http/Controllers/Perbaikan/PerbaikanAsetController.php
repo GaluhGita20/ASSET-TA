@@ -98,7 +98,12 @@ class PerbaikanAsetController extends Controller
             })
 
             ->addColumn('status', function ($record) use ($user) {
-                return $record->labelStatus($record->status ?? 'new');
+                if($record->status == 'completed'){
+                    return '<span class="badge bg-primary text-white">Verified</span>';
+                }else{
+                    return $record->labelStatus($record->status ?? 'new');
+                }
+//                return $record->labelStatus($record->status ?? 'new');
             })
 
             ->addColumn('tanggal_pengajuan', function ($record) {

@@ -29,13 +29,13 @@ class Penghapusan extends Model
         'code',
         'departemen_id',
         'kib_id',
-        'submmission_date',
+        'submission_date',
         'desc_del',
         'status',
     ];
 
     protected $casts = [
-        'submmission_date'   => 'date',
+        'submission_date'  => 'date',
     ];
 
     /*******************************
@@ -81,11 +81,10 @@ class Penghapusan extends Model
             );
         })->when(auth()->user()->roles->pluck('id')->contains(7), function ($query) {
             $query->orWhereHas('approvals', function ($q) {
-                $q
-                    ->where('order', 1)
+                $q->where('order', 1)
                     ->where('status', 'approved');
             });
-        });
+        })->latest();
 
     }
 
@@ -97,21 +96,30 @@ class Penghapusan extends Model
     public function scopeFilters($query)
     {
         return $query->filterBy(['code','status'])
-        ->filterBy(['struct_id'])->when(
-            $names = request()->aset_name,
-            function ($q) use ($names){
-                $q->whereHas('asets', function ($qq) use ($names){
-                    $qq->whereHas('asetData',function ($qqq) use ($names){
-                        $qqq->where('name','LIKE','%'.request()->sperpat_name.'%');
+        ->filterBy(['departemen_id'])
+        ->when(
+            $kib = request()->kib_id,
+            function ($q) use ($kib){
+                $q->whereHas('asets', function ($qq) use ($kib){
+                    $qq->whereHas('usulans',function ($qqq) use ($kib){
+                        $qqq->whereHas('asetd', function ($qqqq) use ($kib){
+                            $qqqq->where('id',$kib);
+                        });
                     });
             });
-        })->when(request()->submmission_date, function ($q) {
-            $date = request()->submmission_date;
-            $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
-            //dd($formatted_date);
-            $q->where('submmission_date',$formatted_date);
+        })
+        // ->when(request()->submission_date, function ($q) {
+        //     $date = request()->submission_date;
+        //     $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
+        //     //dd($formatted_date);
+        //     $q->where('submission_date',$formatted_date);
+        // })
+        ->when(
+            $tahun_usulan = request()->submission_date,
+            function ($q) use ($tahun_usulan){
+                // $formatted_date = Carbon::createFromFormat('d/m/Y',$tahun_usulan)->format('Y-m-d');
+                $q->whereYear('submission_date',$tahun_usulan);
         })->latest();
-        
     }
 
     /*******************************
@@ -132,7 +140,7 @@ class Penghapusan extends Model
             $aset = PerencanaanDetail::where('id',$uid)->pluck('ref_aset_id');
             $name= AsetRs::where('id',$aset[0])->pluck('name');
             // dd(Carbon::createFromFormat('Y/m/d',now()));
-            $this->submmission_date = Carbon::now();
+            $this->submission_date = Carbon::now();
 
             $format_angka = str_pad(($idMax + 1) < 10 ? '0' . ($idMax + 1) : ($idMax + 1), 3, '0', STR_PAD_LEFT);
 

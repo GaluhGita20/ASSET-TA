@@ -50,11 +50,11 @@ class PerencanaanUpdateRequest extends FormRequest
     {
         return [
 
-            'procurement_year.required' => 'Tahun pengadaan wajib diisi.',
-            'procurement_year.integer' => 'Tahun pengadaan harus berupa angka.',
+            'procurement_year.required' => 'Periode pengadaan wajib diisi.',
+            'procurement_year.integer' => 'Periode pengadaan harus berupa angka.',
             'procurement_year.min' => 'Tahun pengadaan minimal 1900.',
             'procurement_year.max' => 'Tahun pengadaan maksimal 2100.',
-            'procurement_year.unique' => 'Tahun pengadaan sudah digunakan untuk struktur ini.',
+            'procurement_year.unique' => 'Periode pengadaan sudah digunakan untuk struktur ini.',
             // 'is_repair.required' => 'Isian perbaikan wajib diisi.',
             'regarding.required' => 'Perihal wajib diisi.',
         ];

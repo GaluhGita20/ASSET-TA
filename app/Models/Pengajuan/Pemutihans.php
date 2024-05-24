@@ -31,7 +31,7 @@ class Pemutihans extends Model
         'code',
         'qty',
         'kib_id',
-        'submmission_date',
+        'submission_date',
         'clean_type',
         'status',
         'pic',
@@ -41,7 +41,7 @@ class Pemutihans extends Model
     ];
 
     protected $casts = [
-        'submmission_date'   => 'date',
+        'submission_date'   => 'date',
     ];
 
     /*******************************
@@ -86,22 +86,14 @@ class Pemutihans extends Model
     {
         $user = auth()->user();
         return $query->when(empty(array_intersect(['Sarpras','Keuangan','Direksi','BPKAD'], $user->roles->pluck('name')->toArray())), 
-            function ($q) use ($user) { 
-            return $q->when($user->position->imKepalaDeparetemen(), 
-                function ($qq) use ($user) {
-                    return $qq->whereIn('departemen_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
-                },
-                function ($qq) use ($user) {
-                    return $qq->where('departemen_id', $user->position->location->id); 
-                }
-            );
-        })->when(auth()->user()->roles->pluck('id')->contains(7), function ($query) {
+
+        )->when(auth()->user()->roles->pluck('id')->contains(7), function ($query) {
             $query->orWhereHas('approvals', function ($q) {
                 $q
                     ->where('order', 1)
                     ->where('status', 'approved');
             });
-        });
+        })->latest();
         
         // return $query->when(!in_array($user->position->location->id, [19]), 
         //     function ($q) use ($user) { 
@@ -132,18 +124,27 @@ class Pemutihans extends Model
     {
         return $query->filterBy(['code','status'])
         ->filterBy(['struct_id'])->when(
-            $names = request()->aset_name,
-            function ($q) use ($names){
-                $q->whereHas('asets', function ($qq) use ($names){
-                    $qq->whereHas('asetData',function ($qqq) use ($names){
-                        $qqq->where('name','LIKE','%'.request()->sperpat_name.'%');
+            $kib = request()->kib_id,
+            function ($q) use ($kib){
+                $q->whereHas('asets', function ($qq) use ($kib){
+                    $qq->whereHas('usulans',function ($qqq) use ($kib){
+                        $qqq->whereHas('asetd', function ($qqqq) use ($kib){
+                            $qqqq->where('id',$kib);
+                        });
                     });
             });
-        })->when(request()->submmission_date, function ($q) {
-            $date = request()->submmission_date;
-            $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
-            //dd($formatted_date);
-            $q->where('submmission_date',$formatted_date);
+        })
+        // ->when(request()->submission_date, function ($q) {
+        //     $date = request()->submission_date;
+        //     $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
+        //     //dd($formatted_date);
+        //     $q->where('submission_date',$date);
+        // })
+        ->when(
+            $tahun_usulan = request()->submission_date,
+            function ($q) use ($tahun_usulan){
+                // $formatted_date = Carbon::createFromFormat('d/m/Y',$tahun_usulan)->format('Y-m-d');
+                $q->whereYear('submission_date',$tahun_usulan);
         })->latest();
     }
 
@@ -153,9 +154,14 @@ class Pemutihans extends Model
     public function handleStore($request,$statusOnly = false){
         $this->beginTransaction();
         try {
-            
-            $coa = Aset::where('id',$request->kib_id)->value('coa_id');
-            $flag1 = Aset::where('coa_id',$coa)->where('status','notactive')->first();
+            // dd($request->all());
+            //mangambil data kib_id == data id dari tabel kib
+
+            $usulan_id = Aset::where('id',$request->kib_id)->value('usulan_id');
+            $aset_id = PerencanaanDetail::where('id',$usulan_id)->value('ref_aset_id');
+            //dapat id aset $aset_id
+
+            $flag1 = Aset::where('usulan_id',$usulan_id)->where('status','notactive')->where('condition','rusak berat')->first();
             // dd($request->qty);
             if(($flag1->no_factory_item != null && $request->qty > 1) || ($flag1->no_frame != null && $request->qty > 1)){
                 if($flag1->no_frame != null && $request->qty > 1 ){
@@ -175,16 +181,17 @@ class Pemutihans extends Model
 
             
             $idMax = Pemutihans::count(); // Menghitung jumlah baris dalam tabel Pemutihans
-            $merek = Aset::where('coa_id', $coa)->pluck('merek_type_item')->first(); // Menggunakan first() untuk mengambil nilai pertama jika ada
-            $name = AsetRs::where('id', $coa)->pluck('name')->first(); // Menggunakan first() untuk mengambil nilai pertama jika ada
+            $merek = Aset::where('usulan_id', $usulan_id)->pluck('merek_type_item')->first(); // Menggunakan first() untuk mengambil nilai pertama jika ada
+            // $name = AsetRs::where('id', $coa)->pluck('name')->first(); // Menggunakan first() untuk mengambil nilai pertama jika ada
+            $name = AsetRs::where('id',$aset_id)->pluck('name')->first();
+            
+            $flag = Aset::whereHas('usulans', function($q) use ($aset_id){
+                        $q->where('ref_aset_id',$aset_id);
+                    })->where('merek_type_item', $merek)
+                    ->where('condition', 'rusak berat')
+                    ->where('status', 'notactive')
+                    ->count();
 
-            $flag = Aset::where('coa_id', $coa)
-                        ->where('merek_type_item', $merek)
-                        ->where('condition', 'rusak berat')
-                        ->where('status', 'notactive')
-                        ->count();
-
-            // dd($request->all());
             if($request->qty > $flag  ){
                 return $this->rollback(
                     [
@@ -193,11 +200,11 @@ class Pemutihans extends Model
                 );
             }
 
-            $time = Carbon::createFromFormat('d/m/Y', $request->submmission_date); // Membuat objek Carbon dengan format tanggal yang benar
+            $time = Carbon::createFromFormat('d/m/Y', $request->submission_date); // Membuat objek Carbon dengan format tanggal yang benar
 
             $format_angka = str_pad(($idMax + 1) < 10 ? '0' . ($idMax + 1) : ($idMax + 1), 3, '0', STR_PAD_LEFT); // Menggunakan operasi penjumlahan dengan nilai integer untuk mendapatkan nomor urut yang benar
 
-            $this->code = $format_angka."/Pemutihan Aset/".$name."/".$merek."/".$time->day."/".$time->month."/".$time->year; // Menghapus indeks [0] pada $name karena pluck() sudah mengembalikan nilai tunggal
+            $this->code = $format_angka."/Pemutihan Aset/".$name."/".$merek."/".$time->year."/".$time->month."/".$time->day; // Menghapus indeks [0] pada $name karena pluck() sudah mengembalikan nilai tunggal
 
             $value4 = str_replace(['.', ','], '', $request->valued);
             // dd('tes');
@@ -211,11 +218,11 @@ class Pemutihans extends Model
             $this->clean_type = $request->clean_type;
 
             $this->valued = (int)$value4;
-            $this->submmission_date = $time;
+            $this->submission_date = $time;
             $this->save();
 
             $coa = Aset::where('id',$request->kib_id)->value('coa_id');
-            Aset::where('coa_id',$coa)->where('merek_type_item',$merek)->where('condition','rusak berat')->where('status','notactive')->limit($request->qty)->update(['status'=>'in cleaned']);
+            Aset::where('usulan_id',$usulan_id)->where('merek_type_item',$merek)->where('condition','rusak berat')->where('status','notactive')->limit($request->qty)->update(['status'=>'in cleaned']);
             
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
 
@@ -285,7 +292,7 @@ class Pemutihans extends Model
                 }}
 
                 $data = $this->code;
-                $tanggal_baru = $request->submmission_date;  // Tanggal baru yang ingin Anda update
+                $tanggal_baru = $request->submission_date;  // Tanggal baru yang ingin Anda update
 
                 // Pisahkan string menjadi bagian-bagian yang terpisah berdasarkan tanda '/'
                 $bagian = explode('/', $data);
@@ -296,7 +303,7 @@ class Pemutihans extends Model
                 // Gabungkan kembali bagian-bagian menjadi string utuh
                 $code = implode('/', $bagian);
 
-                $time = Carbon::createFromFormat('d/m/Y', $request->submmission_date); // Membuat objek Carbon dengan format tanggal yang benar
+                $time = Carbon::createFromFormat('d/m/Y', $request->submission_date); // Membuat objek Carbon dengan format tanggal yang benar
 
                 // $format_angka = str_pad(($idMax + 1) < 10 ? '0' . ($idMax + 1) : ($idMax + 1), 3, '0', STR_PAD_LEFT); // Menggunakan operasi penjumlahan dengan nilai integer untuk mendapatkan nomor urut yang benar
 
@@ -316,7 +323,7 @@ class Pemutihans extends Model
                 $this->clean_type = $request->clean_type;
 
                 $this->valued = (int)$value4;
-                $this->submmission_date = $time;
+                $this->submission_date = $time;
                 $this->save();
                 //dd($request->all());
 

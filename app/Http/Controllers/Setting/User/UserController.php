@@ -487,10 +487,10 @@ class UserController extends Controller
         return $record->handleStoreOrUpdate($request);
     }
 
-    // public function destroy(User $record)
-    // {
-    //     return $record->handleDestroy();
-    // }
+    public function destroy(User $record)
+    {
+        return $record->handleDestroy();
+    }
 
     public function resetPassword(User $record)
     {

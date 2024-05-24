@@ -71,11 +71,11 @@ class KIBBController extends Controller
                     $this->makeColumn('name:no_BPKB|label:Nomor BPKB|className:text-center'),
                     // $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     // $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Penyusutan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
-                    $this->makeColumn('name:nilai_buku|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
                     $this->makeColumn('name:unit|label:Unit|className:text-center'),
                     $this->makeColumn('name:location|label:Lokasi|className:text-center'),
                     // $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
@@ -85,13 +85,16 @@ class KIBBController extends Controller
                 ],
             ],
         ]);
-        return $this->render($this->views . '.index');
+        $jumlah = Aset::where('type','KIB B')->whereIn('status',['actives','in repair','in deletion'])->count('id');
+        $value = Aset::where('type','KIB B')->whereIn('status',['actives','in repair','in deletion'])->sum('book_value');
+        return $this->render($this->views . '.index', compact(['jumlah','value']));
+        // return $this->render($this->views . '.index');
     }
     
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::with('coad')->where('type','KIB B')->grid()->filters()->dtGet();
+        $records = Aset::with('coad')->where('type','KIB B')->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn(
@@ -122,11 +125,11 @@ class KIBBController extends Controller
                 return $record->no_register ? str_pad($record->no_register, 3, '0', STR_PAD_LEFT) : '-';
                 }
             )->addColumn(
-                'tgl_register',
-                function ($record) {
-                return $record->book_date ? $record->book_date : '-';
-                }
-            )->addColumn(
+                    'tgl_register',
+                    function ($record) {
+                    return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
+                })
+            ->addColumn(
                 'merek_tipe',
                 function ($record) {
                     return $record->merek_type_item ? ucwords($record->merek_type_item) : '-';
@@ -144,7 +147,7 @@ class KIBBController extends Controller
             )->addColumn(
                 'bahan',
                 function ($record) {
-                    return $record->material ? ucwords($record->material) : '-';
+                    return $record->materials->name ? $record->materials->name: '-';
                 }
             )->addColumn(
                 'source_acq',

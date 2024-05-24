@@ -20,6 +20,7 @@
 			<option value="">User</option>
 		</select>
 	</div>
+
 	<div class="ml-4 pb-2" style="width: 300px">
 		<div class="input-group">
 			<input type="text" data-post="date_start" class="form-control filter-control base-plugin--datepicker date-start"
@@ -39,6 +40,7 @@
 						"endDate" => now()->format(' d/m/Y') ])' disabled>
 		</div>
 	</div>
+	
 </div>
 @endsection
 

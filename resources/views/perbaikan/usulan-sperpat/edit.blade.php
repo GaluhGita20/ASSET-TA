@@ -16,7 +16,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">{{ __('No Surat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 <div class="col-sm-10 col-form-label">
-                                    <select name="trans_perbaikan_id" id="trans_perbaikan_id" class="form-control base-plugin--select2-ajax trans_perbaikan_id"
+                                    <select name="perbaikan_id" id="perbaikan_id" class="form-control base-plugin--select2-ajax trans_perbaikan_id"
                                         data-url="{{ route('ajax.selectPerbaikan') }}"
                                         data-placeholder="{{ __('Pilih Usulan Perbaikan') }}">
                                         @if ($record->codes)
@@ -32,12 +32,37 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">{{ __('Tipe Perbaikan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                @php
+                                    $menu = \App\Models\Perbaikan\UsulanSperpat::where('trans_perbaikan_id', $record->id)->count('id');
+                                    $flag = $menu;
+                                @endphp
+                                @if($flag == 0)
+                                    <div class="col-sm-10 col-form-label">
+                                        <select class="form-control" name="repair_type" data-placeholder="Tipe Perbaikan">
+                                            <option disabed value="">Jenis Perbaikan</option>
+                                            <option value="sperpat" {{ $record->repair_type =='sperpat' ? 'selected' : '-' }}>Pembelian Sperpat</option>
+                                            <option value="vendor"  {{ $record->repair_type =='vendor' ? 'selected' : '-' }} >Sewa Vendor</option>
+                                        </select>
+                                    </div>
+                                @else
+                                    <div class="col-sm-10 col-form-label">
+                                        <select class="form-control" name="repair_type" data-placeholder="Tipe Perbaikan" disabled>
+                                            <option disabed value="">Jenis Perbaikan</option>
+                                            <option value="sperpat" {{ $record->repair_type =='sperpat' ? 'selected' : '-' }}>Pembelian Sperpat</option>
+                                            <option value="vendor"  {{ $record->repair_type =='vendor' ? 'selected' : '-' }} >Sewa Vendor</option>
+                                        </select>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">{{ __('Tanggal Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+
                                 <div class="col-sm-10 col-form-label">
-                                    <select class="form-control" name="repair_type" data-placeholder="Tipe Perbaikan">
-                                        <option disabed value="">Jenis Perbaikan</option>
-                                        <option value="sperpat" {{ $record->repair_type =='sperpat' ? 'selected' : '-' }}>Pembelian Sperpat</option>
-                                        <option value="vendor"  {{ $record->repair_type =='vendor' ? 'selected' : '-' }} >Sewa Vendor</option>
-                                    </select>
+                                    <input name="submission_date" class="form-control base-plugin--datepicker"
+                                        placeholder="{{ __('Tanggal Pengajuan') }}" value="{{ now()->format('Y-m-d') }}" data-date-end-date="{{ now() }}" disabled>
                                 </div>
                             </div>
                         </div>
@@ -64,6 +89,8 @@
                                 </div>
                             </div>
                         </div>
+
+                 
                     </div>
                 </div>
             </div>

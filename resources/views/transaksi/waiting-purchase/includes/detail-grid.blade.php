@@ -25,8 +25,27 @@
                         <input type="text" class="form-control filter-control" data-post="jenis_aset"
                             placeholder="{{ __('Nama Aset') }}">
                     </div>
+                    <div class="col-12 col-sm-6 col-xl-3 pb-2">
+                        <select class="form-control base-plugin--select2-ajax filter-control"
+                            data-post="procurement_year"
+                            data-placeholder="{{ __('Periode Usulan') }}">
+                            <option value="" selected>{{ __('Periode Usulan') }}</option>
+                            @php
+                                $startYear = 2020;
+                                $currentYear = date('Y');
+                                $endYear = $currentYear + 5;
+                            @endphp
+                            @for ($year = $startYear; $year <= $endYear; $year++)
+                                <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
+                            @endfor
+                        </select>
+                    </div>
                 </div>
+
             </td>
+
+
+
 
             {{-- <td>tes</td> --}}
             @if(auth()->user()->hasRole('PPK') )

@@ -104,7 +104,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('pemutihan-aset/{record}/updateSummary', 'PemutihanAsetController@updateSummary')->name('pemutihan-aset.updateSummary');
                 Route::get('pemutihan-aset/detail/{record}', 'PemutihanAsetController@detail')->name('pemutihan-aset.detail');
                 Route::get('pemutihan-aset/{record}/show', 'PemutihanAsetController@show')->name('pemutihan-aset.show');
-                Route::post('store', 'PemutihanAsetControlle@submitSave')->name('pemutihan-aset.store');
+                Route::post('store', 'PemutihanAsetController@submitSave')->name('pemutihan-aset.store');
                 Route::post('pemutihan-aset/rejected/{id}', 'PemutihanAsetController@rejected')->name('pemutihan-aset.rejected');
                 Route::grid('pemutihan-aset', 'PemutihanAsetController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
@@ -271,6 +271,14 @@ Route::middleware('auth')->group(function () {
                 Route::post('selectKib', 'AjaxController@selectKib')->name('selectKib');
                 Route::post('selectPerbaikan', 'AjaxController@selectPerbaikan')->name('selectPerbaikan');
                 Route::post('getKibById', 'AjaxController@getKibById')->name('getKibById');
+                Route::post('getLapRencana2', 'AjaxController@getLapRencana2')->name('getLapRencana2');
+                Route::post('getLapRencana1', 'AjaxController@getLapRencana1')->name('getLapRencana1');
+                Route::post('getLapPengadaan1', 'AjaxController@getLapPengadaan1')->name('getLapPengadaan1');
+                Route::post('getLapAsetKIBB', 'AjaxController@getLapAsetKIBB')->name('getLapAsetKIBB');
+                Route::post('getLapPenghapusan', 'AjaxController@getLapPenghapusan')->name('getLapPenghapusan');
+                Route::post('getLapPemutihan', 'AjaxController@getLapPemutihan')->name('getLapPemutihan');
+                Route::post('getLapPemeliharaan', 'AjaxController@getLapPemeliharaan')->name('getLapPemeliharaan');
+
                 Route::post('cekSperpat', 'AjaxController@cekSperpat')->name('cekSperpat');
                 Route::post('checkAset', 'AjaxController@checkAset')->name('checkAset');
 
@@ -330,7 +338,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('detail/{record}', 'AsetController@detail')->name('detail');
                 // Route::grid('AsetController');
                 Route::grid('perencanaan-aset', 'LaporanPerencanaanController');
+                Route::grid('penghapusan-aset', 'LaporanPenghapusanController');
                 Route::grid('penerimaan-aset', 'LaporanPenerimaanController');
+                Route::grid('pemutihan-aset', 'LaporanPemutihanController');
+                Route::grid('pemeliharaan-aset', 'LaporanPemeliharaanController');
                 Route::grid('hibah-aset', 'LaporanHibahAsetController');
 
                 //Route::get('hibah-aset/detailShow/{detail}', 'LaporanHibahAsetController@detailShow')->name('hibah-aset.detailShow');
@@ -356,7 +367,7 @@ Route::middleware('auth')->group(function () {
 
                             Route::post('kib-b/{record}/detailpGrid','KIBBController@detailpGrid')->name('kib-b.detailpGrid');
                             Route::get('kib-b/detailp/{record}', 'KIBBController@detailp')->name('kib-b.detailp');
-
+                            
 
                             Route::grid('kib-c','KIBCController');
                             Route::post('kib-c/{record}/detailsGrid','KIBCController@detailsGrid')->name('kib-c.detailsGrid');
@@ -446,6 +457,8 @@ Route::middleware('auth')->group(function () {
 
                 Route::post('kib-b/{record}/detailpGrid','KIBBController@detailpGrid')->name('kib-b.detailpGrid');
                 Route::get('kib-b/detailp/{record}', 'KIBBController@detailp')->name('kib-b.detailp');
+
+                Route::get('inventaris/kib-b/export','KIBBController@export')->name('kib-b.export');
                 // Route::get('kib-a/pemutihan/{record}', 'KIBAController@pemutihan')->name('kib-a.pemutihan');
                 // Route::get('kib-b/pemutihan/{record}', 'KIBBController@pemutihan')->name('kib-b.pemutihan');
                 // Route::get('kib-c/pemutihan/{record}', 'KIBCController@pemutihan')->name('kib-c.pemutihan');

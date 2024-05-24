@@ -64,7 +64,9 @@ class KIBAController extends Controller
                     $this->makeColumn('name:nomor_sertifikat|label:Nomor Sertifikat|className:text-center'),
                     $this->makeColumn('name:tgl_sertifikat|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:kegunaan_tanah|label:Kegunaan Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_kenaikan|label:Nilai Kenaikan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     // $this->makeColumn('name:created_by'),
@@ -78,7 +80,7 @@ class KIBAController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::with('coad')->where('type','KIB A')->grid()->filters()->dtGet();
+        $records = Aset::with('coad')->where('type','KIB A')->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn(
@@ -90,7 +92,7 @@ class KIBAController extends Controller
             ->addColumn(
                 'name',
                 function ($record) {
-                   return $record->usulans ? $record->usulans->asetd->name : '-';
+                    return $record->usulans ? $record->usulans->asetd->name : '-';
                 }
             
             )->addColumn(
@@ -114,7 +116,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'tgl_register',
                 function ($record) {
-                return $record->book_date ? $record->book_date : '-';
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
             })
             ->addColumn(
                 'luas_tanah',
@@ -154,7 +156,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : $record->usulans->trans->receipt_date->format('Y');
                 }
             )->addColumn(
                 'hak_tanah',
@@ -174,7 +176,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'tgl_sertifikat',
                 function ($record) {
-                    return $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-';
+                    return $record->sertificate_date ? Carbon::parse($record->sertificate_date)->formatLocalized('%d/%B/%Y') : '-';
                 }
             )->addColumn(
                 'asal_usul',
@@ -186,7 +188,20 @@ class KIBAController extends Controller
                 function ($record) {
                     return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',');
                 }
+
             )->addColumn(
+                'nilai_kenaikan',
+                function ($record) {
+                    return $record->accumulated_depreciation ? number_format($record->accumulated_depreciation, 0, ',', ',') : '0';
+                }
+            )
+            ->addColumn(
+                'nilai_buku',
+                function ($record) {
+                    return $record->book_value ? number_format($record->book_value, 0, ',', ',') : '-';
+                }
+            )
+            ->addColumn(
                 'status',
                 function ($record) {
                     if ($record->status == 'actives') {

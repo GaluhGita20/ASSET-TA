@@ -30,8 +30,8 @@
         </div>
     </div>
 @endsection
-@section('buttons')
+{{-- @section('buttons')
     @if (auth()->user()->checkPerms($perms.'.create'))
 		@include('layouts.forms.btnAdd')
 	@endif
-@endsection
+@endsection --}}

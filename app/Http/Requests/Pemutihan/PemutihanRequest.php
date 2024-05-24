@@ -29,7 +29,7 @@ class PemutihanRequest extends FormRequest
 
         $rules= [
             // 'kib_id'=>'required',
-            'submmission_date' => 'required',
+            'submission_date' => 'required',
             'target' => 'required',
             'pic' => 'required',
             'valued' => 'required',
@@ -43,7 +43,7 @@ class PemutihanRequest extends FormRequest
     {
         return [
             // 'kib_id.required' => 'Nama Aset Wajib Diisi.',
-            'submmission_date.required' => 'Tanggal Pemutihan wajib diisi.',
+            'submission_date.required' => 'Tanggal Pemutihan wajib diisi.',
             'target.required' => 'Target Pemutihan wajib diisi.',
             'location.required' => 'Lokasi Pemutihan wajib diisi.',
             'clean_type.required' => 'Tipe Pemutihan wajib diisi.',

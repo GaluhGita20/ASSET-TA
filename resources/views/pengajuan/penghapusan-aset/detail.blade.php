@@ -133,7 +133,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">{{ __('Tanggal Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 <div class="col-sm-8 col-form-label">
-                                    <input type="text" class="form-control" name="dates" value = "{{ $record->submmission_date->format('d/m/Y') }}" data-date-end-date="{{ now() }}" disabled>
+                                    <input type="text" class="form-control" name="dates" value = "{{ $record->submission_date->format('d/m/Y') }}" data-date-end-date="{{ now() }}" disabled>
                                 </div>
                             </div>
                         </div>

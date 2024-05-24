@@ -71,8 +71,9 @@ class Role extends SpatieRole
     {
         $this->beginTransaction();
         try {
-            // dd('tes');
+            // dd($request->check);
             $this->syncPermissions($request->check ?? []);
+
             $this->save();
             $this->saveLogNotify();
             app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();

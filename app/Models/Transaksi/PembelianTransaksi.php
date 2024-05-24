@@ -230,6 +230,35 @@ class PembelianTransaksi extends Model
                 //dd($formatted_date);
                 $q->where('receipt_date',$formatted_date);
             })
+            ->when(request()->years, function ($q) {
+                $dated = request()->years;
+                // $yeard = Carbon::createFromFormat('d/m/Y', $dated)->format('Y-m-d');
+                $q->whereYear('spk_start_date',$dated);
+            })
+            ->where('trans_name', 'LIKE', '%' . request()->trans_name . '%')
+            ->latest();
+
+    }
+
+    public function scopeFilterHibah($query)
+    {
+        return $query->filterBy(['no_spk','status'])
+            ->when(request()->vendor_id, function ($q) {
+                $q->whereHas('vendors', function ($qq) {
+                    $qq->where('id', request()->vendor_id);
+                });
+            })
+            ->when(request()->receipt_date, function ($q) {
+                $date = request()->receipt_date;
+                $formatted_date = Carbon::createFromFormat('d/m/Y',$date)->format('Y-m-d');
+                //dd($formatted_date);
+                $q->where('receipt_date',$formatted_date);
+            })
+            ->when(request()->years, function ($q) {
+                $dated = request()->years;
+                // $yeard = Carbon::createFromFormat('d/m/Y', $dated)->format('Y-m-d');
+                $q->whereYear('receipt_date',$dated);
+            })
             ->where('trans_name', 'LIKE', '%' . request()->trans_name . '%')
             ->latest();
 
@@ -423,7 +452,7 @@ class PembelianTransaksi extends Model
     {
         $this->beginTransaction();
         try { 
-           //dd($request->all());
+
             if($request->unit_cost == 0){
                 return $this->rollback(
                     [
@@ -442,6 +471,8 @@ class PembelianTransaksi extends Model
             $data = $request->all();
 
             $this->fill($data);
+
+            // $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
 
             // dd('tes');
             if($request->sp2d_code != null){
@@ -468,17 +499,29 @@ class PembelianTransaksi extends Model
 
             $value6 = str_replace(['.', ','],'',$request->qty);
             $this->qty = (int)$value6;
+
+            if($request->shiping_cost == null){
+                $this->shiping_cost = 0;
+            }
+
+            if($request->tax_cost == null){
+                $this->tax_cost = 0;
+            }
             
             $start_time = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
             $end_time = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
             $selisih = $start_time->diffInDays($end_time);
             $this->spk_range_time = $selisih;
-            
+    
             $this->save();
+            
+            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+            // dd($request->all());
+            
+
             $dataArray = json_decode($request->usulan_id, true);
             PerencanaanDetail::whereIn('id',$dataArray)->update(['trans_id' => $this->id]);
             $this->pengujianPengadaan()->sync($request->user_id ?? []);
-            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
             
             if ($dataArray) {
                 PerencanaanDetail::whereIn('id', $dataArray)->update(['status' => 'waiting receipt']);
@@ -488,12 +531,13 @@ class PembelianTransaksi extends Model
                 // dd($request->all);
                 $this->handleSubmitSave($request);
             }else{
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $module='transaksi_waiting-purchase';
                 $this->addLog('Memperbarui ' . $request->trans_name);
                 $this->logs()->whereModule($module)->latest()->update(['module'=>'transaksi_pengadaan-aset']);
             }
             
-        
+            
             $redirect = route('transaksi.pengadaan-aset' . '.index');
             return $this->commitSaved(compact('redirect'));
         } catch (\Exception $e) {
@@ -776,12 +820,12 @@ class PembelianTransaksi extends Model
                 if (request()->is_submit) {
                     $this->addLog('Submit ' . $data);
                     $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
+                        'message' => 'Waiting Verify ' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);
 
-                    $pesan = $user.' Menunggu Approval ' . $data;
+                    $pesan = $user.' Menunggu Verifikasi ' . $data;
                     $this->sendNotification($pesan);
                 }
                 break;
@@ -812,7 +856,7 @@ class PembelianTransaksi extends Model
                     $this->addLog('Menyetujui ' . $data);
 
                     $this->addNotify([
-                        'message' => 'Waiting Approval ' . $data,
+                        'message' => 'Waiting Verify ' . $data,
                         'url' => route($routes . '.approval', $this->id),
                         'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                     ]);

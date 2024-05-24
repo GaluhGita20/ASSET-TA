@@ -10,7 +10,7 @@
 			<option value="" selected>{{ __('Modul') }}</option>
 			@foreach ($menu->grid()->get() as $menu)
 			@if ($menu->parent_id == NULL)
-			<option value="{{ $menu->module }}">{{ $menu->show_module }}</option>
+				<option value="{{ $menu->module }}">{{ $menu->show_module }}</option>
 			@endif
 			@endforeach
 		</select>

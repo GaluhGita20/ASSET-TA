@@ -291,7 +291,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga') }}</label>
+                                    <label class="col-form-label">{{ __('Harga Perolehan') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -309,7 +309,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga') }}</label>
+                                    <label class="col-form-label">{{ __('Harga Perolehan') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -324,6 +324,42 @@
                             </div>
                         </div>
                         @endif
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-4 pr-0">
+                                    <label class="col-form-label">{{ __('Nilai Buku') }}</label>
+                                </div>
+                                <div class="col-8 parent-group">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="book_value" value="{{ $record->book_value }}" readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                rupiah
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-4 pr-0">
+                                    <label class="col-form-label">{{ __('Persentase Kenaikan Harga / Tahun') }}</label>
+                                </div>
+                                <div class="col-8 parent-group">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="persentase" value="5" readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                Persen
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
                         <div class="col-sm-12">

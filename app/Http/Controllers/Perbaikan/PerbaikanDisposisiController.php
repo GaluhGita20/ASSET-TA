@@ -62,6 +62,10 @@ class PerbaikanDisposisiController extends Controller
                 }
             })
 
+            ->addColumn('procurement_year', function ($record) {
+                return $record->procurement_year;
+            })
+
             ->addColumn('vendor', function ($record) {
                 return $record->vendors->name;
             })
@@ -177,6 +181,7 @@ class PerbaikanDisposisiController extends Controller
                     $this->makeColumn('name:#|className:text-right'),
                     $this->makeColumn('name:no_surat|label:Nomor Surat|className:text-center|width:300px'),
                     $this->makeColumn('name:vendor|label:Vendor|className:text-center|width:250px'),
+                    $this->makeColumn('name:procurement_year|label:Periode Usulan|className:text-center|width:300px'),
                     $this->makeColumn('name:repair_type|label:Jenis Perbaikan|className:text-center|width:250px'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),

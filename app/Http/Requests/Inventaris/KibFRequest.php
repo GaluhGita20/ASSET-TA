@@ -53,7 +53,7 @@ class KibFRequest extends FormRequest
             'tanah_id.required' => 'Kode Aset Tanah Wajib Diisi',
             'coa_id.required' => 'Kode Aset Wajib Diisi',
             'no_sertificate.required' => 'Nomor Dokumen Wajib Diisi',
-            'sertificate_date.required' => 'Tanggal Sertifikat Wajib Diisi',
+            'sertificate_date.required' => 'Tanggal Document Wajib Diisi',
             'useful.required' => 'Masa Manfaat Wajib Diisi.',
             'residual_value.required' => 'Nilai Residu Diisi',
         ];

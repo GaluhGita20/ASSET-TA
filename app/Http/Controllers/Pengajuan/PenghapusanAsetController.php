@@ -49,6 +49,7 @@ class PenghapusanAsetController extends Controller
                     $this->makeColumn('name:type_aset|label:Tipe Aset|className:text-center|width:250px'),
                     $this->makeColumn('name:nama_aset|label:Nama Aset|className:text-center|width:250px'),
                     $this->makeColumn('name:departemen|label:Departemen|className:text-center|width:300px'),
+                    $this->makeColumn('name:nilai_hapus|label:Nilai Aset Dihapus (Rupiah)|className:text-center|width:300px'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
@@ -91,6 +92,10 @@ class PenghapusanAsetController extends Controller
 
             ->addColumn('status', function ($record) use ($user) {
                 return $record->labelStatus($record->status ?? 'new');
+            })
+
+            ->addColumn('nilai_hapus', function ($record) use ($user) {
+                return number_format($record->asets->book_value, 0, ',', ',') ?? '0' ;
             })
 
             ->addColumn('updated_by', function ($record) {

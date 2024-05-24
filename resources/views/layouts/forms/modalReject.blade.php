@@ -100,7 +100,7 @@
 						{{-- data-swal-ok="{{ __('base.confirm.reject.ok') }}" --}}
 						>
 						<i class="fa fa-check mr-1"></i>
-						{{ __('Approve') }}
+						{{ __('Verify') }}
 					</button>
 				</div>
 			</form>

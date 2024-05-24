@@ -9,16 +9,16 @@
     </div>
     <div class="col-sm-6">
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">{{ __('Tgl Surat') }}</label>
+            <label class="col-sm-4 col-form-label">{{ __('Tanggal Surat') }}</label>
             <div class="col-sm-8 col-form-label">
-                <input type="text" class="form-control" value="{{ $record->date->format('d/m/Y') }}" disabled>
+                <input type="text" class="form-control" value="{{ $record->date->formatLocalized('%d/%B/%Y') }}" disabled>
             </div>
         </div>
     </div>
 
     <div class="col-sm-6">
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">{{ __('Tahun Pengadaan') }}</label>
+            <label class="col-sm-4 col-form-label">{{ __('Periode Perencanaan') }}</label>
             <div class="col-sm-8 col-form-label">
                 <input type="text" class="form-control" value={{ $record->procurement_year }} type="number" min="1900" max="2100" name="procurement_year" placeholder="{{ __('Tahun Pengadaan') }}" readonly>
             </div>
@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    <div class="col-sm-12">
+    {{-- <div class="col-sm-12">
         <div class="form-group row">
             <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
             <div class="col-10 parent-group">
@@ -102,6 +102,6 @@
                     @endforeach
             </div>
         </div>
-    </div>
+    </div> --}}
 
 </div>

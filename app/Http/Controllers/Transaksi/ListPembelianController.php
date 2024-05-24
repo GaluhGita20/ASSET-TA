@@ -156,7 +156,7 @@ class ListPembelianController extends Controller
                         $this->makeColumn('name:num|label:#'),
                         $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
                         $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-left|width:200px'),
-                        $this->makeColumn('name:tahun_usulan|label:Tahun Usulan|className:text-center|width:200px'),
+                        $this->makeColumn('name:tahun_usulan|label:Periode Usulan|className:text-center|width:200px'),
                         $this->makeColumn('name:qty_agree|label:Jumlah (Unit)|className:text-center|width:300px'),
                         $this->makeColumn('name:HPS_unit_cost|label:Standar Harga (Rupiah)|className:text-center|width:200px'),
                         // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),

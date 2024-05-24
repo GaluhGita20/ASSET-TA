@@ -64,7 +64,7 @@ class KIBDController extends Controller
                     $this->makeColumn('name:nomor_dokumen|label:Nomor Dokumen|className:text-center'),
                     $this->makeColumn('name:tgl_dokumen|label:Tanggal Dokumen|className:text-center'),
                     $this->makeColumn('name:tanah_id|label:Kode Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Biaya Pembangunan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
@@ -118,7 +118,7 @@ class KIBDController extends Controller
             )->addColumn(
                 'tgl_register',
                 function ($record) {
-                return $record->book_date ? $record->book_date : '-';
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
             })->addColumn(
                 'nama_kontruksi',
                 function ($record) {
@@ -137,7 +137,7 @@ class KIBDController extends Controller
             )->addColumn(
                 'luas',
                 function ($record) {
-                    return $record->wide ? $record->wide : '-';
+                    return $record->wide ? number_format($record->wide, 0, ',', ','): '-';
                 }
             )->addColumn(
                 'alamat',
@@ -147,7 +147,7 @@ class KIBDController extends Controller
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : $record->usulans->trans->receipt_date->format('Y');
                 }
             )->addColumn(
                 'status_tanah',
@@ -162,7 +162,7 @@ class KIBDController extends Controller
             )->addColumn(
                 'tgl_dokumen',
                 function ($record) {
-                    return $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-';
+                    return $record->sertificate_date ? Carbon::parse($record->sertificate_date)->formatLocalized('%d/%B/%Y'): '-';
                 }
             )->addColumn(
                 'source_acq',
@@ -200,12 +200,12 @@ class KIBDController extends Controller
                         return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
                 }
-            )->addColumn(
-                'tanah_id',
-                function ($record) {
-                    return $record->tanah_id ? $record->tanah_id : '-';
-                }
-            )->addColumn(
+                )->addColumn(
+                    'tanah_id',
+                    function ($record) {
+                        return $record->tanahs->nama_akun ? $record->tanahs->kode_akun.'/'.$record->tanahs->nama_akun : '-';
+                    }
+                )->addColumn(
                 'kondisi',
                 function ($record) {
                    // return $record->condition ? ucfirst($record->condition) : '-';

@@ -85,7 +85,7 @@ class LaporanPerencanaanController extends Controller
             ->addColumn(
                 'qty_req',
                 function ($detail) {
-                    return $detail->qty_req;
+                    return '<span class="badge bg-primary text-white">'.$detail->qty_req.'</span>';
                 }
             )
             ->addColumn(
@@ -108,15 +108,25 @@ class LaporanPerencanaanController extends Controller
             ->addColumn(
                 'HPS_total_cost',
                 function ($detail) {
+                    // if($detail->status)
                     return number_format($detail->HPS_total_cost, 0, ',', ',');
                 }
             )
             ->addColumn(
                 'qty_agree',
                 function ($detail) {
-                    return number_format($detail->qty_agree, 0, ',', ',') ?? '0';
+                    return  '<span class="badge bg-success text-white">'.number_format($detail->qty_agree, 0, ',', ',') ?? '0'.'</span>';
                 }
             )
+
+            ->addColumn(
+                'not_agree',
+                function ($detail) {
+                    // return ($detail->qty_agree);
+                    return '<span class="badge bg-danger text-white">'.number_format(($detail->qty_req - $detail->qty_agree), 0, ',', ',') ?? '0'.'</span>';
+                }
+            )
+
             ->addColumn(
                 'HPS_total_agree',
                 function ($detail) {
@@ -166,7 +176,7 @@ class LaporanPerencanaanController extends Controller
                 }
             )
             
-            ->rawColumns(['status','action_show','updated_by','created_by','status'])
+            ->rawColumns(['status','action_show','updated_by','created_by','status','not_agree','qty_agree','qty_req'])
             ->make(true);
     }
 
@@ -180,8 +190,9 @@ class LaporanPerencanaanController extends Controller
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi|className:text-left|width:300px'),
                     $this->makeColumn('name:qty_req|label:Pengajuan|className:text-center|width:250px'),
                     $this->makeColumn('name:qty_agree|label:Disetujui|className:text-center|width:250px'),
-                    $this->makeColumn('name:status|label:Status|className:text-center|width:150px'),
-                    $this->makeColumn('name:procurement_year|label:Tahun Pengadaaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:not_agree|label:Ditolak|className:text-center|width:250px'),
+                    $this->makeColumn('name:HPS_total_cost|label:Total Biaya (Rupiah)|className:text-center|width:150px'),
+                    $this->makeColumn('name:procurement_year|label:Periode Usulan|className:text-center|width:250px'),
                     $this->makeColumn('name:departement|label:Unit Kerja|className:text-center|width:250px'),
                     $this->makeColumn('name:updated_by|width:300px'),
                   //  $this->makeColumn('name:created_by|width:300px'),

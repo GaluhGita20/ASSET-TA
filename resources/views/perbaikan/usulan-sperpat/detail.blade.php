@@ -21,6 +21,7 @@
                 <div class="card-body">
                     @include('globals.notes')
                     @csrf
+
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group row">
@@ -38,6 +39,24 @@
                                 </div>
                             </div>
                         </div> 
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">{{ __('Tanggal Pengajuan Usulan') }}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <input type="text" class="form-control" value="{{ $record->submission_date->format('d/m/Y') }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">{{ __('Periode Usulan') }}</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <input type="text" class="form-control" value="{{ $record->procurement_year }}" disabled>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="col-sm-12">
                             <div class="form-group row">

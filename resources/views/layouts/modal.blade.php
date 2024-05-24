@@ -42,7 +42,7 @@
 <script>
 	// Mendaftarkan fungsi untuk menangani penutupan modal saat tombol close diklik
 	$(document).ready(function () {
-		$('.modal .close').click(function () {
+		$('.modal .modal-header .close').click(function () {
 			$(this).closest('.modal').modal('hide');
 		});
 	});

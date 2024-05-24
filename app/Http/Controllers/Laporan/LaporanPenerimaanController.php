@@ -44,7 +44,7 @@ class LaporanPenerimaanController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = PembelianTransaksi::where('source_acq','pembelian')->filters()->dtGet();
+        $records = PembelianTransaksi::where('source_acq','pembelian')->where('status','completed')->filters()->dtGet();
         
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {
@@ -98,7 +98,14 @@ class LaporanPenerimaanController extends Controller
                 return number_format($detail->total_cost, 0, ',', ',');
             })
             ->addColumn('status', function ($detail) {
-                return $detail->labelStatus($detail->status ?? 'draft');
+                if($detail->status == 'completed'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($detail->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $detail->labelStatus($detail->status ?? 'draft');
+                }
+                //return $detail->labelStatus($detail->status ?? 'draft');
             })
             ->addColumn('updated_by', function ($detail) use ($user) {
                 if ($detail->status === 'draf') {

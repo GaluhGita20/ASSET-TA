@@ -57,6 +57,8 @@ class KIBAController extends Controller
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     // $this->makeColumn('name:nama_akun|label:Nama Akun|className:text-center|width:300px'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
+
                     $this->makeColumn('name:luas_tanah|label:Luas (m2)|className:text-center'),
                     $this->makeColumn('name:provinsi|label:Provinsi|className:text-center'),
                     $this->makeColumn('name:kota|label:Kota|className:text-center'),
@@ -68,7 +70,10 @@ class KIBAController extends Controller
                     $this->makeColumn('name:nomor_sertifikat|label:Nomor Sertifikat|className:text-center'),
                     $this->makeColumn('name:tgl_sertifikat|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:kegunaan_tanah|label:Kegunaan Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Harga (Rupiah)|className:text-center'),
+                    // $this->makeColumn('name:nilai_beli|label:Harga Perolehan(Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_kenaikan|label:Nilai Kenaikan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     // $this->makeColumn('name:created_by'),
@@ -76,13 +81,16 @@ class KIBAController extends Controller
                 ],
             ],
         ]);
-        return $this->render($this->views . '.index');
+
+        $jumlah = Aset::where('type','KIB A')->where('status','actives')->count('id');
+        $value = Aset::where('type','KIB A')->where('status','actives')->sum('book_value');
+        return $this->render($this->views . '.index', compact(['jumlah','value']));
     }
     
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::with('coad')->where('type','KIB A')->grid()->filters()->dtGet();
+        $records = Aset::with('coad')->where('type','KIB A')->filters()->dtGet();
 
         return \DataTables::of($records)
             ->addColumn(
@@ -115,7 +123,13 @@ class KIBAController extends Controller
                 // $panjang_target = max(3, ceil(log10($max_no + 1)));
                 // return $record->no_register ? str_pad($record->no_register, $panjang_target, '0', STR_PAD_LEFT) : '-';
                 }
-            )->addColumn(
+            )
+            ->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
+            })
+            ->addColumn(
                 'luas_tanah',
                 function ($record) {
                     return $record->wide ? number_format($record->wide, 0, ',', ',') : '-';
@@ -135,7 +149,18 @@ class KIBAController extends Controller
                 function ($record) {
                     return $record->district_id ? $record->district->name : '-';
                 }
+            ) ->addColumn(
+                'nilai_buku',
+                function ($record) {
+                    return $record->book_value ? number_format($record->book_value, 0, ',', ',') : '-';
+                }
             )->addColumn(
+                'nilai_kenaikan',
+                function ($record) {
+                    return $record->accumulated_depreciation ? number_format($record->accumulated_depreciation, 0, ',', ',') : '0';
+                }
+            )
+            ->addColumn(
                 'alamat',
                 function ($record) {
                     return $record->address ? ucwords($record->address) : '-';
@@ -155,12 +180,12 @@ class KIBAController extends Controller
                 function ($record) {
                     return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
                 }
-            )->addColumn(
-                'hak_tanah',
-                function ($record) {
-                    return $record->land_rights ? ucwords($record->land_rights) : '-';
-                }
-            )->addColumn(
+                )->addColumn(
+                    'hak_tanah',
+                    function ($record) {
+                        return $record->hakTanah->name ? $record->hakTanah->name : '-';
+                    }
+                )->addColumn(
                 'kegunaan_tanah',
                 function ($record) {
                     return $record->land_use ? ucwords($record->land_use) : '-';
@@ -173,7 +198,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'tgl_sertifikat',
                 function ($record) {
-                    return $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-';
+                    return $record->sertificate_date ? Carbon::parse($record->sertificate_date)->formatLocalized('%d/%B/%Y')  : '-';
                 }
             )->addColumn(
                 'asal_usul',
@@ -226,7 +251,7 @@ class KIBAController extends Controller
                 $actions[] = [
                     'type' => 'show',
                     'page' => true,
-                    'label' => 'Laporan Penyusutan',
+                    'label' => 'Laporan Kenaikan Nilai',
                     'icon' => 'fas fa-coins text-primary',
                     'id' => $record->id,
                     'url' => route($this->routes . '.detailp', $record->id),
@@ -422,33 +447,43 @@ class KIBAController extends Controller
     public function detailpGrid(Aset $record){
 
         $asset = Aset::find($record->id);
-        $res_val = $asset->residual_value;
+        // $res_val = $asset->residual_value;
         $book_val = $asset->acq_value;
         $book_reg = $asset->book_date;
         $useful = $asset->useful;
 
-        $npt = ($book_val - $res_val)/$useful;
+        // $npt = ($book_val - $res_val)/$useful;
 
         $data  = collect();
-        for($i=0; $i<=$useful; $i++){
-            if($i == 0){
+        for ($i = Carbon::parse($book_reg)->format('Y'); $i <= date('Y'); $i++) {
+            if ($i == Carbon::parse($book_reg)->format('Y')) {
                 $data->push([
                     'date'=> $book_reg ,
-                    'nilai_penyusutan'=> 0,
-                    'keterangan'=> 'Penyusutan Awal ',
+                    'nilai_kenaikan'=> 0,
+                    'keterangan'=> 'Akumulasi Kenaikan Awal ',
                     'nilai_buku'=> $book_val,
                 ]);
             }else{
-                $penyusutan = $npt;
-                // Hitung nilai buku setelah penyusutan
-                $nilai_buku = max(0, $book_val - ($penyusutan * $i));
+                if(date('Y') - $i == 0){ //nilai = 0
+                    $kenaikan = ($asset->acq_value * 0.05) * (date('Y') - Carbon::parse($book_reg)->format('Y'));
+                    $data->push([
+                        'date' => date('Y-m-d', strtotime($book_reg . ' + ' . (date('Y') - Carbon::parse($book_reg)->format('Y')) . ' years')),
+                        'nilai_kenaikan' => $kenaikan,
+                        'keterangan' => 'Akumulasi Kenaikan Tahun Ke ' . $i,
+                        'nilai_buku' => $book_val + $kenaikan,
+                    ]);
+                }else{
+                    $kenaikan = ($asset->acq_value * 0.05) * (date('Y') - $i);
+                    // $nilai_buku = $book_val + $kenaikan;
+                    $data->push([
+                        'date' => date('Y-m-d', strtotime($book_reg . ' + ' . (date('Y') - $i) . ' years')),
+                        'nilai_kenaikan' => $kenaikan,
+                        'keterangan' => 'Akumulasi Kenaikan Tahun Ke ' . $i,
+                        'nilai_buku' => $book_val + $kenaikan,
+                    ]);
+                }
         
-                $data->push([
-                    'date' => date('Y-m-d', strtotime($book_reg . ' + ' . $i . ' years')),
-                    'nilai_penyusutan' => $penyusutan * $i,
-                    'keterangan' => 'Penyusutan Tahun Ke ' . $i,
-                    'nilai_buku' => $nilai_buku,
-                ]);
+                
             }
         }
 
@@ -462,8 +497,8 @@ class KIBAController extends Controller
             ->addColumn('date', function ($data) {
                 return isset($data['date']) ? $data['date'] : '-';
             })
-            ->addColumn('nilai_penyusutan', function ($data) {
-                return isset($data['nilai_penyusutan']) ? number_format($data['nilai_penyusutan'], 0, ',', ',') : '-';
+            ->addColumn('nilai_kenaikan', function ($data) {
+                return isset($data['nilai_kenaikan']) ? number_format($data['nilai_kenaikan'], 0, ',', ',') : '-';
             })
             ->addColumn('keterangan', function ($data) {
                 return isset($data['keterangan']) ? $data['keterangan'] : '-';
@@ -471,7 +506,7 @@ class KIBAController extends Controller
             ->addColumn('nilai_buku', function ($data) {
                 return isset($data['nilai_buku']) ? number_format($data['nilai_buku'], 0, ',', ',') : '-';
             })
-            ->rawColumns(['date','nilai_penyusutan' ,'keterangan', 'nilai_buku'])
+            ->rawColumns(['date','nilai_kenaikan' ,'keterangan', 'nilai_buku'])
             ->make(true);
     }
 
@@ -482,7 +517,7 @@ class KIBAController extends Controller
                 'datatable_1' => [
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:date|label:Tanggal|className:text-center|width:200px'),
-                    $this->makeColumn('name:nilai_penyusutan|label:Nilai Penyusutan|className:text-center|width:300px'),
+                    $this->makeColumn('name:nilai_kenaikan|label:Akumulasi Kenaikan|className:text-center|width:300px'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center|width:250px'),
                     $this->makeColumn('name:nilai_buku|label:Nilai Buku|className:text-center|width:250px'),
                 ],

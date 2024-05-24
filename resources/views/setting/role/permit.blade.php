@@ -41,16 +41,18 @@
 					@if ($record->id == 1 && $menu['title'] == 'Monitoring')
 						@continue
 					@endif
+
 					<thead>
 						<tr>
 							<th>
 								<h6 class="font-weight-bold">{!! $menu['title'] !!}</h6>
 							</th>
 							<th class="text-center ">
-								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master', 'report']))
+								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master']))
 								<button type="button" class="btn btn-light-primary font-weight-bold mr-2 check all" data-check="view">
 									<i class="far fa-check-circle fa-fw mr-1"></i>View All
 								</button>
+								
 								@elseif($p = $perms->where('name', $menu['perms'].'.view')->first())
 								<div class="d-inline-block">
 									<label class="checkbox checkbox-lg checkbox-light-primary checkbox-single flex-shrink-0">
@@ -65,8 +67,9 @@
 								</div>
 								@endif
 							</th>
+
 							<th class="text-center ">
-								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master', 'report']))
+								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master']))
 									<button type="button" class="btn btn-light-primary font-weight-bold mr-2 check all" data-check="create">
 										<i class="far fa-check-circle fa-fw mr-1"></i>Create All
 									</button>
@@ -79,8 +82,9 @@
 									</div>
 								@endif
 							</th>
+							
 							<th class="text-center ">
-								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master', 'report']))
+								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master']))
 									<button type="button" class="btn btn-light-primary font-weight-bold mr-2 check all" data-check="edit">
 										<i class="far fa-check-circle fa-fw mr-1"></i>Edit All
 									</button>
@@ -94,7 +98,7 @@
 								@endif
 							</th>
 							<th class="text-center ">
-								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master', 'report']))
+								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master']))
 									<button type="button" class="btn btn-light-primary font-weight-bold mr-2 check all" data-check="delete">
 										<i class="far fa-check-circle fa-fw mr-1"></i>Delete All
 									</button>
@@ -108,7 +112,7 @@
 								@endif
 							</th>
 							<th class="text-center ">
-								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master', 'report']) && !in_array($record->id,
+								@if(!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master']) && !in_array($record->id,
 									[1]))
 									<button type="button" class="btn btn-light-primary font-weight-bold mr-2 check all" data-check="approve">
 										<i class="far fa-check-circle fa-fw mr-1"></i>Approve All
@@ -124,8 +128,9 @@
 									@endif
 								@endif
 							</th>
+
 							<th class="text-right ">
-								@if(empty($menu['submenu']) || in_array($menu['name'], ['setting', 'master', 'report']))
+								@if(empty($menu['submenu']) || in_array($menu['name'], ['setting', 'master'] ))
 									<button type="button" class="btn btn-light-primary font-weight-bold select all"
 										@if($menu['name']=='dashboard' ) hidden @endif><i class="far fa-check-circle fa-fw mr-1"></i>Check
 										All</button>
@@ -133,7 +138,7 @@
 							</th>
 						</tr>
 					</thead>
-					@if (!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master', 'report']))
+					@if (!empty($menu['submenu']) && !in_array($menu['name'], ['setting', 'master']))
 						<tbody>
 							@foreach ($menu['submenu'] as $child)
 								@if (empty($child['submenu']))

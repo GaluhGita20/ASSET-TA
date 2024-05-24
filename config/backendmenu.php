@@ -196,68 +196,88 @@ return [
         'title' => 'Pelaporan',
         'icon' => 'fa fa-book',
         'submenu' => [
-            [
-                'name' => 'laporan.Inventaris',
-                'title' => 'Daftar Laporan Aset',
-                'url' => '',
-                'submenu' => [
+            // [
+            //     'name' => 'laporan-inventaris_kib-a',
+            //     'perms' => 'report-inventaris',
+            //     // 'perms' => 'report-perencanaan',
+            //     'title' => 'Daftar Laporan Aset',
+            //     // 'url' => '/laporan/inventaris/kib-a',
+                // 'submenu' => [
                     [
                         'name' => 'laporan-inventaris_kib-a',
-                        'perms' => 'registrasi.inventaris-aset',
+                        'perms' => 'report-inventaris',
                         'title' => 'Aset KIB A',
                         'url' => '/laporan/inventaris/kib-a',
                     ],
                     [
                         'name' => 'laporan-inventaris_kib-b',
-                        'perms' => 'registrasi.inventaris-aset',
+                        'perms' => 'report-inventaris',
                         'title' => 'Aset KIB B',
                         'url' => '/laporan/inventaris/kib-b',
                     ],
                     [
                         'name' => 'laporan-inventaris_kib-c',
-                        'perms' => 'registrasi.inventaris-aset',
+                        'perms' => 'report-inventaris',
                         'title' => 'Aset KIB C',
                         'url' => '/laporan/inventaris/kib-c',
                     ],
                     [
                         'name' => 'laporan-inventaris_kib-d',
-                        'perms' => 'registrasi.inventaris-aset',
+                        'perms' => 'report-inventaris',
                         'title' => 'Aset KIB D',
                         'url' => '/laporan/inventaris/kib-d',
                     ],
                     [
                         'name' => 'laporan-inventaris_kib-e',
-                        'perms' => 'registrasi.inventaris-aset',
+                        'perms' => 'report-inventaris',
                         'title' => 'Aset KIB E',
                         'url' => '/laporan/inventaris/kib-e',
                     ],
                     [
                         'name' => 'laporan-inventaris_kib-f',
-                        'perms' => 'registrasi.inventaris-aset',
+                        'perms' => 'report-inventaris',
                         'title' => 'Aset KIB F',
                         'url' => '/laporan/inventaris/kib-f',
+                    // ],
                     ],
-                ]
-            ],
+            
             [
                 'name' => 'laporan_perencanaan-aset',
-                'perms' => 'perencanaan-aset',
+                'perms' => 'report-perencanaan',
                 'title' => 'Usulan Aset',
                 'url' => '/laporan/perencanaan-aset',
             ],
             [
                 'name' => 'laporan_penerimaan-aset',
-                'perms' => 'perencanaan-aset',
+                'perms' => 'report-transaksi',
                 'title' => 'Penerimaan Aset',
                 'url' => '/laporan/penerimaan-aset',
             ],
-
             [
-                'name' => 'laporan_hibah-aset',
-                'perms' => 'perencanaan-aset',
-                'title' => 'Penerimaan Hibah Aset',
-                'url' => '/laporan/hibah-aset',
+                'name' => 'laporan_pemeliharaan-aset',
+                'perms' => 'report-pemeliharaan',
+                'title' => 'Pemeliharaan Aset',
+                'url' => '/laporan/pemeliharaan-aset',
             ],
+            [
+                'name' => 'laporan_penghapusan-aset',
+                'perms' => 'report-penghapusan',
+                'title' => 'Penghapusan Aset',
+                'url' => '/laporan/penghapusan-aset',
+            ],
+            [
+                'name' => 'laporan_pemutihan-aset',
+                'perms' => 'report-pemutihan',
+                'title' => 'Pemutihan Aset',
+                'url' => '/laporan/pemutihan-aset',
+            ],
+
+            // [
+            //     'name' => 'laporan_hibah-aset',
+            //     'perms' => 'perencanaan-aset',
+            //     'title' => 'Penerimaan Hibah Aset',
+            //     'url' => '/laporan/hibah-aset',
+            // ],
 
             // [
             //     'name' => 'laporan_pengadaan-aset',

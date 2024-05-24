@@ -40,7 +40,7 @@ class PemutihanAsetController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Pemutihans::dtGet();
+        $records = Pemutihans::grid()->filters()->dtGet();
 
         return DataTables::of($records)
             ->addColumn('#', function ($record) {
@@ -87,7 +87,13 @@ class PemutihanAsetController extends Controller
             })
 
             ->addColumn('status', function ($record) use ($user) {
-                return $record->labelStatus($record->status ?? 'new');
+                if($record->status =='completed'){
+                    return '<span class="badge bg-success text-white">Verified</span>';
+                }elseif($record->status == 'waiting.approval'){
+                    return '<span class="badge bg-primary text-white">Waiting Verify</span>';
+                }else{
+                    return $record->labelStatus($record->status ?? 'new');
+                }
             })
 
             ->addColumn('updated_by', function ($record) {
@@ -124,7 +130,10 @@ class PemutihanAsetController extends Controller
                 }
 
                 if ($record->checkAction('tracking', $this->perms)) {
-                    $actions[] = 'type:tracking';
+                    $actions[] = [
+                        'type'=>'tracking',
+                        'label'=>'Tracking Verify'];
+                    //$actions[] = 'type:tracking';
                 }
 
                 if ($record->checkAction('edit', $this->perms)) {
@@ -150,7 +159,7 @@ class PemutihanAsetController extends Controller
                 if ($record->checkAction('approval', $this->perms) && (auth()->user()->position->id == 36)) {
                     $actions[] = [
                         'type' => 'approval',
-                        'label' => 'Approval',
+                        'label' => 'Verify',
                         'page' => true,
                         'id' => $record->id,
                         'url' => route($this->routes . '.approval', $record->id)
@@ -182,7 +191,7 @@ class PemutihanAsetController extends Controller
                     $this->makeColumn('name:target|label:Target Pemutihan|className:text-center|width:250px'),
                     $this->makeColumn('name:qty|label:Jumlah|className:text-center|width:250px'),
                     $this->makeColumn('name:pic|label:PIC|className:text-center|width:250px'),
-                    $this->makeColumn('name:value|label:Pendapatan (Rupiah)|className:text-center|width:250px'),
+                    $this->makeColumn('name:value|label:Pendapatan Pemutihan (Rupiah)|className:text-center|width:250px'),
                     $this->makeColumn('name:location|label:Lokasi Pemutihan|className:text-center|width:250px'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),

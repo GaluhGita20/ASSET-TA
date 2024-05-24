@@ -166,7 +166,11 @@ class Pemeliharaan extends Model
         // })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
 
 
-        $data = Aset::where('condition','baik')->where('status', 'actives')->where('acq_value','>=',1000000)->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
+        $data = Aset::where('condition','baik')->whereHas('usulans',function($q)use($dep){
+            $q->whereHas('perencanaan', function($q) use ($dep){
+                $q->where('struct_id',$dep);
+            });
+        })->orWhere('location_hibah_aset',$dep)->where('status', 'actives')->where('acq_value','>=',1000000)->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
 
         // $data = Aset::with('usulans')
         //     ->where('condition', 'baik')
@@ -416,10 +420,10 @@ class Pemeliharaan extends Model
                 
                 break;
             case $routes . '.update':
-                $this->addLog('Mengubah ' . $data);
+                $this->addLog('Memperbarui ' . $data.' '.'dan Hasil Pemeliharaan');
                 if (request()->is_submit) {
 
-                    $this->addLog('Submit ' . $data);
+                    $this->addLog('Submit ' . $data. ' '.'dan Hasil Pemeliharaan');
                     //dd($data);
                     $this->addNotify([
                         'message' => 'Waiting Verification ' . $data,

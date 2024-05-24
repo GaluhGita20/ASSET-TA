@@ -103,7 +103,13 @@ class Perbaikan extends Model
     public function scopeFilters($query)
     {
         return $query->filterBy(['code'])
-        ->filterBy(['departemen_id','repair_results','status'])->latest();
+        ->filterBy(['departemen_id','repair_results','status'])
+        ->when(
+            $tahun_usulan = request()->submission_date,
+            function ($q) use ($tahun_usulan){
+                $q->whereYear('submission_date',$tahun_usulan);
+            })
+        ->latest();
         
     }
 

@@ -19,7 +19,6 @@
                         <div class="col-sm-12">
                             <div class="col-10 parent-group">
                             </div>
-                      
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
                                     <label class="col-form-label">{{ __('Nama Aset') }}</label>
@@ -58,28 +57,30 @@
                                     <label class="col-form-label">{{ __('Tanggal Pembukuan') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <input class="form-control " name="book_date" value="{{ now()->format('Y/m/d') }}" readonly>
+                                    <input class="form-control " name="book_date" value="{{ $record->book_date }}" readonly>
                                 </div>
                             </div>
                         </div>
-            
-                        <div class="col-sm-6">
-                            <div class="form-group row">
-                                <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Masa Manfaat') }}</label>
-                                </div>
-                                <div class="col-8 parent-group">
-                                    <div class="input-group">
-                                        <input type="number" class="form-control base-plugin--inputmask_currency text-right" placeholder="{{ __('Masa Manfaat') }}" name="useful" value="{{ $record->useful }}" readonly>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                Tahun
-                                            </span>
+
+                        @if($record->type != 'KIB A')
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <div class="col-4 pr-0">
+                                        <label class="col-form-label">{{ __('Masa Manfaat') }}</label>
+                                    </div>
+                                    <div class="col-8 parent-group">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control base-plugin--inputmask_currency text-right" placeholder="{{ __('Masa Manfaat') }}" name="useful" value="{{ $record->useful }}" readonly>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    Tahun
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -98,24 +99,25 @@
                                 </div>
                             </div>
                         </div>
-            
-                        <div class="col-sm-6">
-                            <div class="form-group row">
-                                <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Nilai Residu') }}</label>
-                                </div>
-                                <div class="col-8 parent-group">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" placeholder="{{ __('Nilai Residu') }}" name="residual_value" value="{{ $record->residual_value }}" readonly>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                Rupiah
-                                            </span>
+                        @if($record->type != 'KIB A')
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <div class="col-4 pr-0">
+                                        <label class="col-form-label">{{ __('Nilai Residu') }}</label>
+                                    </div>
+                                    <div class="col-8 parent-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control base-plugin--inputmask_currency text-right" placeholder="{{ __('Nilai Residu') }}" name="residual_value" value="{{ $record->residual_value }}" readonly>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    Rupiah
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
             
                     </div>
                 </div>

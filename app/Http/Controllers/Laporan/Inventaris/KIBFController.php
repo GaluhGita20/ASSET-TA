@@ -55,6 +55,8 @@ class KIBFController extends Controller
                     $this->makeColumn('name:name|label:Nama Aset|className:text-left'),
                     $this->makeColumn('name:kode_akun|label:Kode Akun|className:text-center'),
                     $this->makeColumn('name:nomor_register|label:Nomor Register|className:text-center'),
+                    $this->makeColumn('name:tgl_register|label:Tanggal Register|className:text-center'),
+
                     $this->makeColumn('name:status|label:Status|className:text-center'),
                     $this->makeColumn('name:kondisi|label:Kondisi|className:text-center'),
                     $this->makeColumn('name:bertingkat|label:Bertingkat/Tidak|className:text-center|width:300px'),
@@ -68,7 +70,7 @@ class KIBFController extends Controller
                     $this->makeColumn('name:tgl_dokumen|label:Tanggal Sertifikat|className:text-center'),
                     $this->makeColumn('name:tahun_beli|label:Tgl/Bln/Thn Mulai|className:text-center'),
                     $this->makeColumn('name:tanah_id|label:Kode Tanah|className:text-center'),
-                    $this->makeColumn('name:nilai_beli|label:Biaya Pembangunan (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:nilai_beli|label:Harga Perolehan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:masa_manfaat|label:Masa Manfaat (Tahun)|className:text-center'),
                     $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
@@ -81,13 +83,16 @@ class KIBFController extends Controller
                 ],
             ],
         ]);
-        return $this->render($this->views . '.index');
+        $jumlah = Aset::where('type','KIB F')->where('status',['actives','in repair','in deletion'])->count('id');
+        $value = Aset::where('type','KIB F')->where('status',['actives','in repair','in deletion'])->sum('book_value');
+        return $this->render($this->views . '.index', compact(['jumlah','value']));
+        // return $this->render($this->views . '.index');
     }
     
     public function grid()
     {
         $user = auth()->user();
-        $records = Aset::with('coad')->where('type','KIB F')->grid()->filters()->dtGet();
+        $records = Aset::with('coad')->where('type','KIB F')->filters()->dtGet();
         return \DataTables::of($records)
             ->addColumn(
                 'num',
@@ -132,7 +137,7 @@ class KIBFController extends Controller
             )->addColumn(
                 'luas',
                 function ($record) {
-                    return $record->wide ? $record->wide : '-';
+                    return $record->wide ? number_format($record->wide, 0, ',', ',') : '-';
                 }
             )->addColumn(
                 'nilai_residu',
@@ -142,7 +147,7 @@ class KIBFController extends Controller
             )->addColumn(
                 'nilai_beli',
                 function ($record) {
-                    return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : '-';
+                    return $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ',');
                 }
             )->addColumn(
                 'nilai_buku',
@@ -167,22 +172,28 @@ class KIBFController extends Controller
             )->addColumn(
                 'tahun_beli',
                 function ($record) {
-                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('d/m/Y') : '-';
+                    return $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-';
                 }
-            )->addColumn(
-                'status_tanah',
-                function ($record) {
-                    return $record->land_status ? ucwords($record->land_status) : '-';
-                }
-            )->addColumn(
+                )->addColumn(
+                    'status_tanah',
+                    function ($record) {
+                        return $record->statusTanah->name ? $record->statusTanah->name : '-';
+                    }
+                )->addColumn(
                 'nomor_dokumen',
                 function ($record) {
                     return $record->no_sertificate ? $record->no_sertificate : '-';
                 }
-            )->addColumn(
+            )
+            ->addColumn(
+                'tgl_register',
+                function ($record) {
+                return $record->book_date ? Carbon::parse($record->book_date)->formatLocalized('%d/%B/%Y') : '-';
+            })
+            ->addColumn(
                 'tgl_dokumen',
                 function ($record) {
-                    return $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date))  : '-';
+                    return $record->sertificate_date ? Carbon::parse($record->sertificate_date)->formatLocalized('%d/%B/%Y')  : '-';
                 }
             )->addColumn(
                 'source_acq',
@@ -215,12 +226,12 @@ class KIBFController extends Controller
                         return $record->status ? '<span class="badge bg-light">'.ucfirst($record->status).'</span>' : '-';
                     }
                 }
-            )->addColumn(
-                'tanah_id',
-                function ($record) {
-                    return $record->tanah_id ? $record->tanah_id : '-';
-                }
-            )->addColumn(
+                )->addColumn(
+                    'tanah_id',
+                    function ($record) {
+                        return $record->tanahs->nama_akun ? $record->tanahs->kode_akun.'/'.$record->tanahs->nama_akun : '-';
+                    }
+                )->addColumn(
                 'kondisi',
                 function ($record) {
                     if ($record->condition == 'baik') {
