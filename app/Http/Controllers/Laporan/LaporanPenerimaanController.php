@@ -162,9 +162,9 @@ class LaporanPenerimaanController extends Controller
                     $this->makeColumn('name:no_spk|label:Nomor SPK/Tgl SPK|className:text-center|width:200px'),
                     $this->makeColumn('name:qty|label:Jumlah Pembelian|className:text-center|width:100px'),
                     $this->makeColumn('name:unit_cost|label:Harga Unit|width:200px'),
-                    $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman|className:text-center|width:200px'),
-                    $this->makeColumn('name:tax_cost|label:Biaya Pajak|className:text-center|width:200px'),
-                    $this->makeColumn('name:total_cost|label:Total|width:200px'),
+                    $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman (Rupiah)|className:text-center|width:200px'),
+                    $this->makeColumn('name:tax_cost|label:Biaya Pajak  (Rupiah)|className:text-center|width:200px'),
+                    $this->makeColumn('name:total_cost|label:Total Biaya (Rupiah)|width:200px'),
                     $this->makeColumn('name:status'),
                   //  $this->makeColumn('name:updated_by|label:Diperbarui|className:text-left|width:200px'),
                     $this->makeColumn('name:action|label:Aksi|width:200px'),
@@ -175,25 +175,111 @@ class LaporanPenerimaanController extends Controller
         return $this->render($this->views.'.penerimaan');
     }
 
+
+
     public function show(PembelianTransaksi $record)
     {
         $records = $record->getPerencanaanPengadaan($record->id);
         $data = $records['usulan_id'];
         $this->prepare([
             'tableStruct' => [
-                'url' => route('transaksi.waiting-purchase'. ".grid", compact('data')),
+                // 'url' => route('transaksi.waiting-purchase'. ".grid", compact('data')),
                 'datatable_1' => [
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-center|width:150px'),
                     $this->makeColumn('name:desc_spesification|label:Spesifikasi Aset|className:text-center|width:300px'),
-                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center,label-info'),
+                    $this->makeColumn('name:qty_agree|label:Jumlah|className:text-center'),
                     $this->makeColumn('name:HPS_unit_cost|label:Standar Harga Satuan|className:text-center|width:150px'),
-                    $this->makeColumn('name:HPS_total_agree|label:Total Harga Disetujui|className:text-center|width:150px'),
+                    $this->makeColumn('name:HPS_total_cost|label:Total Harga Disetujui|className:text-center|width:150px'),
                     $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:150px'),
+                    // $this->makeColumn('name:action|label:Aksi|width:200px'),
                 ],
+                'url' => route($this->routes . '.detailGrid', $record->id),
             ],
         ]);
+
         return $this->render($this->views . '.show', compact('record','data'));
     }
+
+    public function detailGrid(PembelianTransaksi $record)
+    {        
+        $user = auth()->user();
+        $records = PerencanaanDetail::with(['trans','asetd'])->where('trans_id',$record->id)
+            ->orderByRaw("CASE WHEN updated_at > created_at THEN updated_at ELSE created_at END DESC")->filters()
+            ->dtGet();
+    
+        return DataTables::of($records)
+            ->addColumn(
+                'num',
+                function ($detail) {
+                    return request()->start;
+                }
+            )
+            ->addColumn(
+                'ref_aset_id',
+                function ($detail) {
+                    return $detail->asetd->name ? $detail->asetd->name : '-';
+                }
+            )
+            ->addColumn(
+                'desc_spesification',
+                function ($detail) {
+                    return $detail->desc_spesification ? $detail->desc_spesification : '-';
+                }
+            )
+
+            ->addColumn(
+                'struct',
+                function ($detail) {
+                    return $detail->perencanaan->struct->name ? $detail->perencanaan->struct->name : '-';
+                }
+            )
+
+            ->addColumn(
+                'qty_agree',
+                function ($detail) {
+                    return $detail->qty_agree ? $detail->qty_agree : '-';
+                }
+            )
+
+            ->addColumn(
+                'HPS_unit_cost',
+                function ($detail) {
+                    return $detail->HPS_unit_cost ? number_format($detail->HPS_unit_cost , 0, ',', ','): '-';
+                }
+            )
+
+            ->addColumn(
+                'HPS_total_cost',
+                function ($detail) {
+                    return $detail->HPS_total_cost ?  number_format($detail->HPS_total_cost, 0, ',', ',') : '-';
+                }
+            )
+            ->addColumn(
+                'updated_by',
+                function ($detail) use ($record) {
+                    return $detail->createdByRaw();
+                }
+            )
+            ->addColumn(
+                'action',
+                function ($detail) use ($user, $record) {
+                    $actions = [];
+                    $actions[] = [
+                        'type' => 'show',
+                        'url' => route($this->routes . '.detailShow', $detail->id),
+                    ];
+                    return $this->makeButtonDropdown($actions, $detail->id);
+                }
+            )
+            ->rawColumns(['action','HPS_unit_cost','HPS_total_cost','ref_aset_id','struct','desc_spesification'])
+            ->make(true);
+    }
+    // public function detailShow(PemeliharaanDetail $detail)
+    // {
+    //     $type ='show';
+    //     $baseContentReplace = 'base-modal--render';
+    //     return $this->render('laporan.detail.detailPembelian', compact('type','detail', 'baseContentReplace'));
+    // }
     
 }

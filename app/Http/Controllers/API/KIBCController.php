@@ -55,6 +55,7 @@ class KIBCController extends Controller
                 // 'kondisi' => $record->condition ? ($record->condition == 'baik' ? '<span class="badge bg-success text-white">'.ucwords($record->condition).'</span>' : ($record->condition == 'rusak berat' ? '<span class="badge bg-danger text-white">'.ucwords($record->condition).'</span>' : '<span class="badge bg-warning text-white">'.ucwords($record->condition).'</span>')) : '-',
                 'keterangan' => $record->description ? $record->description : '-',
                 'source_acq' => $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-',
+                'unit_pengusul' =>!empty($record->usulans->perencanaan->struct) ? $record->usulans->perencanaan->struct->name : ($record->location_hibah_aset ? $record->deps->name : '-'),
                 // 'source_acq' => $record->usulans ? ($record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ? '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' : '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>') : '-',
                 'updated_by' => preg_replace('/\s+/', ' ', $user),
             ];

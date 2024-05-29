@@ -224,6 +224,155 @@ class AjaxController extends Controller
         ]);
     }
 
+
+    public function getLapPerbaikan(Request $request)
+    {
+        if (isset($request->val1) && $request->val2 == null) {
+            $jumlah = Perbaikan::where('repair_results','<>','BELUM')->where('status', 'Approved')->where('check_up_result','<>',null)
+            ->whereYear('repair_date',$request->val1)->count('id');
+    
+            $value = TransPerbaikanDisposisi::whereHas('codes', function($q) use ($request){
+                $q->where('status', 'Approved')->where('check_up_result','<>',null)
+                ->whereYear('repair_date',$request->val1);
+            })->sum('total_cost');
+
+        }elseif($request->val1 == null && $request->val2 != null) {
+            
+            $jumlah = Perbaikan::where('repair_results','<>','BELUM')->where('status', 'Approved')->where('check_up_result','<>',null)
+            ->whereYear('repair_date',date('Y'))->where('departemen_id',$request->val2)->count('id');
+
+            $value = TransPerbaikanDisposisi::whereHas('codes', function($q) use ($request){
+                $q->where('status', 'Approved')->where('check_up_result','<>',null)
+                ->whereYear('repair_date',date('Y'))->where('departemen_id',$request->val2);
+            })->sum('total_cost');
+
+        }elseif($request->val1 != null && $request->val2 != null){
+            $jumlah = Perbaikan::where('repair_results','<>','BELUM')->where('status', 'Approved')->where('check_up_result','<>',null)
+            ->whereYear('repair_date',$request->val1)->where('departemen_id',$request->val2)->count('id');
+
+            $value = TransPerbaikanDisposisi::whereHas('codes', function($q) use ($request){
+                $q->where('status', 'Approved')->where('check_up_result','<>',null)
+                ->whereYear('repair_date',$request->val1)->where('departemen_id',$request->val2);
+            })->sum('total_cost');
+
+        }else{
+            $jumlah = Perbaikan::where('repair_results','<>','BELUM')->where('status', 'Approved')->where('check_up_result','<>',null)
+            ->whereYear('repair_date',date('Y'))->count('id');
+    
+            $value = TransPerbaikanDisposisi::whereHas('codes', function($q){
+                $q->where('status', 'Approved')->where('check_up_result','<>',null)
+                ->whereYear('repair_date',date('Y'));
+            })->sum('total_cost');
+
+        }
+
+        return response()->json([
+            'jumlah' => $jumlah,
+            'biaya' =>$value,
+        ]);
+    }
+
+    public function getLapHibah(Request $request)
+    {
+        //val 1 = year
+        if (isset($request->val1) && $request->val2 == null) {
+            $jumlah = PembelianTransaksi::whereYear('receipt_date',$request->val1)->where('status','completed')->where('source_acq','<>','pembelian')
+            ->count('id');  // Include the related asets
+    
+            $value = PembelianTransaksi::whereYear('receipt_date', $request->val1)
+            ->where('trans_aset.status', 'completed')
+            ->where('trans_aset.source_acq', '<>', 'pembelian')
+            ->join('trans_usulan_details', 'trans_aset.id', '=', 'trans_usulan_details.trans_id')
+            ->sum('trans_usulan_details.qty_agree');
+        }elseif($request->val1 == null && $request->val2 != null) {
+            $jumlah = PembelianTransaksi::whereYear('receipt_date',date('Y'))->where('vendor_id',$request->val2)->where('status','completed')->where('source_acq','<>','pembelian')
+            ->count('id');  // Include the related asets
+    
+            $value = PembelianTransaksi::whereYear('receipt_date', date('Y'))->where('vendor_id',$request->val2)
+            ->where('trans_aset.status', 'completed')
+            ->where('trans_aset.source_acq', '<>', 'pembelian')
+            ->join('trans_usulan_details', 'trans_aset.id', '=', 'trans_usulan_details.trans_id')
+            ->sum('trans_usulan_details.qty_agree');
+        }elseif($request->val1 != null && $request->val2 != null){
+            $jumlah = PembelianTransaksi::whereYear('receipt_date',$request->val1)->where('status','completed')->where('source_acq','<>','pembelian')
+            ->where('vendor_id',$request->val2)->count('id');  // Include the related asets
+    
+            $value = PembelianTransaksi::whereYear('receipt_date', $request->val1)->where('vendor_id',$request->val2)
+            ->where('trans_aset.status', 'completed')
+            ->where('trans_aset.source_acq', '<>', 'pembelian')
+            ->join('trans_usulan_details', 'trans_aset.id', '=', 'trans_usulan_details.trans_id')
+            ->sum('trans_usulan_details.qty_agree');
+        }else{
+            $jumlah = PembelianTransaksi::whereYear('receipt_date',date('Y'))->where('status','completed')->where('source_acq','<>','pembelian')
+            ->count('id');  // Include the related asets
+    
+            $value = PembelianTransaksi::whereYear('receipt_date', date('Y'))
+            ->where('trans_aset.status', 'completed')
+            ->where('trans_aset.source_acq', '<>', 'pembelian')
+            ->join('trans_usulan_details', 'trans_aset.id', '=', 'trans_usulan_details.trans_id')
+            ->sum('trans_usulan_details.qty_agree');
+        }
+
+        return response()->json([
+            'jumlah' => $jumlah,
+            'biaya' =>$value,
+        ]);
+    }
+
+    public function getLapSperpat(Request $request)
+    {
+
+        if (isset($request->val1) && $request->val2 == null) {
+            $jumlah = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',$request->val1)
+            ->count('id');
+
+            $jumlah1 = UsulanSperpat::whereHas('perbaikans',function($q) use ($request){
+                $q->whereYear('procurement_year',$request->val1)->where('status','completed');
+            })->select('id')->distinct()->sum('qty');
+
+            $value = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',$request->val1)
+            ->sum('total_cost');
+
+        }elseif($request->val1 == null && $request->val2 != null) {
+            $jumlah = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',date('Y'))
+            ->where('vendor_id',$request->val2)->count('id');
+
+            $jumlah1 = UsulanSperpat::whereHas('perbaikans',function($q) use ($request){
+                $q->whereYear('procurement_year',date('Y'))->where('status','completed')->where('vendor_id',$request->val2);
+            })->select('id')->distinct()->sum('qty');
+
+            $value = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',date('Y'))
+            ->where('vendor_id',$request->val2)->sum('total_cost');
+
+        }elseif($request->val1 != null && $request->val2 != null){
+            $jumlah = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',$request->val1)
+            ->where('vendor_id',$request->val2)->count('id');
+
+            $jumlah1 = UsulanSperpat::whereHas('perbaikans',function($q) use ($request){
+                $q->whereYear('procurement_year',$request->val1)->where('status','completed')->where('vendor_id',$request->val2);
+            })->select('id')->distinct()->sum('qty');
+
+            $value = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',$request->val1)->where('vendor_id',$request->val2)
+            ->sum('total_cost');
+        }else{
+            $jumlah = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',date('Y'))
+            ->count('id');
+    
+            $jumlah1 = UsulanSperpat::whereHas('perbaikans',function($q) use ($request){
+                $q->whereYear('procurement_year',date('Y'))->where('status','completed');
+            })->select('id')->distinct()->sum('qty');
+    
+            $value = TransPerbaikanDisposisi::where('status','completed')->whereYear('procurement_year',date('Y'))
+            ->sum('total_cost');
+        }
+
+        return response()->json([
+            'jumlah' => $jumlah,
+            'jumlah1' => $jumlah1,
+            'biaya' => $value,
+        ]);
+    }
+
     public function getLapPemeliharaan(Request $request)
     {
         //val 1 = year
@@ -363,14 +512,14 @@ class AjaxController extends Controller
     {
         //val 1 = org
         if (isset($request->val1) && isset($request->val2)) {
-            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion','maintenance'])
             ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
                 $q->whereHas('perencanaan', function ($qqq) use ($request) {
                     $qqq->where('struct_id', $request->val1);
                 });
             })->where('room_location',$request->val2)->count('id');
 
-            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion','maintenance'])
             ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
                 $q->whereHas('perencanaan', function ($qqq) use ($request) {
                     $qqq->where('struct_id', $request->val1);
@@ -383,14 +532,14 @@ class AjaxController extends Controller
                 ]);
 
         }elseif(isset($request->val1)  && $request->val2 == null){
-            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion','maintenance'])
             ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
                 $q->whereHas('perencanaan', function ($qqq) use ($request) {
                     $qqq->where('struct_id', $request->val1);
                 });
             })->count('id');
 
-            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion','maintenance'])
             ->where('location_hibah_aset',$request->val1)->orWhereHas('usulans', function ($q) use ($request) {
                 $q->whereHas('perencanaan', function ($qqq) use ($request) {
                     $qqq->where('struct_id', $request->val1);
@@ -402,10 +551,10 @@ class AjaxController extends Controller
                     'value' =>$value,
                 ]);
         }elseif(isset($request->val2) && $request->val1 == null){
-            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            $jumlah = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion','maintenance'])
             ->where('room_location',$request->val2)->count('id');
 
-            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion'])
+            $value = Aset::where('type',$request->val3)->whereIn('status',['actives','in repair','in deletion','maintenance'])
             ->where('room_location',$request->val2)->sum('book_value');
 
                 return response()->json([

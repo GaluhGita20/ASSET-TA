@@ -44,7 +44,7 @@
                                 </div>
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
-                                    <div class="text-dark font-weight-bolder font-size-h5" style="width: 100%; height: 100%;">
+                                    <div class="text-dark font-weight-bolder font-size-h6" style="width: 100%; height: 100%;">
                                         Jumlah Usulan
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
@@ -80,7 +80,7 @@
                                 </div>
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
-                                    <div class="text-dark font-weight-bolder font-size-h5" style="text-align: center">
+                                    <div class="text-dark font-weight-bolder font-size-h6" style="text-align: center">
                                         Jumlah Terealisasikan
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">

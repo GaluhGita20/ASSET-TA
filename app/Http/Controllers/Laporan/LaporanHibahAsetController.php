@@ -218,7 +218,7 @@ class LaporanHibahAsetController extends Controller
     public function detail(PembelianTransaksi $record)
     {
         // dd($record->id);
-        $this->pushBreadcrumb(['Detail' => route($this->routes . '.detail', $record)]);
+        // $this->pushBreadcrumb(['Detail' => route($this->routes . '.detail', $record)]);
         $this->prepare([
             'tableStruct' => [
                 'datatable_1' => [

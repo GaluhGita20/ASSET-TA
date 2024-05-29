@@ -278,6 +278,12 @@ Route::middleware('auth')->group(function () {
                 Route::post('getLapPenghapusan', 'AjaxController@getLapPenghapusan')->name('getLapPenghapusan');
                 Route::post('getLapPemutihan', 'AjaxController@getLapPemutihan')->name('getLapPemutihan');
                 Route::post('getLapPemeliharaan', 'AjaxController@getLapPemeliharaan')->name('getLapPemeliharaan');
+                Route::post('getLapHibah', 'AjaxController@getLapHibah')->name('getLapHibah');
+                Route::post('getLapPerbaikan', 'AjaxController@getLapPerbaikan')->name('getLapPerbaikan');
+
+                Route::post('getLapSperpat', 'AjaxController@getLapSperpat')->name('getLapSperpat');
+                Route::post('getLapPerbaikan', 'AjaxController@getLapPerbaikan')->name('getLapPerbaikan');
+
 
                 Route::post('cekSperpat', 'AjaxController@cekSperpat')->name('cekSperpat');
                 Route::post('checkAset', 'AjaxController@checkAset')->name('checkAset');
@@ -340,12 +346,33 @@ Route::middleware('auth')->group(function () {
                 Route::grid('perencanaan-aset', 'LaporanPerencanaanController');
                 Route::grid('penghapusan-aset', 'LaporanPenghapusanController');
                 Route::grid('penerimaan-aset', 'LaporanPenerimaanController');
+                Route::grid('penerimaan-hibah-aset', 'LaporanPenerimaanHibahController');
                 Route::grid('pemutihan-aset', 'LaporanPemutihanController');
                 Route::grid('pemeliharaan-aset', 'LaporanPemeliharaanController');
                 Route::grid('hibah-aset', 'LaporanHibahAsetController');
 
+                Route::grid('perbaikan-sperpat-aset', 'LaporanSperpatController');
+                Route::grid('perbaikan-aset', 'LaporanPerbaikanController');
+                Route::post('perbaikan-aset/{record}/detailGrid', 'LaporanPerbaikanController@detailGrid')->name('perbaikan-aset.detailGrid');
+                Route::get('perbaikan-aset/detailShow/{detail}', 'LaporanPerbaikanController@detailShow')->name('perbaikan-aset.detailShow');
+                Route::post('perbaikan-sperpat-aset/{record}/detailGrid', 'LaporanSperpatController@detailGrid')->name('perbaikan-sperpat-aset.detailGrid');
+                Route::get('perbaikan-sperpat-aset/detailShow/{detail}', 'LaporanSperpatController@detailShow')->name('perbaikan-sperpat-aset.detailShow');
+
+
                 //Route::get('hibah-aset/detailShow/{detail}', 'LaporanHibahAsetController@detailShow')->name('hibah-aset.detailShow');
                 Route::get('perencanaan-aset/detailShow/{detail}', 'LaporanPerencanaanController@detailShow')->name('perencanaan-aset.detailShow');
+
+                Route::get('penerimaan-aset/detailShow/{detail}', 'LaporanPenerimaanController@detailShow')->name('penerimaan-aset.detailShow');
+                Route::post('penerimaan-aset/{record}/detailGrid', 'LaporanPenerimaanController@detailGrid')->name('penerimaan-aset.detailGrid');
+
+                Route::get('penerimaan-hibah-aset/detailShow/{detail}', 'LaporanPenerimaanHibahController@detailShow')->name('penerimaan-hibah-aset.detailShow');
+                Route::post('penerimaan-hibah-aset/{record}/detailGrid', 'LaporanPenerimaanHibahController@detailGrid')->name('penerimaan-hibah-aset.detailGrid');
+
+                Route::get('pemeliharaan-aset/detailShow/{detail}', 'LaporanPemeliharaanController@detailShow')->name('pemeliharaan-aset.detailShow');
+                Route::post('pemeliharaan-aset/{record}/detailGrid', 'LaporanPemeliharaanController@detailGrid')->name('pemeliharaan-aset.detailGrid');
+                // Route::get('pemeliharaan-aset/detailShow/{detail}', 'LaporanPemeliharaanController@detailShow')->name('pemeliharaan-aset.detailShow');
+                Route::get('penghapusan-aset/detailShow/{detail}', 'LaporanPenghapusanController@detailShow')->name('penghapusan-aset.detailShow');
+                Route::get('pemutihan-aset/detailShow/{detail}', 'LaporanPemutihanController@detailShow')->name('pemutihan-aset.detailShow');
                 // Route::get('penerimaan-aset/detailShow/{detail}', 'LaporanPenerimaanController@detailShow')->name('penerimaan-aset.detailShow');
 
                 Route::namespace('Inventaris')
@@ -458,7 +485,19 @@ Route::middleware('auth')->group(function () {
                 Route::post('kib-b/{record}/detailpGrid','KIBBController@detailpGrid')->name('kib-b.detailpGrid');
                 Route::get('kib-b/detailp/{record}', 'KIBBController@detailp')->name('kib-b.detailp');
 
+                Route::get('inventaris/kib-a/export','KIBAController@export')->name('kib-a.export');
                 Route::get('inventaris/kib-b/export','KIBBController@export')->name('kib-b.export');
+                Route::get('inventaris/kib-c/export','KIBCController@export')->name('kib-c.export');
+                Route::get('inventaris/kib-d/export','KIBDController@export')->name('kib-d.export');
+                Route::get('inventaris/kib-e/export','KIBEController@export')->name('kib-e.export');
+                Route::get('inventaris/kib-f/export','KIBFController@export')->name('kib-f.export');
+
+                Route::get('inventaris/kib-a/kib-pdf','KIBAController@print')->name('kib-a.kib-pdf');
+                Route::get('inventaris/kib-b/kib-pdf','KIBBController@print')->name('kib-b.kib-pdf');
+                Route::get('inventaris/kib-c/kib-pdf','KIBCController@print')->name('kib-c.kib-pdf');
+                Route::get('inventaris/kib-d/kib-pdf','KIBDController@print')->name('kib-d.kib-pdf');
+                Route::get('inventaris/kib-e/kib-pdf','KIBEController@print')->name('kib-e.kib-pdf');
+                Route::get('inventaris/kib-f/kib-pdf','KIBFController@print')->name('kib-f.kib-pdf');
                 // Route::get('kib-a/pemutihan/{record}', 'KIBAController@pemutihan')->name('kib-a.pemutihan');
                 // Route::get('kib-b/pemutihan/{record}', 'KIBBController@pemutihan')->name('kib-b.pemutihan');
                 // Route::get('kib-c/pemutihan/{record}', 'KIBCController@pemutihan')->name('kib-c.pemutihan');

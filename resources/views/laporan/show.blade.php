@@ -356,6 +356,9 @@
         </div>
     </div>
 
+    @include('laporan.detail.pembelian');
+
+
 @endsection
 
 

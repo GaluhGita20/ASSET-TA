@@ -63,6 +63,7 @@ class KIBFController extends Controller
                     $this->makeColumn('name:berbeton|label:Beton/Tidak|className:text-center'),
                     $this->makeColumn('name:luas|label:Luas (m2)|className:text-center'),
                     $this->makeColumn('name:alamat|label:Alamat|className:text-center'),
+                    $this->makeColumn('name:char_bld|label:Karakter Bangunan|className:text-center'),
                     $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
                     $this->makeColumn('name:status_tanah|label:Hak Tanah|className:text-center'),
@@ -83,8 +84,8 @@ class KIBFController extends Controller
                 ],
             ],
         ]);
-        $jumlah = Aset::where('type','KIB F')->where('status',['actives','in repair','in deletion'])->count('id');
-        $value = Aset::where('type','KIB F')->where('status',['actives','in repair','in deletion'])->sum('book_value');
+        $jumlah = Aset::where('type','KIB F')->where('status',['actives','in repair','in deletion','maintenance'])->count('id');
+        $value = Aset::where('type','KIB F')->where('status',['actives','in repair','in deletion','maintenance'])->sum('book_value');
         return $this->render($this->views . '.index', compact(['jumlah','value']));
         // return $this->render($this->views . '.index');
     }
@@ -105,7 +106,12 @@ class KIBFController extends Controller
                 function ($record) {
                     return $record->usulans ? $record->usulans->asetd->name : '-';
                 }
-            
+            )->addColumn(
+                'char_bld',
+                function ($record) {
+                    return $record->character_bld ? $record->character_bld : '-';
+                }
+        
             )->addColumn(
                 'kode_akun',
                 function ($record) {

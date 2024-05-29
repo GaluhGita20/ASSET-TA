@@ -40,7 +40,6 @@ class KIBBController extends Controller
                 'ukuran_cc' => $record->cc_size_item ? $record->cc_size_item : '-',
                 'bahan' => $record->materials->name ? $record->materials->name : '-',
                 'source_acq' => $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-',
-                // 'source_acq' => $record->usulans ? ($record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ? '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' : '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>') : '-',
                 'tahun_beli' => $record->usulans->trans->spk_start_date ? $record->usulans->trans->spk_start_date->format('Y') : '-',
                 'no_pabrik' => $record->no_factory_item ? $record->no_factory_item : '-',
                 'no_rangka' => $record->no_frame ? $record->no_frame : '-',

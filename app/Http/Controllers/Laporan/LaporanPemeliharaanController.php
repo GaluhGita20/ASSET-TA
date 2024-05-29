@@ -53,7 +53,7 @@ class LaporanPemeliharaanController extends Controller
                     $this->makeColumn('name:tanggal_pemeliharaan|label:Tanggal Pemeliharaan|className:text-center|width:300px'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),
-                    // $this->makeColumn('name:action'),
+                    $this->makeColumn('name:action'),
                 ],
             ],
         ]);
@@ -110,6 +110,21 @@ class LaporanPemeliharaanController extends Controller
                     return $record->createdByRaw();
                 }
             })
+            ->addColumn('action', function ($record) use ($user) {
+                $actions = [];
+
+                if ($record->checkAction('show', $this->perms)) {
+                    $actions[] = [
+                        'type' => 'show',
+                        'page' => true,
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.show', $record->id),
+                    ];
+                }
+
+                return $this->makeButtonDropdown($actions, $record->id);
+
+            })
 
             ->rawColumns([
             'code',
@@ -117,6 +132,115 @@ class LaporanPemeliharaanController extends Controller
             'dates',
             'status','updated_by','action'])
             ->make(true);
+    }
+
+    public function show(Pemeliharaan $record)
+    {
+        $this->prepare([
+            'tableStruct' => [
+                'datatable_1' => [
+                    $this->makeColumn('name:num|label:#'),
+                    $this->makeColumn('name:kib_id|label:Nama Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:type|label:Tipe Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:merek|label:Merek Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:lokasi|label:Lokasi Aset|className:text-center|width:200px'),
+                    $this->makeColumn('name:status|label:Status Pemeliharaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:petugas|label:Penanggung Jawab Pemeliharaan|className:text-center|width:250px'),
+                    $this->makeColumn('name:updated_by|width:300px'),
+                    $this->makeColumn('name:action|label:Aksi'),
+                ],
+                'url' => route($this->routes. '.detailGrid', $record->id),
+            ],
+        ]);
+        return $this->render($this->views.'.pemeliharaanShow', compact('record'));
+    }
+
+    public function detailGrid(Pemeliharaan $record)
+    {        
+        $user = auth()->user();
+        $records = PemeliharaanDetail::with(['pemeliharaan','asetd'])
+            ->whereHas(
+                'pemeliharaan',
+                function ($q) use ($record) {
+                    $q->where('pemeliharaan_id', $record->id);
+                }
+            )->orderByRaw("CASE WHEN updated_at > created_at THEN updated_at ELSE created_at END DESC")->filters()
+            ->dtGet();
+    
+        return DataTables::of($records)
+            ->addColumn(
+                'num',
+                function ($detail) {
+                    return request()->start;
+                }
+            )
+            ->addColumn(
+                'kib_id',
+                function ($detail) {
+                    return $detail->asetd ? $detail->asetd->usulans->asetd->name : '-';
+                }
+            )
+            ->addColumn(
+                'type',
+                function ($detail) {
+                    return $detail->asetd->type ? $detail->asetd->type : '-';
+                }
+            )
+            ->addColumn(
+                'merek',
+                function ($detail) {
+                    return $detail->asetd->merek_type_item ? $detail->asetd->merek_type_item  : '-';
+                }
+            )
+            ->addColumn(
+                'lokasi',
+                function ($detail) {
+                    return $detail->asetd->locations ? $detail->asetd->locations->name : $detail->asetd->non_room_location;
+                }
+            )
+            ->addColumn(
+                'status',
+                function ($detail) {
+                    if($detail->maintenance_action == null){
+                        return $detail->labelStatus('not completed');
+                    }else{
+                        return $detail->labelStatus('completed');   
+                    }
+                }
+            )
+            ->addColumn(
+                'petugas',
+                function ($detail) {
+                    return $detail->petugas ? $detail->petugas->name : '-' ;
+                }
+            )
+            ->addColumn(
+                'updated_by',
+                function ($detail) use ($record) {
+                    return $detail->createdByRaw();
+                }
+            )
+            ->addColumn(
+                'action',
+                function ($detail) use ($user, $record) {
+                    // dd($detail->pemeliharaan->status);
+                    $actions = [];
+                    $actions[] = [
+                        'type' => 'show',
+                        'url' => route($this->routes . '.detailShow', $detail->id),
+                    ];
+                    return $this->makeButtonDropdown($actions, $detail->id);
+                }
+            )
+            ->rawColumns(['merek','type','status','action','updated_by','created_by'])
+            ->make(true);
+    }
+
+    public function detailShow(PemeliharaanDetail $detail)
+    {
+        $type ='show';
+        $baseContentReplace = 'base-modal--render';
+        return $this->render('laporan.detail.pemeliharaan', compact('type','detail', 'baseContentReplace'));
     }
 
 }

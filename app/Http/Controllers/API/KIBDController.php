@@ -43,18 +43,10 @@ class KIBDController extends Controller
                 'nomor_dokumen' => $record->no_sertificate ? $record->no_sertificate : '-',
                 'tgl_dokumen' => $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-',
                 'source_acq' => $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-',
-                // 'source_acq' => $record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ?
-                //     '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' :
-                //     '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>',
                 'asal_usul' => $record->usulans->danad ? $record->usulans->danad->name : '-',
                 'status' => $record->status ? ($record->status == 'actives' ? ucfirst('active'): ($record->status == 'notactive' ? ucfirst($record->status): ($record->status == 'in repair' ?ucfirst($record->status) : ($record->status == 'in deletion' ? ucfirst($record->status) : ucfirst($record->status))))) : '-',
                 'tanah_id' => $record->tanah_id ? $record->tanah_id : '-',
                 'kondisi' => $record->condition ? ($record->condition == 'baik' ? ucfirst($record->condition) : ($record->condition == 'rusak berat' ? ucfirst($record->condition) : ucfirst($record->condition))) : '-',
-                // 'kondisi' => $record->condition == 'baik' ?
-                //     '<span class="badge bg-success text-white">'.ucwords($record->condition).'</span>' :
-                //     ($record->condition == 'rusak berat' ?
-                //         '<span class="badge bg-danger text-white">'.ucwords($record->condition).'</span>' :
-                //         '<span class="badge bg-warning text-white">'.ucwords($record->condition).'</span>'),
                 'keterangan' => $record->description ? $record->description : '-',
                 'nilai_residu' => $record->residual_value ? number_format($record->residual_value, 0, ',', ',') : '-',
                 'nilai_beli' => $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') :
@@ -62,6 +54,7 @@ class KIBDController extends Controller
                 'nilai_buku' => $record->book_value ? number_format($record->book_value, 0, ',', ',') : '-',
                 'masa_manfaat' => $record->useful ? $record->useful : '-',
                 'akumulasi' => $record->accumulated_depreciation ? number_format($record->accumulated_depreciation, 0, ',', ',') : '0',
+                'unit_pengusul' =>!empty($record->usulans->perencanaan->struct) ? $record->usulans->perencanaan->struct->name : ($record->location_hibah_aset ? $record->deps->name : '-'),
                 'updated_by' => preg_replace('/\s+/', ' ', $user),
             ];
         }
@@ -96,18 +89,10 @@ class KIBDController extends Controller
                 'nomor_dokumen' => $record->no_sertificate ? $record->no_sertificate : '-',
                 'tgl_dokumen' => $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-',
                 'source_acq' => $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-',
-                // 'source_acq' => $record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ?
-                //     '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' :
-                //     '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>',
                 'asal_usul' => $record->usulans->danad ? $record->usulans->danad->name : '-',
                 'status' => $record->status ? ($record->status == 'actives' ? ucfirst('active'): ($record->status == 'notactive' ? ucfirst($record->status): ($record->status == 'in repair' ?ucfirst($record->status) : ($record->status == 'in deletion' ? ucfirst($record->status) : ucfirst($record->status))))) : '-',
                 'tanah_id' => $record->tanah_id ? $record->tanah_id : '-',
                 'kondisi' => $record->condition ? ($record->condition == 'baik' ? ucfirst($record->condition) : ($record->condition == 'rusak berat' ? ucfirst($record->condition) : ucfirst($record->condition))) : '-',
-                // 'kondisi' => $record->condition == 'baik' ?
-                //     '<span class="badge bg-success text-white">'.ucwords($record->condition).'</span>' :
-                //     ($record->condition == 'rusak berat' ?
-                //         '<span class="badge bg-danger text-white">'.ucwords($record->condition).'</span>' :
-                //         '<span class="badge bg-warning text-white">'.ucwords($record->condition).'</span>'),
                 'keterangan' => $record->description ? $record->description : '-',
                 'nilai_residu' => $record->residual_value ? number_format($record->residual_value, 0, ',', ',') : '-',
                 'nilai_beli' => $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') :

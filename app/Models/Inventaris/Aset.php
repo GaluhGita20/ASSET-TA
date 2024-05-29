@@ -77,6 +77,7 @@ class Aset extends Model
     'acq_value',
     'dates_depreciation',
     'tanah_id',
+    'charater_bld',
     'non_room_location',
     'location_hibah_aset',
     'book_date',

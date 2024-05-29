@@ -360,6 +360,7 @@ class PemeliharaanAsetController extends Controller
     {
         $record = $detail->pemeliharaan;
         return $record->handleDetailDestroy($detail);
+        
     }
 
     public function destroy(Pemeliharaan $record)

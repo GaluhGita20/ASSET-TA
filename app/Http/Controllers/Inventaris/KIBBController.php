@@ -65,7 +65,7 @@ class KIBBController extends Controller
                     $this->makeColumn('name:merek_tipe|label:Merek|className:text-center'),
                     $this->makeColumn('name:ukuran_cc|label:Ukuran CC|className:text-center'),
                     $this->makeColumn('name:bahan|label:Bahan|className:text-center'),
-                    $this->makeColumn('name:tahun_beli|label:Tahun Pembelian|className:text-center'),
+                    $this->makeColumn('name:tahun_beli|label:Tahun Perolehan|className:text-center'),
                     $this->makeColumn('name:no_pabrik|label:Nomor Pabrik|className:text-center'),
                     $this->makeColumn('name:no_rangka|label:Nomor Rangka|className:text-center'),
                     $this->makeColumn('name:no_mesin|label:Nomor Mesin|className:text-center'),
@@ -234,6 +234,8 @@ class KIBBController extends Controller
                         return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
                     } elseif ($record->status == 'notactive') {
                         return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
+                    } elseif ($record->status == 'maintenance') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
                     } elseif ($record->status == 'in repair') {
                         return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
                     } elseif ($record->status == 'in deletion') {
@@ -528,10 +530,20 @@ class KIBBController extends Controller
     }
 
 
-    public function export(){
-        //dd('tes');
-       // return Excel::download(new ActivityExport, date('Y-m-d') . ' Audit Trail.xlsx');
-        return Excel::download(new KibBExport, date('Y-m-d') . ' KIBB.xlsx');
+    public function export(Request $request){
+        // if($request== null){
+        //     return Excel::download(new KibBExport, date('Y-m-d') . ' KIBB.xlsx');
+        // }else{
+            return Excel::download(new KibBExport, date('Y-m-d') . ' KIBB.xlsx');
+        // }
+    }
+
+    public function print()
+    {
+        $title ='Laporan Aset KIB B';
+        $records = Aset::with('coad')->where('type','KIB B')->whereIn('status',['actives','in repair','in deletion','maintenance'])->filters()->get();
+
+        return $this->render($this->views.'.cetak',compact('records','title'));
     }
 
 }

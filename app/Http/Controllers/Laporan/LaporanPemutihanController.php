@@ -98,6 +98,21 @@ class LaporanPemutihanController extends Controller
                     return $record->createdByRaw();
                 }
             })
+            ->addColumn('action', function ($record) use ($user) {
+                $actions = [];
+
+                if ($record->checkAction('show', $this->perms)) {
+                    $actions[] = [
+                        'type' => 'show',
+                        'page' => true,
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.show', $record->id),
+                    ];
+                }
+
+                return $this->makeButtonDropdown($actions, $record->id);
+
+            })
 
             ->rawColumns([
             'status','updated_by','action'])
@@ -122,7 +137,7 @@ class LaporanPemutihanController extends Controller
                     $this->makeColumn('name:location|label:Lokasi Pemutihan|className:text-center|width:250px'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),
-                    // $this->makeColumn('name:action'),
+                    $this->makeColumn('name:action'),
                 ],
             ],
         ]);
@@ -134,6 +149,12 @@ class LaporanPemutihanController extends Controller
 
         return $this->render($this->views . '.pemutihan', compact(['jumlah','value']));
         // return $this->render($this->views . '.pemutihan');
+    }
+
+    public function show(Pemutihans $record)
+    {
+        
+        return $this->render($this->views.'.pemutihanShow', compact('record'));
     }
 
 

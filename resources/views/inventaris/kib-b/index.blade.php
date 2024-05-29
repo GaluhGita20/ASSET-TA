@@ -10,6 +10,7 @@
 				data-placeholder="{{ __('Status') }}">
 				<option value="" selected>{{ __('Status') }}</option>
 				<option value="actives">Active</option>
+				<option value="maintenance">Dalam Pemeliharaan</option>
 				<option value="in repair">Dalam Perbaikan</option>
 				<option value="in deletion">Dalam Penghapusan</option>
 				<option value="notactive">Not active</option>
@@ -18,7 +19,7 @@
 		</div>
 
         <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
-			<select class="form-control base-plugin--select2-ajax filter-control"
+			<select class="form-control base-plugin--select2-ajax filter-control condition"
 				data-post="condition"
 				data-placeholder="{{ __('Kondisi') }}">
 				<option value="" selected>{{ __('Kondisi') }}</option>
@@ -32,7 +33,6 @@
 			<select name="location_id" id="location_id" class="form-control filter-control base-plugin--select2-ajax location_id"
 				data-url="{{ route('ajax.selectStruct', ['search' => 'all']) }}"
 				data-post="location_id"
-				
 				data-placeholder="{{ __('Struktur Organisasi') }}">
 			</select>
 		</div>
@@ -54,7 +54,9 @@
 <a href="{{ route($routes . '.export') }}" target="_blank" class="btn btn-info ml-2 export-excel text-nowrap">
     <i class="far fa-file-excel mr-2"></i> Export
 </a>
-
+<a href="{{ route($routes . '.kib-pdf') }}" target="_blank" class="btn btn-danger ml-2 export-pdf text-nowrap">
+    <i class="far fa-file-pdf mr-2"></i> Pdf
+</a>
 @endsection
 
 
@@ -75,13 +77,6 @@
 		});
 	}
     
-    // if ($loc) {
-    //     $('.content-page').on('change', 'select.location_id', function (e) {
-    //         handleDepartemenChange($loc, objectId);
-    //     });
-    // }
-
-	//console.log($loc);
     function handleDepartemenChange(loc, objectId) {
         var urlOrigin = objectId.data('url-origin');
         var urlParam = $.param({ location_id: loc.value });
@@ -102,8 +97,10 @@
 			location_id: $('.filter-control[data-post="location_id"]').val(),
 			room_location: $('.filter-control[data-post="room_location"]').val(),
 		}
+
 		filters = $.param(filters);
 		url = url+'?'+filters;
+		console.log(url);
 
 		window.open(url);
 	});

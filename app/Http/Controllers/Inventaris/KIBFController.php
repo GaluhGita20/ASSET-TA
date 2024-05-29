@@ -10,6 +10,8 @@ use App\Models\inventaris\Aset;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\Setting\KibFExport;
+use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
 class KIBFController extends Controller
@@ -30,11 +32,11 @@ class KIBFController extends Controller
                 'views' => $this->views,
                 'perms' => $this->perms,
                 'permission' => $this->perms . '.view',
-                'title' => 'Aset Kontruksi Pembangunan',
+                'title' => 'Aset Kontruksi dalam Pengerjaan',
                 'breadcrumb' => [
                     'Invantaris' => rut($this->routes . '.index'),
                     // 'Jenis Aset' => rut($this->routes . '.index'),
-                    'Aset Kontruksi Pembangunan' => rut($this->routes . '.index'),
+                    'Aset Kontruksi dalam Pengerjaan' => rut($this->routes . '.index'),
                 ]
             ]
         );
@@ -56,6 +58,7 @@ class KIBFController extends Controller
                     $this->makeColumn('name:berbeton|label:Beton/Tidak|className:text-center'),
                     $this->makeColumn('name:luas|label:Luas (m2)|className:text-center'),
                     $this->makeColumn('name:alamat|label:Alamat|className:text-center'),
+                    $this->makeColumn('name:char_bld|label:Karakter Bangunan|className:text-center'),
                     $this->makeColumn('name:source_acq|label:Sumber Perolehan|className:text-center'),
                     $this->makeColumn('name:asal_usul|label:Asal Usul|className:text-center'),
                     $this->makeColumn('name:status_tanah|label:Status Tanah|className:text-center'),
@@ -96,6 +99,11 @@ class KIBFController extends Controller
                     return $record->usulans ? $record->usulans->asetd->name : '-';
                 }
             
+            )->addColumn(
+                'char_bld',
+                function ($record) {
+                    return $record->character_bld ? $record->character_bld : '-';
+                }
             )->addColumn(
                 'kode_akun',
                 function ($record) {
@@ -304,6 +312,18 @@ class KIBFController extends Controller
     public function deletes(Aset $record)
     {
         return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
+    }
+
+    public function export(Request $request){
+        return Excel::download(new KibFExport, date('Y-m-d') . ' KIBB.xlsx');
+    }
+
+    public function print()
+    {
+        $title ='Laporan Aset KIB F';
+        $records = Aset::with('coad')->where('type','KIB F')->filters()->get();
+
+        return $this->render($this->views.'.cetak',compact('records','title'));
     }
 
 }

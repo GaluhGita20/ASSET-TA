@@ -45,6 +45,8 @@ class KIBAController extends Controller
                 'tgl_sertifikat' => $record->sertificate_date ? date('d/m/Y', strtotime($record->sertificate_date)) : '-',
                 'asal_usul' => $record->usulans->danad ? $record->usulans->danad->name : '-',
                 'nilai_beli' => $record->usulans->trans->unit_cost ? number_format($record->usulans->trans->unit_cost, 0, ',', ',') : number_format($record->usulans->HPS_unit_cost, 0, ',', ','),
+                'nilai_buku' =>$record->book_value ? number_format($record->book_value, 0, ',', ',')  : '-', 
+                'akumulasi_kenaikan_harga' =>$record->accumulated_depreciation ? number_format($record->accumulated_depreciation, 0, ',', ',') : '0',
                 'status' => $record->status == 'actives' ? ucfirst('active') : ($record->status == 'notactive' ? ucfirst($record->status) : ($record->status == 'in repair' ? ucfirst($record->status) : ($record->status == 'in deletion' ? ucfirst($record->status): ucfirst($record->status)))),
                 'keterangan' => $record->description ? $record->description : '-',
                 'created_by' => preg_replace('/\s+/', ' ', $user),

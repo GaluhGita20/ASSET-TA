@@ -153,6 +153,24 @@ class Pemeliharaan extends Model
 
     public function createDetail($request){
         $dep = $request->departemen_id;
+        $data = Aset::where('condition', 'baik')
+            ->where(function ($query) use ($dep) {
+                $query->whereHas('usulans', function ($q) use ($dep) {
+                    $q->whereHas('perencanaan', function ($q) use ($dep) {
+                        $q->where('struct_id', $dep);
+                    });
+                })
+                ->orWhere('location_hibah_aset', $dep);
+            })
+            ->where('status', 'actives')
+            ->where('acq_value', '>=', 1000000)
+            ->whereIn('type', ['KIB B', 'KIB E'])
+            ->pluck('id')
+            ->toArray();
+
+        // Update status aset menjadi 'maintenance'
+        Aset::whereIn('id', $data)->update(['status' => 'maintenance']);
+
         // $data = Aset::where('condition','baik')->where('status', 'actives')->whereHas('usulans', function ($q) use ($dep) {
         //     $q->whereHas('perencanaan', function ($qq) use ($dep) {
         //         $qq->where('struct_id', $dep);
@@ -166,12 +184,13 @@ class Pemeliharaan extends Model
         // })->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
 
 
-        $data = Aset::where('condition','baik')->whereHas('usulans',function($q)use($dep){
-            $q->whereHas('perencanaan', function($q) use ($dep){
-                $q->where('struct_id',$dep);
-            });
-        })->orWhere('location_hibah_aset',$dep)->where('status', 'actives')->where('acq_value','>=',1000000)->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
+        // $data = Aset::where('condition','baik')->whereHas('usulans',function($q)use($dep){
+        //     $q->whereHas('perencanaan', function($q) use ($dep){
+        //         $q->where('struct_id',$dep);
+        //     });
+        // })->orWhere('location_hibah_aset',$dep)->where('status', 'actives')->where('acq_value','>=',1000000)->whereIn('type', ['KIB B','KIB E'])->pluck('id')->toArray();
 
+        // Aset::whereIn('id',$data)->update(['status'=>'maintenance']);
         // $data = Aset::with('usulans')
         //     ->where('condition', 'baik')
         //     ->where('status', 'actives')
@@ -291,6 +310,7 @@ class Pemeliharaan extends Model
            // $time = $this->maintenance_date;
             $this->details()->save($detail);
             $this->save();
+            Aset::where('id',$request->kib_id)->update(['status'=>'maintenance']);
             // $awal = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->whereHas('pemeliharaan',function ($q) use ($time) {
             //     $q->whereMonth('maintenance_date', $time->month);
             // })->count('id');
@@ -311,8 +331,12 @@ class Pemeliharaan extends Model
     {
         $this->beginTransaction();
         try {
+            $aset = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->pluck('kib_id')->toArray();
+            Aset::whereIn('id',$aset)->update(['status' => 'actives']);
+
             PemeliharaanDetail::where('pemeliharaan_id',$this->id)->delete();
             $this->delete();
+
             return $this->commitDeleted();
         } catch (\Exception $e) {
             return $this->rollbackDeleted($e);
@@ -324,7 +348,7 @@ class Pemeliharaan extends Model
         $this->beginTransaction();
         
         try {
-            // $this->saveLogNotify();
+            Aset::where('id',$detail->kib_id)->update(['status'=>'actives']);
             $detail->delete();
             return $this->commitDeleted([
                 'redirect' => route(request()->routes . '.detail', $this->id)
@@ -375,6 +399,8 @@ class Pemeliharaan extends Model
                         $this->saveLogNotify();
                     } else {
                         $this->update(['status' => 'completed']);
+                        $aset = PemeliharaanDetail::where('pemeliharaan_id',$this->id)->pluck('kib_id')->toArray();
+                        Aset::whereIn('id',$aset)->update(['status' => 'actives']);
                         // Aset::where('id',$this->kib_id)->update(['status'=>'notactive']);
                         $this->saveLogNotify();
                     }

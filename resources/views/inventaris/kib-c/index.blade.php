@@ -10,6 +10,7 @@
             data-placeholder="{{ __('Status') }}">
             <option value="" selected>{{ __('Status') }}</option>
             <option value="actives">Active</option>
+            <option value="maintenance">Dalam Pemeliharaan</option>
             <option value="in repair">Dalam Perbaikan</option>
             <option value="in deletion">Dalam Penghapusan</option>
             <option value="notactive">Not active</option>
@@ -38,6 +39,14 @@
     </div>
 </div>
 
+@endsection
+@section('buttons')
+<a href="{{ route($routes . '.export') }}" target="_blank" class="btn btn-info ml-2 export-excel text-nowrap">
+    <i class="far fa-file-excel mr-2"></i> Export
+</a>
+<a href="{{ route($routes . '.kib-pdf') }}" target="_blank" class="btn btn-danger ml-2 export-pdf text-nowrap">
+    <i class="far fa-file-pdf mr-2"></i> Pdf
+</a>
 @endsection
 
 {{-- @section('buttons')

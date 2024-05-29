@@ -85,8 +85,8 @@ class KIBBController extends Controller
                 ],
             ],
         ]);
-        $jumlah = Aset::where('type','KIB B')->whereIn('status',['actives','in repair','in deletion'])->count('id');
-        $value = Aset::where('type','KIB B')->whereIn('status',['actives','in repair','in deletion'])->sum('book_value');
+        $jumlah = Aset::where('type','KIB B')->whereIn('status',['actives','in repair','in deletion','maintenance'])->count('id');
+        $value = Aset::where('type','KIB B')->whereIn('status',['actives','in repair','in deletion','maintenance'])->sum('book_value');
         return $this->render($this->views . '.index', compact(['jumlah','value']));
         // return $this->render($this->views . '.index');
     }
@@ -233,7 +233,9 @@ class KIBBController extends Controller
                 function ($record) {
                     if ($record->status == 'actives') {
                         return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
-                    } elseif ($record->status == 'notactive') {
+                    } elseif ($record->status == 'maintenance') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    }elseif ($record->status == 'notactive') {
                         return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
                     } elseif ($record->status == 'in repair') {
                         return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';

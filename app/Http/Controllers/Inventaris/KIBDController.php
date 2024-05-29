@@ -10,6 +10,8 @@ use App\Models\inventaris\Aset;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\Setting\KibDExport;
+use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
 class KIBDController extends Controller
@@ -189,6 +191,8 @@ class KIBDController extends Controller
                 function ($record) {
                     if ($record->status == 'actives') {
                         return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
+                    }elseif ($record->status == 'maintenance') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
                     } elseif ($record->status == 'notactive') {
                         return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
                     } elseif ($record->status == 'in repair') {
@@ -329,6 +333,18 @@ class KIBDController extends Controller
     public function deletes(Aset $record)
     {
         return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
+    }
+
+    public function export(Request $request){
+        return Excel::download(new KibDExport, date('Y-m-d') . ' KIBB.xlsx');
+    }
+
+    public function print()
+    {
+        $title ='Laporan Aset KIB D';
+        $records = Aset::with('coad')->where('type','KIB D')->whereIn('status',['actives','in repair','in deletion','maintenance'])->filters()->get();
+
+        return $this->render($this->views.'.cetak',compact('records','title'));
     }
 
 }

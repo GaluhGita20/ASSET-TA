@@ -52,7 +52,7 @@ class LaporanPenghapusanController extends Controller
                     $this->makeColumn('name:nilai_hapus|label:Nilai Aset Dihapus (Rupiah)|className:text-center|width:300px'),
                     $this->makeColumn('name:status'),
                     $this->makeColumn('name:updated_by'),
-                    // $this->makeColumn('name:action'),
+                    $this->makeColumn('name:action'),
                 ],
             ],
         ]);
@@ -124,6 +124,21 @@ class LaporanPenghapusanController extends Controller
                     return $record->createdByRaw();
                 }
             })
+            ->addColumn('action', function ($record) use ($user) {
+                $actions = [];
+
+                if ($record->checkAction('show', $this->perms)) {
+                    $actions[] = [
+                        'type' => 'show',
+                        'page' => true,
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.show', $record->id),
+                    ];
+                }
+
+                return $this->makeButtonDropdown($actions, $record->id);
+
+            })
 
             ->rawColumns([
             'no_surat',
@@ -131,6 +146,11 @@ class LaporanPenghapusanController extends Controller
             'nama_aset',
             'status','updated_by','action'])
             ->make(true);
+    }
+
+    public function show(Penghapusan $record)
+    {
+        return $this->render($this->views.'.penghapusanShow', compact('record'));
     }
 
 }

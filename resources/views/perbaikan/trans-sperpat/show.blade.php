@@ -133,7 +133,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Biaya Total Sementara') }}</label>
+                                <label class="col-sm-4 col-form-label">{{ __('Biaya Total Sperpat') }}</label>
                                 <div class="col-sm-8 col-form-label">  
                                     @if($record->repair_type =='sperpat')
                                         @if($ts_cost != null)

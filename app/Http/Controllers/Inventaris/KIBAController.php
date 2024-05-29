@@ -10,6 +10,8 @@ use App\Models\inventaris\Aset;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\Setting\KibAExport;
+use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
 class KIBAController extends Controller
@@ -126,7 +128,7 @@ class KIBAController extends Controller
             )->addColumn(
                 'provinsi',
                 function ($record) {
-                   return $record->province_id ? $record->provinsi->name : '-';
+                    return $record->province_id ? $record->provinsi->name : '-';
                 }
             )->addColumn(
                 'kota',
@@ -260,7 +262,7 @@ class KIBAController extends Controller
         $baseContentReplace = "base-modal--render";
         return $this->render($this->views . '.create');
     }
-   
+
     public function show(Aset $record){
         $type ='show';
         return $this->render($this->views . '.detailShow',compact('record','type'));
@@ -281,23 +283,16 @@ class KIBAController extends Controller
         return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
     }
 
+    public function export(Request $request){
+        return Excel::download(new KibAExport, date('Y-m-d') . ' KIBB.xlsx');
+    }
 
-    // public function update(Aset $record, AsetRequest $request){
-    //     return $record->handleStoreOrUpdate($request);
-    // }
+    public function print()
+    {
+        $title ='Laporan Aset KIB A';
+        $records = Aset::with('coad')->where('type','KIB A')->where('status','actives')->filters()->get();
 
-    // public function destroy(Aset $record){
-    //     return $record->handleDestroy();
-    // }
-
-    // public function getDetailAset(AsetRequest $request){
-    //     $id_akun = $request->id;
-    //     $aset = Aset::where('id', $id)->first();
-    //     return response()->json([
-    //         'name' => $aset->name,
-    //        /// 'jenis_pengadaan' => $aset->jenis_pengadaan,
-    //         'description' => $aset->description,
-    //     ]);
-    // }
+        return $this->render($this->views.'.cetak',compact('records','title'));
+    }
 
 }

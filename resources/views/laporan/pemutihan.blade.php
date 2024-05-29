@@ -14,21 +14,7 @@
             placeholder="{{ __('Pilih Salah Satu') }}">
             <option value="">{{ __('Pilih Salah Satu') }}</option>
         </select>
-        {{-- <input type="text" class="form-control filter-control" data-post="aset_name" name="aset_name"
-            placeholder="{{ __('Nama Aset') }}"> --}}
     </div>
-    {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
-        <input type="text" class="form-control filter-control" data-post="code" placeholder="{{ __('No Pengajuan') }}">
-    </div> --}}
-    {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
-        <select class="form-control filter-control base-plugin--select2-ajax deps" name="departemen_id" data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
-            data-placeholder="{{ __('Unit Kerja') }}" data-post="departemen_id">
-        </select>
-    </div> --}}
-    {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2">
-        <input type='text' class="form-control filter-control  base-plugin--datepicker" name="submission_date" 
-            placeholder="{{ __('Tanggal Pengajuan') }}" data-post="submission_date">
-    </div> --}}
 
     <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
         <select class="form-control base-plugin--select2-ajax filter-control yearSelect"
@@ -47,17 +33,7 @@
         {{-- <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Periode Perencanaan') }}"> --}}
     </div>
 
-    {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2">
-        <select class="form-control base-plugin--select2-ajax filter-control"
-            data-post="status"
-            data-placeholder="{{ __('Status') }}">
-            <option value="" selected>{{ __('Status') }}</option>
-            <option value="Draft">Draft</option>
-            <option value="waiting.approval">Waiting Approval</option>
-            <option value="completed">Completed</option>
-            <option value="rejected">Rejected</option>
-        </select>
-    </div> --}}
+
 </div>
 
     <div class="card-body p-8">
@@ -75,7 +51,7 @@
                                 </div>
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
-                                    <div class="text-dark font-weight-bolder font-size-h5" style="text-align: center">
+                                    <div class="text-dark font-weight-bolder font-size-h6" style="text-align: center">
                                         Jumlah Aset Diputihkan
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
@@ -110,7 +86,7 @@
                                 </div>
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
-                                    <div class="text-dark font-weight-bolder font-size-h5" style="text-align: center">
+                                    <div class="text-dark font-weight-bolder font-size-h6" style="text-align: center">
                                         Total Pendapatan Pemutihan Aset
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
@@ -124,7 +100,6 @@
                                 <div class="d-flex flex-column w-100 mt-5">
                                     <div class="text-dark mr-2 font-size-lg font-weight-bolder pb-3">
                                         <div class="d-flex justify-content-between">
-                                            {{-- <span class="percent-text">0%</span> --}}
                                         </div>
                                     </div>
                                 </div>

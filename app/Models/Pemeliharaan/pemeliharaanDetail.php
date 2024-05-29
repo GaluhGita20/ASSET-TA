@@ -87,7 +87,8 @@ class PemeliharaanDetail extends Model
         try { 
 
             $data = $request->all();
-          //  dd($data);
+            // dd($request->kib_id);
+            // Aset::where('id',$request->kib_id)->update(['status'=>'maintenance']);
             $this->fill($data);
             $this->save();
 
@@ -102,8 +103,10 @@ class PemeliharaanDetail extends Model
     public function handleDestroy(){
         $this->beginTransaction();
         try {
+            // dd($this->kib_id);
+            Aset::where('id',$this->kib_id)->update(['status'=>'actives']);
+            
             $this->delete();
-
             return $this->commitDeleted();
         } catch (\Exception $e) {
             return $this->rollbackDeleted($e);

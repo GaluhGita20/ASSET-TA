@@ -250,9 +250,31 @@ return [
             [
                 'name' => 'laporan_penerimaan-aset',
                 'perms' => 'report-transaksi',
-                'title' => 'Penerimaan Aset',
+                'title' => 'Transaksi Pembelian Aset',
                 'url' => '/laporan/penerimaan-aset',
             ],
+
+            [
+                'name' => 'laporan_penerimaan-hibah-aset',
+                'perms' => 'report-transaksi',
+                'title' => 'Penerimaan Hibah Aset',
+                'url' => '/laporan/penerimaan-hibah-aset',
+            ],
+
+            [
+                'name' => 'laporan_perbaikan-aset',
+                'perms' => 'report-perbaikan',
+                'title' => 'Perbaikan Aset',
+                'url' => '/laporan/perbaikan-aset',
+            ],
+
+            [
+                'name' => 'laporan_perbaikan-sperpat-aset',
+                'perms' => 'report-perbaikan',
+                'title' => 'Transaksi Sperpat Aset',
+                'url' => '/laporan/perbaikan-sperpat-aset',
+            ],
+
             [
                 'name' => 'laporan_pemeliharaan-aset',
                 'perms' => 'report-pemeliharaan',

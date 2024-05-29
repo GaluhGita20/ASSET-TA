@@ -67,6 +67,11 @@ class Perencanaan extends Model
         return $this->hasMany(PerencanaanDetail::class, 'perencanaan_id');
     }
 
+    public function trans()
+    {
+        return $this->hasMany(PerencanaanDetail::class, 'trans_id');
+    }
+
     // public function cc()
     // {
     //     return $this->belongsToMany(User::class, 'trans_pengajuan_pembelian_cc', 'perencanaan_id', 'user_id');
@@ -331,6 +336,8 @@ class Perencanaan extends Model
                 $this->update(['sentence_end' => $request->sentence_end]);
             }
             
+            // dd($this->status);
+            
             
 
             $redirect = route(request()->get('routes') . '.index');
@@ -377,15 +384,10 @@ class Perencanaan extends Model
         }
         if($flag <= 0){
             return $data = [
-                    'status' => 'ok',
-                    'message' => 'null',
+                'status' => 'ok',
+                'message' => 'null',
             ];
         }else{
-            // return $this->rollback(
-            //     [
-            //         'message' => 'Silahkan lakukan approval pada .'
-            //     ]
-            // );
             $datak = implode(', ', array_column($list_error, 'text'));
             return $data = [
                 'status' => 'gagal',
@@ -488,9 +490,35 @@ class Perencanaan extends Model
     {
         $this->beginTransaction();
         try {
-            // dd('tes');
-            $data = PerencanaanDetail::where('perencanaan_id', $this->id)->update(['status' => 'draf']);
-            // dd($data);
+
+            if($this->status == 'waiting.approval'){
+                // dd($this->id);
+                PerencanaanDetail::where('perencanaan_id', $this->id)
+                ->update([
+                    'status' => 'draf',
+                ]);
+
+                PerencanaanDetail::where('perencanaan_id', $this->id)
+                ->update([
+                    'qty_agree' => 0,
+                ]);
+
+                PerencanaanDetail::where('perencanaan_id', $this->id)
+                ->update([
+                    'HPS_total_agree' => 0,
+                ]);
+
+                PerencanaanDetail::where('perencanaan_id', $this->id)
+                ->update([
+                    'reject_notes' => null
+                ]);
+
+                PerencanaanDetail::where('perencanaan_id', $this->id)
+                ->update([
+                    'source_fund_id' => null
+                ]);
+            }
+
             $this->rejectApproval($request->module, $request->note);
             $this->update(['status' => 'rejected']);
             $this->saveLogNotify();

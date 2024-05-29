@@ -43,28 +43,6 @@
         {{-- <input type="text" class="form-control filter-control" data-post="procurement_year" placeholder="{{ __('Periode Perencanaan') }}"> --}}
     </div>
 
-    {{-- <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
-        <div class="input-group">
-            <input name="spk_start_date"
-                class="form-control base-plugin--datepicker spk_start_date"
-                placeholder="{{ __('Mulai') }}"
-                data-orientation="bottom"
-                data-post="spk_start_date"
-                >
-            <div class="input-group-append">
-                <span class="input-group-text">
-                    <i class="la la-ellipsis-h"></i>
-                </span>
-            </div>
-            
-            <input name="spk_end_date"
-                class="form-control filter-control base-plugin--datepicker spk_end_date"
-                placeholder="{{ __('Selesai') }}"
-                data-orientation="bottom"
-                data-post="spk_end_date"
-                >
-        </div>
-    </div> --}}
 </div>
 <div class="card-body p-8">
     <div class="col-12">
@@ -81,7 +59,7 @@
                             </div>
                             
                             <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
-                                <div class="text-dark font-weight-bolder font-size-h5" style="width: 100%; height: 100%;">
+                                <div class="text-dark font-weight-bolder font-size-h6" style="width: 100%; height: 100%;">
                                     Jumlah Pembelian Aset
                                 </div>
                                 <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
@@ -117,7 +95,7 @@
                             </div>
                             
                             <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
-                                <div class="text-dark font-weight-bolder font-size-h5" style="text-align: center">
+                                <div class="text-dark font-weight-bolder font-size-h6" style="text-align: center">
                                     Total Biaya Pembelian Aset
                                 </div>
                                 <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
@@ -142,6 +120,8 @@
         </div>
     </div>
 </div>
+
+
 
 @endsection
 
@@ -212,8 +192,6 @@
                         },
                     });
         }
-
-      
     });
     </script>
 @endpush

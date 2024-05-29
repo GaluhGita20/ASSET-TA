@@ -50,11 +50,13 @@ class KIBFController extends Controller
                 // 'source_acq' => $record->usulans->trans->source_acq == 'Hibah' || $record->usulans->trans->source_acq == 'Sumbangan' ?
                 //     '<span class="badge bg-primary text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>' :
                 //     '<span class="badge bg-success text-white">'.ucfirst($record->usulans->trans->source_acq).'</span>',
+                'karakter_bangunan' => $record->charater_bld ? $record->charater_bld : '-',
                 'asal_usul' => $record->usulans->danad ? $record->usulans->danad->name : '-',
                 'status' => $record->status ? ($record->status == 'actives' ? ucfirst('active'): ($record->status == 'notactive' ? ucfirst($record->status): ($record->status == 'in repair' ?ucfirst($record->status) : ($record->status == 'in deletion' ? ucfirst($record->status) : ucfirst($record->status))))) : '-',
                 'tanah_id' => $record->tanah_id ? $record->tanah_id : '-',
                 'kondisi' => $record->condition ? ($record->condition == 'baik' ? ucfirst($record->condition) : ($record->condition == 'rusak berat' ? ucfirst($record->condition) : ucfirst($record->condition))) : '-',
                 // 'kondisi' => ucwords($record->condition == 'rusak berat' ? $record->condition : 'baik'),
+                'unit_pengusul' =>!empty($record->usulans->perencanaan->struct) ? $record->usulans->perencanaan->struct->name : ($record->location_hibah_aset ? $record->deps->name : '-'),
                 'keterangan' => $record->description ? $record->description : '-',
                 'updated_by' => preg_replace('/\s+/', ' ', $user),
             ];

@@ -10,6 +10,8 @@ use App\Models\inventaris\Aset;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\Setting\KibCExport;
+use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
 class KIBCController extends Controller
@@ -67,6 +69,7 @@ class KIBCController extends Controller
                     $this->makeColumn('name:nilai_residu|label:Nilai Residu (Rupiah)|className:text-center'),
                     $this->makeColumn('name:akumulasi|label:Akumulasi Penyusutan (Rupiah)|className:text-center'),
                     $this->makeColumn('name:nilai_buku|label:Nilai Buku (Rupiah)|className:text-center'),
+                    $this->makeColumn('name:pengusul|label:Unit Pengusul|className:text-center'),
                     $this->makeColumn('name:keterangan|label:Keterangan|className:text-center'),
                     $this->makeColumn('name:updated_by'),
                     $this->makeColumn('name:action'),
@@ -193,7 +196,9 @@ class KIBCController extends Controller
                 function ($record) {
                     if ($record->status == 'actives') {
                         return $record->status ? '<span class="badge bg-success text-white">'.ucfirst('active').'</span>' : '-';
-                    } elseif ($record->status == 'notactive') {
+                    } elseif ($record->status == 'maintenance') {
+                        return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
+                    }elseif ($record->status == 'notactive') {
                         return $record->status ? '<span class="badge bg-danger text-white">'.ucfirst($record->status).'</span>' : '-';
                     } elseif ($record->status == 'in repair') {
                         return $record->status ? '<span class="badge bg-warning text-white">'.ucfirst($record->status).'</span>' : '-';
@@ -236,7 +241,18 @@ class KIBCController extends Controller
                     }
                   //  return $record->usulans ? ucwords($record->usulans->trans->source_acq) : '-';
                 }
-            )->addColumn(
+            )
+            ->addColumn(
+                'pengusul',
+                    function ($record) {
+                        if(!empty($record->usulans->perencanaan->struct)){
+                            return $record->usulans->perencanaan->struct->name ? $record->usulans->perencanaan->struct->name : '-';
+                        }else{
+                            return $record->location_hibah_aset ? $record->deps->name : '-';
+                        }
+                    }
+                )
+            ->addColumn(
                 'updated_by',
                 function ($record) {
                     return $record->createdByRaw();
@@ -320,6 +336,18 @@ class KIBCController extends Controller
     public function deletes(Aset $record)
     {
         return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
+    }
+
+    public function export(Request $request){
+        return Excel::download(new KibCExport, date('Y-m-d') . ' KIBB.xlsx');
+    }
+
+    public function print()
+    {
+        $title ='Laporan Aset KIB C';
+        $records = Aset::with('coad')->where('type','KIB C')->whereIn('status',['actives','in repair','in deletion','maintenance'])->filters()->get();
+
+        return $this->render($this->views.'.cetak',compact('records','title'));
     }
 
 }
