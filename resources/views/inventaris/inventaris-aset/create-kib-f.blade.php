@@ -30,7 +30,7 @@
                       
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Nama Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <input type="text" class="form-control" name="nama__aset" placeholder="{{ __('Nama Aset') }}" value="{{ $usulan->asetd->name }}" readonly>
@@ -42,10 +42,10 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="spesifikasi" value="{{ $usulan->desc_spesification }}">{{ $usulan->desc_spesification }}</textarea>
+                                    <textarea class="form-control" name="spesifikasi" value="{{ $usulan->desc_spesification }}" readonly>{{ $usulan->desc_spesification }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -164,7 +164,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Sumber Perolehan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Sumber Perolehan') }}</label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source_acq" class="form-control" disabled>
@@ -216,7 +216,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Pembelian') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Tanggal Pembelian') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="receipt_date" value="{{ $usulan->trans->spk_start_date->format('Y/m/d') }}" readonly>
@@ -228,7 +228,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Penerimaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Tanggal Penerimaan') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="receipt_date" value="{{ $usulan->trans->receipt_date->format('Y/m/d') }}" readonly>
@@ -239,7 +239,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Tanggal Pembukuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Tanggal Pembukuan') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input class="form-control " name="book_date" value="{{ now()->format('Y/m/d') }}" readonly>
@@ -252,7 +252,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Asal Usul') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Asal Usul') }}</label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="source" id="source" class="form-control base-plugin--select2-ajax">
@@ -270,7 +270,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4">
-                                    <label class="col-form-label">{{ __('Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Vendor') }}</label>
                                 </div>
                                 <div class="col-md-8 parent-group">
                                     <select name="vendor_id" class="form-control base-plugin--select2-ajax vendor_id" disabled>
@@ -289,7 +289,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Harga') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Harga') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -374,7 +374,7 @@
                         <div class="col-sm-6" id="percepatan2" style="display:block">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Jumlah') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input type="number" class="form-control" id="qty" name="qty" max="{{ $jumlah }}" placeholder="{{ __('Jumlah Maksimum '.$jumlah.' ') }}" min="1" value="1" disabled>

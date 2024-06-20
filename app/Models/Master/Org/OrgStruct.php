@@ -84,6 +84,10 @@ class OrgStruct extends Model
     // {
     //     return $this->belongsToMany(OrgStruct::class, 'ref_org_structs_groups', 'struct_id', 'group_id');
     // }
+    // public function orgLocations()
+    // {
+    //     return $this->hasMany(Location::class, 'departemen_id');;
+    // }
 
     public function positions()
     {

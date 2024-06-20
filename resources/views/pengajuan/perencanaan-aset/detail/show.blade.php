@@ -37,6 +37,13 @@
                     <textarea class="form-control" name="desc_spesification" placeholder="{{ __('Spesifikasi Aset') }}" value ="{{ $detail->desc_spesification }}" readonly>{{ $detail->desc_spesification }}</textarea>
                 </div>
             </div>
+            <div class="form-group row">
+                <div class="col-sm-12 offset-md-5 col-md-7">
+                    <span style="font-size: 11px">{{ __('*Contoh Prosesor: Intel Core i7-10750H
+                        RAM: 16 GB DDR4
+                        Penyimpanan: 512 GB SSD') }}</span>
+                </div>
+            </div>
         </div>
 
         <div class="col-sm-12 col-sm-12">

@@ -81,7 +81,7 @@
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
                                     <div class="text-dark font-weight-bolder font-size-h6" style="text-align: center">
-                                        Jumlah Terealisasikan
+                                        Jumlah Disetujui
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
                                         <div class="d-flex justify-content-center align-items-center">
@@ -116,7 +116,7 @@
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
                                     <div class="text-dark font-weight-bolder font-size-h5" style="text-align: center">
-                                        Jumlah Tidak Terealisasikan
+                                        Jumlah Tidak Disetujui
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
                                         <div class="d-flex justify-content-center align-items-center">
@@ -151,7 +151,7 @@
                                 
                                 <div class="d-flex flex-column flex-grow-1 my-lg-0 my-2 pr-3">
                                     <div class="text-dark font-weight-bolder font-size-h5" style="text-align: center">
-                                        Total Biaya
+                                        Total Biaya Perencanaan Aset
                                     </div>
                                     <div class="text-muted font-weight-bold font-size-lg" style="margin-top:3px;">
                                         <div class="d-flex justify-content-center align-items-center">

@@ -219,12 +219,6 @@ class PemeliharaanAsetController extends Controller
                     return $detail->asetd ? $detail->asetd->usulans->asetd->name : '-';
                 }
             )
-            // ->addColumn(
-            //     'kib_id',
-            //     function ($detail) {
-            //         return $detail->asetd ? $detail->asetd->usulans->asetd->name : '-';
-            //     }
-            // )
             ->addColumn(
                 'type',
                 function ($detail) {
@@ -240,7 +234,13 @@ class PemeliharaanAsetController extends Controller
             ->addColumn(
                 'lokasi',
                 function ($detail) {
-                    return $detail->asetd->locations ? $detail->asetd->locations->name : $detail->asetd->non_room_location;
+                    if($detail->asetd->locations){
+                        return $detail->asetd->locations->name;
+                    }elseif($detail->asetd->non_room_location){
+                        return $detail->asetd->non_room_location;
+                    }else{
+                        return '-';
+                    }
                 }
             )
             ->addColumn(

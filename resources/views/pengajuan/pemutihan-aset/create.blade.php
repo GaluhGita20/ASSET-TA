@@ -198,9 +198,6 @@
 @endsection
 
 @push('scripts')
-
-
-
 <script>
     
         function updateTotal() {
@@ -210,6 +207,8 @@
 
             valued = parseInt(valued);
         }
+
+        
 
         $("#kib_id").on('change', function() {
             var me = $(this);

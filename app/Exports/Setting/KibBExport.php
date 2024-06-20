@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class KibBExport implements FromCollection, WithStyles
 {
+    protected $filters;
     public function thead()
     {
         return [
@@ -41,13 +42,53 @@ class KibBExport implements FromCollection, WithStyles
         ];
     }
 
+
+    
+
+    public function __construct(array $filters)
+    {
+        $this->filters = $filters;
+    }
+
     public function collection()
     {
+
+        $query = Aset::with('coad')->grid()
+        ->where('type', 'KIB B')
+        ->whereIn('status', ['actives', 'in repair', 'in deletion', 'maintenance']);
+    
+    if ($this->filters['jenis_aset'] !== null) {
+        $query->where('jenis_aset', $this->filters['jenis_aset']);
+    }
+    
+    if ($this->filters['room_location'] !== null) {
+        $query->where('room_location', $this->filters['room_location']);
+    }
+    
+    if ($this->filters['location_id'] !== null) {
+        $req = $this->filters['location_id'];
+        $query->where(function ($query) use ($req) {
+            $query->whereHas('usulans', function ($q) use ($req) {
+                $q->whereHas('perencanaan', function ($qq) use ($req) {
+                    $qq->where('struct_id', $req); // Menggunakan $req untuk menghindari masalah referensi
+                });
+            })->orWhere('location_hibah_aset', $req); // Menggunakan $req untuk konsistensi
+        });
+    }
+    
+    if ($this->filters['condition'] !== null) {
+        $query->where('condition', $this->filters['condition']);
+    }
+    
+    // Mendapatkan hasil query
+    $results = $query->get();
+    // dd($results);
+
         $data = [];
         $data[] = array_values($this->thead());
-        // $records = Aset::grid()->where('type','KIB B')->filters()->get();
-        $records = Aset::where('type','KIB B')->grid()->filters()->get();
-        foreach ($records as $i => $record) {
+        // $query = Aset::where('type','KIB B')->grid()->filters()->get();
+        
+        foreach ($results as $i => $record) {
             $data[] = [
                 ($i + 1),
                 $record->usulans ? $record->usulans->asetd->name : '-',
@@ -78,6 +119,7 @@ class KibBExport implements FromCollection, WithStyles
             ];
         }
 
+       // dd($data);
         return collect($data);
     }
 

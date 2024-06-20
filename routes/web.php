@@ -93,6 +93,24 @@ Route::middleware('auth')->group(function () {
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
 
+                Route::name('perubahan-perencanaan-aset.')
+                ->prefix('perubahan-perencanaan-aset')
+                ->group(
+                    function(){
+                        Route::post('{record}/updateSummary', 'PerubahanPerencanaanAsetController@updateSummary')->name('updateSummary');
+                        Route::post('reject/{id}','PerubahanPerencanaanAsetController@reject')->name('reject');
+                        Route::get('updateSpesifikasi/{record}', 'PerubahanPerencanaanAsetController@updateSpesifikasi')->name('updateSpesifikasi');
+                        Route::post('{record}/saveSpesifikasi', 'PerubahanPerencanaanAsetController@saveSpesifikasi')->name('saveSpesifikasi');
+                    }
+                );
+
+                Route::grid('perubahan-perencanaan-aset', 'PerubahanPerencanaanAsetController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+
+                Route::get('perubahan-perencanaan-aset/detail/{record}', 'PerubahanPerencanaanAsetController@detail')->name('perubahan-perencanaan-aset.detail');
+
+
                 Route::post('penghapusan-aset/{record}/updateSummary', 'PenghapusanAsetController@updateSummary')->name('penghapusan-aset.updateSummary');
                 Route::get('penghapusan-aset/detail/{record}', 'PenghapusanAsetController@detail')->name('penghapusan-aset.detail');
                 Route::grid('penghapusan-aset', 'PenghapusanAsetController', [
@@ -283,6 +301,8 @@ Route::middleware('auth')->group(function () {
 
                 Route::post('getLapSperpat', 'AjaxController@getLapSperpat')->name('getLapSperpat');
                 Route::post('getLapPerbaikan', 'AjaxController@getLapPerbaikan')->name('getLapPerbaikan');
+                Route::post('getUsulanAsetById', 'AjaxController@getUsulanAsetById')->name('getUsulanAsetById');
+                
 
 
                 Route::post('cekSperpat', 'AjaxController@cekSperpat')->name('cekSperpat');
@@ -296,6 +316,14 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectRole', 'AjaxController@selectRole')->name('selectRole');
                 Route::post('{search}/selectStruct', 'AjaxController@selectStruct')->name('selectStruct');
                 Route::post('selectPemeliharaan', 'AjaxController@selectPemeliharaan')->name('selectPemeliharaan');
+
+
+                //selectCodePerencanaan
+                Route::post('selectCodePerencanaan', 'AjaxController@selectCodePerencanaan')->name('selectCodePerencanaan');
+                Route::post('selectUsulanDetail', 'AjaxController@selectUsulanDetail')->name('selectUsulanDetail');
+
+                Route::post('selectPemeliharaan', 'AjaxController@selectPemeliharaan')->name('selectPemeliharaan');
+
 
                 Route::get('child-struct-options', 'AjaxController@childStructOptions')->name('child-struct-options');
                 Route::post('{search}/selectPosition', 'AjaxController@selectPosition')->name('selectPosition');
@@ -498,6 +526,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('inventaris/kib-d/kib-pdf','KIBDController@print')->name('kib-d.kib-pdf');
                 Route::get('inventaris/kib-e/kib-pdf','KIBEController@print')->name('kib-e.kib-pdf');
                 Route::get('inventaris/kib-f/kib-pdf','KIBFController@print')->name('kib-f.kib-pdf');
+
+                Route::get('inventaris/kib-b/kir-pdf','KIBBController@printKIR')->name('kib-b.kir-pdf');
+                Route::get('inventaris/kib-e/kir-pdf','KIBEController@printKIR')->name('kib-e.kir-pdf');
+
                 // Route::get('kib-a/pemutihan/{record}', 'KIBAController@pemutihan')->name('kib-a.pemutihan');
                 // Route::get('kib-b/pemutihan/{record}', 'KIBBController@pemutihan')->name('kib-b.pemutihan');
                 // Route::get('kib-c/pemutihan/{record}', 'KIBCController@pemutihan')->name('kib-c.pemutihan');

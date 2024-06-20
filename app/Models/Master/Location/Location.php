@@ -38,7 +38,7 @@ class Location extends Model
         return $this->belongsTo(OrgStruct::class, 'departemen_id');;
     }
 
-   
+
     /** SCOPE **/
 
     public function scopeFilters($query)

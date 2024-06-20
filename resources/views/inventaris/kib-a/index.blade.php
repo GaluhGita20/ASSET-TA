@@ -22,11 +22,11 @@
     </div>
 @endsection
 @section('buttons')
-<a href="{{ route($routes . '.export') }}" target="_blank" class="btn btn-info ml-2 export-excel text-nowrap">
+<a href="{{ route($routes . '.export') }}" target="_blank" class="btn btn-info ml-2 export-excel-kib text-nowrap">
     <i class="far fa-file-excel mr-2"></i> Excel
 </a>
-<a href="{{ route($routes . '.kib-pdf') }}" target="_blank" class="btn btn-danger ml-2 export-pdf text-nowrap">
-    <i class="far fa-file-pdf mr-2"></i> Pdf
+<a href="{{ route($routes . '.kib-pdf') }}" target="_blank" class="btn btn-danger ml-2 export-pdf-kib text-nowrap">
+    <i class="far fa-file-pdf mr-2"></i> Cetak KIB
 </a>
 @endsection
 

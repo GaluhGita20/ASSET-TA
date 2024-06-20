@@ -131,173 +131,173 @@
     </div>
 @endsection
 @push('scripts')
-<script>
+    <script>
 
-   $(function () {
-        var org = null;
-        var year = null;
-        var mon = null;
+    $(function () {
+            var org = null;
+            var year = null;
+            var mon = null;
 
-        $('.content-page').on('change', 'select.yearSelect', function (e) {
-            year = $(this);
-            // console.log(org.val());
-			$.ajax({
-					type: 'POST',
-					url: '/ajax/getLapPemeliharaan',
-					data: {
-						_token: BaseUtil.getToken(),
-						val1: year.val(),
-						val2: null,
-                        val3:null,
-					},
-					success: function(resp) {
-						var jumlah = resp.jumlah;
-						var biaya = resp.value;
-						
-						
-						$('.jums').text(jumlah);
-						$('.biaya').text(biaya);
-	
-						console.log(resp);
-					},
-					error: function(resp) {
-						console.log(resp)
-						console.log('error')
-					},
-				});
+            $('.content-page').on('change', 'select.yearSelect', function (e) {
+                year = $(this);
+                // console.log(org.val());
+                $.ajax({
+                        type: 'POST',
+                        url: '/ajax/getLapPemeliharaan',
+                        data: {
+                            _token: BaseUtil.getToken(),
+                            val1: year.val(),
+                            val2: null,
+                            val3:null,
+                        },
+                        success: function(resp) {
+                            var jumlah = resp.jumlah;
+                            var biaya = resp.value;
+                            
+                            
+                            $('.jums').text(jumlah);
+                            $('.biaya').text(biaya);
+        
+                            console.log(resp);
+                        },
+                        error: function(resp) {
+                            console.log(resp)
+                            console.log('error')
+                        },
+                    });
+            });
+
+            $('.content-page').on('change', 'select.org', function (e) {
+                org = $(this);
+                // console.log(ruang.val());
+
+                $.ajax({
+                        type: 'POST',
+                        url: '/ajax/getLapPemeliharaan',
+                        data: {
+                            _token: BaseUtil.getToken(),
+                            val1: new Date().getFullYear(),
+                            val2: org.val(),
+                            val3: null,
+
+                        },
+                        success: function(resp) {
+                            var jumlah = resp.jumlah;
+                            var biaya = resp.value;
+                            
+                            
+                            $('.jums').text(jumlah);
+                            $('.biaya').text(biaya);
+        
+                            console.log(resp);
+                        },
+                        error: function(resp) {
+                            console.log(resp)
+                            console.log('error')
+                        },
+                    });
+            });
+
+            $('.content-page').on('change', 'select.month', function (e) {
+                mon = $(this);
+                // console.log(ruang.val());
+
+                
+            });
+
+
+            $('.content-page').on('change', 'select.org, select.yearSelect', function (e) {
+                // console.log(org.val, ruang.val)
+                if (org != null && org.val() != null && year != null && year.val() != null) {
+                        $.ajax({
+                        type: 'POST',
+                        url: '/ajax/getLapPemeliharaan',
+                        data: {
+                            _token: BaseUtil.getToken(),
+                            val1: year.val(),
+                            val2: org.val(),
+                            val3: null,
+                        },
+                        success: function(resp) {
+                            var jumlah = resp.jumlah;
+                            var biaya = resp.value;
+                            
+                            
+                            $('.jums').text(jumlah);
+                            $('.biaya').text(biaya);
+        
+                            console.log(resp);
+                        },
+                        error: function(resp) {
+                            console.log(resp)
+                            console.log('error')
+                        },
+                    });
+                }
+            });
+
+
+            $('.content-page').on('change', 'select.month, select.yearSelect', function (e) {
+                // console.log(org.val, ruang.val)
+                if (mon != null && mon.val() != null && year != null && year.val() != null) {
+                        $.ajax({
+                        type: 'POST',
+                        url: '/ajax/getLapPemeliharaan',
+                        data: {
+                            _token: BaseUtil.getToken(),
+                            val1: year.val(),
+                            val2: null,
+                            val3: mon.val(),
+                        },
+                        success: function(resp) {
+                            var jumlah = resp.jumlah;
+                            var biaya = resp.value;
+                            
+                            
+                            $('.jums').text(jumlah);
+                            $('.biaya').text(biaya);
+        
+                            console.log(resp);
+                        },
+                        error: function(resp) {
+                            console.log(resp)
+                            console.log('error')
+                        },
+                    });
+                }
+            });
+
+            $('.content-page').on('change', 'select.month, select.yearSelect, select.org', function (e) {
+                // console.log(org.val, ruang.val)
+                if (mon != null && mon.val() != null && year != null && year.val() != null && org != null && org.val() != null) {
+                        $.ajax({
+                        type: 'POST',
+                        url: '/ajax/getLapPemeliharaan',
+                        data: {
+                            _token: BaseUtil.getToken(),
+                            val1: year.val(),
+                            val2: org.val(),
+                            val3: mon.val(),
+                        },
+                        success: function(resp) {
+                            var jumlah = resp.jumlah;
+                            var biaya = resp.value;
+                            
+                            
+                            $('.jums').text(jumlah);
+                            $('.biaya').text(biaya);
+        
+                            console.log(resp);
+                        },
+                        error: function(resp) {
+                            console.log(resp)
+                            console.log('error')
+                        },
+                    });
+                }
+            });
+
+
         });
-
-        $('.content-page').on('change', 'select.org', function (e) {
-            org = $(this);
-			// console.log(ruang.val());
-
-			$.ajax({
-					type: 'POST',
-					url: '/ajax/getLapPemeliharaan',
-					data: {
-						_token: BaseUtil.getToken(),
-						val1: new Date().getFullYear(),
-						val2: org.val(),
-                        val3: null,
-
-					},
-					success: function(resp) {
-						var jumlah = resp.jumlah;
-						var biaya = resp.value;
-						
-						
-						$('.jums').text(jumlah);
-						$('.biaya').text(biaya);
-	
-						console.log(resp);
-					},
-					error: function(resp) {
-						console.log(resp)
-						console.log('error')
-					},
-				});
-        });
-
-        $('.content-page').on('change', 'select.month', function (e) {
-            mon = $(this);
-			// console.log(ruang.val());
-
-			
-        });
-
-
-        $('.content-page').on('change', 'select.org, select.yearSelect', function (e) {
-			// console.log(org.val, ruang.val)
-            if (org != null && org.val() != null && year != null && year.val() != null) {
-					$.ajax({
-					type: 'POST',
-					url: '/ajax/getLapPemeliharaan',
-					data: {
-						_token: BaseUtil.getToken(),
-						val1: year.val(),
-						val2: org.val(),
-                        val3: null,
-					},
-					success: function(resp) {
-						var jumlah = resp.jumlah;
-						var biaya = resp.value;
-						
-						
-						$('.jums').text(jumlah);
-						$('.biaya').text(biaya);
-	
-						console.log(resp);
-					},
-					error: function(resp) {
-						console.log(resp)
-						console.log('error')
-					},
-				});
-            }
-        });
-
-
-        $('.content-page').on('change', 'select.month, select.yearSelect', function (e) {
-			// console.log(org.val, ruang.val)
-            if (mon != null && mon.val() != null && year != null && year.val() != null) {
-					$.ajax({
-					type: 'POST',
-					url: '/ajax/getLapPemeliharaan',
-					data: {
-						_token: BaseUtil.getToken(),
-						val1: year.val(),
-						val2: null,
-                        val3: mon.val(),
-					},
-					success: function(resp) {
-						var jumlah = resp.jumlah;
-						var biaya = resp.value;
-						
-						
-						$('.jums').text(jumlah);
-						$('.biaya').text(biaya);
-	
-						console.log(resp);
-					},
-					error: function(resp) {
-						console.log(resp)
-						console.log('error')
-					},
-				});
-            }
-        });
-
-        $('.content-page').on('change', 'select.month, select.yearSelect, select.org', function (e) {
-			// console.log(org.val, ruang.val)
-            if (mon != null && mon.val() != null && year != null && year.val() != null && org != null && org.val() != null) {
-					$.ajax({
-					type: 'POST',
-					url: '/ajax/getLapPemeliharaan',
-					data: {
-						_token: BaseUtil.getToken(),
-						val1: year.val(),
-						val2: org.val(),
-                        val3: mon.val(),
-					},
-					success: function(resp) {
-						var jumlah = resp.jumlah;
-						var biaya = resp.value;
-						
-						
-						$('.jums').text(jumlah);
-						$('.biaya').text(biaya);
-	
-						console.log(resp);
-					},
-					error: function(resp) {
-						console.log(resp)
-						console.log('error')
-					},
-				});
-            }
-        });
-
-
-    });
-</script>
+    </script>
 @endpush

@@ -479,8 +479,6 @@ class Perencanaan extends Model
     
                 return $this->commitSaved();
             }
-
-
         } catch (\Exception $e) {
             return $this->rollbackSaved($e);
         }

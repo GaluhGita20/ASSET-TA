@@ -20,4 +20,14 @@ class ProfileRequest extends FormRequest
             'email' => 'Email',
         ];
     }
+
+    public function messages()
+    {
+        //dd($errors->all());
+        return [
+
+            'email.required' => 'Email Wajib Diisi',
+            'email.unique' => 'Email Ini Sudah Tersedia',
+        ];
+    }
 }

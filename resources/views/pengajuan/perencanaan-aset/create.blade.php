@@ -4,27 +4,23 @@
 
 @section('modal-body')
     @method('POST')
-    {{-- @csrf --}}
-    {{-- @if ($errors->any())
-        <div class="alert alert-danger">
-            <strong>Failed!</strong> Terdapat beberapa kesalahan saat memproses formulir:<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif --}}
-
     <input type="hidden" name="is_submit" value="0">
-    {{-- @dump($errors) --}}
     <div class="row">
 
         <div class="col-sm-12">
             <div class="form-group row">
-                <div class="col-2">
-                    <label class="col-form-label">{{ __('Unit Kerja') }}<span style=" color: red;margin-left: 5px;">*</span></label>
-                </div>
+                @if($departemen->location->level == 'department' || $departemen->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan')
+                    <div class="col-2">
+                        <label class="col-form-label">{{ __('Unit Kerja') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                    </div>
+                @endif
+
+                @if($departemen->location->level == 'subdepartmen' || $departemen->location->name != 'Sub Bagian Program Perencanaan dan Pelaporan' && $departemen->location->level != 'department')
+                    <div class="col-2">
+                        <label class="col-form-label">{{ __('Unit Kerja') }}</label>
+                    </div>
+                @endif
+
                 <div class="col-10 parent-group">
                     @if($departemen->location->level == 'department')
                         <input type="hidden" id="departemen_idt" value="{{ $departemen->location->id }}">
@@ -43,10 +39,13 @@
                         </select>  
                     @endif
                     @if($departemen->location->level == 'subdepartmen' || $departemen->location->name != 'Sub Bagian Program Perencanaan dan Pelaporan' && $departemen->location->level != 'department')
-                        <select class="form-control"  name="struct_id">
+                        <input type="text" class="form-control" value="{{ $departemen->location->name }}" readonly>
+                        {{-- <select class="form-control" name="struct_id" disabled>
                             <option value="{{ $departemen->location->id}}" selected> {{ $departemen->location->name }} </option>
-                        </select>
+                        </select> --}}
+                        <input type="hidden" name="struct_id" value="{{ $departemen->location->id }}">
                     @endif
+
                 </div>
             </div>
 
@@ -67,7 +66,7 @@
 
             <div class="form-group row">
                 <div class="col-2 pr-0">
-                    <label class="col-form-label">{{ __('Tanggal Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                    <label class="col-form-label">{{ __('Tanggal Pengajuan') }}</label>
                 </div>
                 <div class="col-10 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"

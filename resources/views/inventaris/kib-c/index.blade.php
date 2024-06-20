@@ -41,14 +41,57 @@
 
 @endsection
 @section('buttons')
-<a href="{{ route($routes . '.export') }}" target="_blank" class="btn btn-info ml-2 export-excel text-nowrap">
-    <i class="far fa-file-excel mr-2"></i> Export
+<a href="{{ route($routes . '.export') }}" target="_blank" class="btn btn-info ml-2 export-excel-kib text-nowrap">
+    <i class="far fa-file-excel mr-2"></i> Excel
 </a>
-<a href="{{ route($routes . '.kib-pdf') }}" target="_blank" class="btn btn-danger ml-2 export-pdf text-nowrap">
-    <i class="far fa-file-pdf mr-2"></i> Pdf
+<a href="{{ route($routes . '.kib-pdf') }}" target="_blank" class="btn btn-danger ml-2 export-pdf-kib text-nowrap">
+    <i class="far fa-file-pdf mr-2"></i> Cetak KIB
 </a>
 @endsection
 
+@push('scripts')
+
+<script>
+    $('.content-page').on('click', ' .export-excel-kib', function (e) {
+		e.preventDefault();
+		var me = $(this);
+		var url = me.attr('href');
+		var filters = {
+			jenis_aset: $('.filter-control[data-post="jenis_aset"]').val(),
+			status: $('.filter-control[data-post="status"]').val(),
+			condition: $('.filter-control[data-post="condition"]').val(),
+			location_id: $('.filter-control[data-post="location_id"]').val(),
+			room_location: $('.filter-control[data-post="room_location"]').val(),
+		}
+
+		filters = $.param(filters);
+		url = url+'?'+filters;
+		console.log(url);
+
+		window.open(url);
+	});
+
+    $('.content-page').on('click', ' .export-pdf-kib', function (e) {
+        e.preventDefault();
+        var me = $(this);
+        var url = me.attr('href');
+        var filters = {
+            jenis_aset: $('.filter-control[data-post="jenis_aset"]').val(),
+            status: $('.filter-control[data-post="status"]').val(),
+            condition: $('.filter-control[data-post="condition"]').val(),
+            location_id: $('.filter-control[data-post="location_id"]').val(),
+            room_location: $('.filter-control[data-post="room_location"]').val(),
+        }
+
+        filters = $.param(filters);
+        url = url+'?'+filters;
+        console.log(url);
+
+        window.open(url);
+    });
+
+</script>
+@endpush
 {{-- @section('buttons')
 	@if (auth()->user()->checkPerms($perms.'.create'))
         <a href="{{ $urlAdd ?? (\Route::has($routes.'.create') ? route($routes.'.create') : 'javascript:;') }}"

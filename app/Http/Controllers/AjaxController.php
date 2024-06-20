@@ -21,6 +21,7 @@ use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Pemeliharaan\Pemeliharaan;
 use App\Models\Pengajuan\Penghapusan;
 use App\Models\Pengajuan\Pemutihans;
+use App\Models\Pengajuan\Perencanaan;
 use App\Models\Master\Dana\Dana;
 use App\Models\Master\Geografis\City;
 use App\Models\Master\Geografis\Province;
@@ -160,7 +161,11 @@ class AjaxController extends Controller
     public function getKibById(Request $request)
     {
         $item = Aset::with('asetData')->where('id',$request->id)->where('status','notactive')->where('condition','rusak berat')->get();
-        // $item = AsetRs::where('id')
+        return $item;
+    }
+
+    public function getUsulanAsetById(Request $request){
+        $item = PerencanaanDetail::with('asetd')->where('id',$request->id)->where('status','waiting purchase')->get();
         return $item;
     }
 
@@ -644,6 +649,47 @@ class AjaxController extends Controller
         return $item;
     }
 
+    public function selectCodePerencanaan(Request $request){
+        $items = Perencanaan::where('status', 'completed')
+        ->whereHas('details', function ($q) {
+            $q->where('status', 'waiting purchase');
+        })
+        ->keywordBy('code')
+        ->get();
+
+        $results = [];
+
+        foreach ($items as $item) {
+            $results[] = [
+                'id' => $item->id,
+                'text' => $item->code, 
+                // 'text' => "Aset".' : '.$item->asetd->name.', '.'Spesifikasi'.' : '.$item->desc_spesification.', '.'Jumlah'.' : '.$item->qty_agree.', '.'Departemen'.' : '.$item->struct->name,
+            ];
+        }
+        return response()->json(compact('results'));
+    
+    }
+
+    public function selectUsulanDetail(Request $request){
+        
+        $items = PerencanaanDetail::where('status','waiting purchase')
+        ->where('perencanaan_id',$request->usulan_id)->keywordBy('ref_aset_id')->get();
+      //  return $item;
+       // dd($items);
+        $results = [];
+
+        foreach ($items as $item) {
+            $results[] = [
+                'id' => $item->id,
+                'text' => $item->asetd->name, 
+                // 'text' => "Aset".' : '.$item->asetd->name.', '.'Spesifikasi'.' : '.$item->desc_spesification.', '.'Jumlah'.' : '.$item->qty_agree.', '.'Departemen'.' : '.$item->struct->name,
+            ];
+        }
+        
+    
+        return response()->json(compact('results'));
+    }
+
 
     public function checkAset(Request $request)
     {   
@@ -750,7 +796,6 @@ class AjaxController extends Controller
                 break;
             case 'find':
                 return $items->find($request->id);
-
             default:
                 $items = $items->whereNull('id');
                 break;

@@ -36,6 +36,16 @@
                     <textarea class="form-control" name="desc_spesification" placeholder="{{ __('Spesifikasi Aset') }}"></textarea>
                 </div>
             </div>
+            <div class="form-group row">
+                <div class="col-sm-12 offset-md-5 col-md-7">
+                    <span style="font-size: 11px">{{ __('*Contoh Bahan: Kaca
+                        Ukuran: 100 Ml
+                        Panjang: 20 cm
+                        Lebar : 20 cm
+                        Frekuensi: 100Hz'
+                        ) }}</span>
+                </div>
+            </div>
         </div>
 
         <div class="col-sm-12 col-sm-12">

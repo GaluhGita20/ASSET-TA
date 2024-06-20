@@ -124,7 +124,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Jumlah Beli') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -142,7 +142,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Pagu') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Pagu') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -213,11 +213,10 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Total Biaya') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Total Biaya') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">

@@ -9,7 +9,7 @@
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col-4">
-                    <label class="col-form-label">{{ __('No Surat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                    <label class="col-form-label">{{ __('No Surat') }}</label>
                 </div>
                 <div class="col-8 parent-group">
                     <input class="form-control" name="code" placeholder="{{ __('No Surat') }}" value="{{ $record->code }}" readonly>
@@ -19,7 +19,7 @@
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col-4">
-                    <label class="col-form-label">{{ __('Tanggal Surat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                    <label class="col-form-label">{{ __('Tanggal Surat') }}</label>
                 </div>
                 <div class="col-8 parent-group">
                     <input name="date" class="form-control base-plugin--datepicker"

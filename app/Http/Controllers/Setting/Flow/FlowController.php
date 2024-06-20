@@ -50,6 +50,7 @@ class FlowController extends Controller
     public function grid()
     {
         $records = Menu::grid()->filters()->dtGet();
+        // dd($records);
 
         return \DataTables::of($records)
             ->addColumn('num', function ($record) {

@@ -263,7 +263,6 @@ class PerencanaanDetail extends Model
                         'pagu' => $pagu,
                         'jumlah_beli' => $jumlah_beli,
                     ];
-                 
                     //session
                     session(['usulan_id' => $allIds]);
     
@@ -290,8 +289,6 @@ class PerencanaanDetail extends Model
     }
 
     public function filterErrorUsulan($idx){
-       
-       
         $filterTahun = PerencanaanDetail::whereIn('id', $idx)
             ->whereHas('perencanaan', function ($query) {
             $currentYear = now()->year; // Mendapatkan tahun saat ini

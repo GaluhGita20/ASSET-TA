@@ -64,4 +64,18 @@ class UserRequest extends FormRequest
         }
         return $rules;
     }
+
+    public function messages()
+    {
+        //dd($errors->all());
+        return [
+            'name.required' => 'Nama Wjib Diisi.',
+            'nip.required' => 'NIP Wajib Diisi',
+            'username.required' => 'Username Wajib Diisi',
+            'email.required' => 'Email Wajib Diisi',
+            'username.unique' => 'Username Ini Sudah Tersedia',
+            'nip.unique' => 'NIP Ini Sudah Tersedia',
+            'email.unique' => 'Email Ini Sudah Tersedia',
+        ];
+    }
 }

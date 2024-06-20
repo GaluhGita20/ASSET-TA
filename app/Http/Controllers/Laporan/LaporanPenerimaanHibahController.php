@@ -126,6 +126,7 @@ class LaporanPenerimaanHibahController extends Controller
                 ],
             ],
         ]);
+        
         $jumlah = PembelianTransaksi::whereYear('receipt_date',date('Y'))->where('status','completed')->where('source_acq','<>','pembelian')
         ->count('id');  // Include the related asets
 

@@ -43,6 +43,17 @@ return [
         //     ],
         // ]
     ],
+
+    // fitur belum jadi ===========================================================
+    // [
+    //     'name' => 'perubahan-usulan-aset',
+    //     'title' => 'Perubahan Perencanaan',
+    //     'perms' => 'perubahan-perencanaan',
+    //     'icon' => 'fa fa-file-alt',
+    //     'url' => '/pengajuan/perubahan-perencanaan-aset',
+    // ],
+    // fitur belum jadi ===========================================================
+
     // [
     //     'name' => 'pembelian-aset',
     //     'title' => 'Transaksi Pembelian',
@@ -196,6 +207,39 @@ return [
         'title' => 'Pelaporan',
         'icon' => 'fa fa-book',
         'submenu' => [
+            [
+                'name' => 'laporan_perencanaan-aset',
+                'perms' => 'report-perencanaan',
+                'title' => 'Perencanaan Aset',
+                'url' => '/laporan/perencanaan-aset',
+            ],
+
+            // [
+            //     'name' => 'penerimaan',
+            //     'title' => 'Transaksi Aset',
+            //     // 'icon' => 'fa fa-cube',
+            //     'submenu' => [
+                    [
+                        'name' => 'laporan_penerimaan-aset',
+                        'perms' => 'report-transaksi',
+                        'title' => 'Pembelian Aset',
+                        'url' => '/laporan/penerimaan-aset',
+                    ],
+
+                    [
+                        'name' => 'laporan_penerimaan-hibah-aset',
+                        'perms' => 'report-transaksi',
+                        'title' => 'Hibah Aset',
+                        'url' => '/laporan/penerimaan-hibah-aset',
+                    ],
+            //     ],
+            // ],
+
+            // [
+            //     'name' => 'inventaris',
+            //     'title' => 'Inventaris Aset',
+            //     // 'icon' => 'fa fa-cube',
+            //     'submenu' => [
             // [
             //     'name' => 'laporan-inventaris_kib-a',
             //     'perms' => 'report-inventaris',
@@ -240,40 +284,31 @@ return [
                         'url' => '/laporan/inventaris/kib-f',
                     // ],
                     ],
-            
-            [
-                'name' => 'laporan_perencanaan-aset',
-                'perms' => 'report-perencanaan',
-                'title' => 'Usulan Aset',
-                'url' => '/laporan/perencanaan-aset',
-            ],
-            [
-                'name' => 'laporan_penerimaan-aset',
-                'perms' => 'report-transaksi',
-                'title' => 'Transaksi Pembelian Aset',
-                'url' => '/laporan/penerimaan-aset',
-            ],
+            //    ],
+            // ],
 
-            [
-                'name' => 'laporan_penerimaan-hibah-aset',
-                'perms' => 'report-transaksi',
-                'title' => 'Penerimaan Hibah Aset',
-                'url' => '/laporan/penerimaan-hibah-aset',
-            ],
+            // [
+            //     'name' => 'perbaikan',
+            //     'title' => 'Perbaikan Aset',
+            //     'perms' => 'report-perbaikan',
+            //     // 'icon' => 'fa fa-cube',
+            //     'submenu' => [
 
-            [
-                'name' => 'laporan_perbaikan-aset',
-                'perms' => 'report-perbaikan',
-                'title' => 'Perbaikan Aset',
-                'url' => '/laporan/perbaikan-aset',
-            ],
+                    [
+                        'name' => 'laporan_perbaikan-aset',
+                        'perms' => 'report-perbaikan',
+                        'title' => 'Perbaikan Aset',
+                        'url' => '/laporan/perbaikan-aset',
+                    ],
 
-            [
-                'name' => 'laporan_perbaikan-sperpat-aset',
-                'perms' => 'report-perbaikan',
-                'title' => 'Transaksi Sperpat Aset',
-                'url' => '/laporan/perbaikan-sperpat-aset',
-            ],
+                    [
+                        'name' => 'laporan_perbaikan-sperpat-aset',
+                        'perms' => 'report-perbaikan',
+                        'title' => 'Transaksi Sperpat Aset',
+                        'url' => '/laporan/perbaikan-sperpat-aset',
+                    ],
+            //     ],
+            // ],
 
             [
                 'name' => 'laporan_pemeliharaan-aset',
@@ -309,7 +344,6 @@ return [
             // ],
         ]
     ],
-
     [
         'section' => 'ADMIN KONSOL',
         'name' => 'console_admin',

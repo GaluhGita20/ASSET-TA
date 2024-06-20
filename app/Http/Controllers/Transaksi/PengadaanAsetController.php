@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use PDF;
 use App\Models\Globals\Approval;
 
 class PengadaanAsetController extends Controller
@@ -128,12 +129,12 @@ class PengadaanAsetController extends Controller
                     ];
                 }
 
-                // if($record->status == 'completed'){
-                //     $actions[] = [
-                //         'type' => 'print',
-                //         'url' => route($this->routes . '.print', $record->id),
-                //     ];
-                // }
+                if($record->status == 'completed'){
+                    $actions[] = [
+                        'type' => 'print',
+                        'url' => route($this->routes . '.print', $record->id),
+                    ];
+                }
 
                 if ($record->checkAction('edit', $this->perms)) {
                     $actions[] = [
@@ -357,14 +358,24 @@ class PengadaanAsetController extends Controller
         if ($record->status === 'waiting.approval.revisi') {
             $module = $module . '_upgrade';
         }
-   
         return $this->render('globals.tracking', compact('record', 'module'));
     }
 
     public function print(PembelianTransaksi $record, $title = '')
     {
         $detailData = PerencanaanDetail::where('trans_id',$record->id)->first();
-        return $this->render($this->views.'.cetak',compact('record','detailData','title'));
+        $gambar_logo_1 = public_path('assets/images/KLU_logo.png');
+        $gambar_logo_2 = public_path(config('base.logo.auth'));
+        // $detail = PerencanaanDetail::where('perencanaan_id',$record->id)->get();
+        $view1 = view($this->views.'.cetak',compact('record','detailData','title','gambar_logo_1','gambar_logo_2'))->render();
+        // $view2 = view($this->views.'.cetakDetail',compact('detail','record','title','gambar_logo_1','gambar_logo_2'))->render();
+        $html = $view1;
+        $pdf = PDF::loadHTML($html)->setPaper('a4', 'portrait');
+        //$pdf = PDF::loadView($this->views.'.cetakDetail', compact('detail','record'))->setPaper('a4', 'portrait');;
+        
+        // Mengatur response untuk menampilkan PDF di browser
+        return $pdf->stream('document.pdf');
+        // return $this->render($this->views.'.cetak',compact('record','detailData','title'));
     }
 
 }

@@ -7,10 +7,12 @@ use App\Http\Requests\Master\Aset\AsetRequest;
 use App\Models\Globals\Menu;
 // use App\Models\Master\Aset\Aset;
 use App\Models\inventaris\Aset;
+use App\Models\Master\Location\Location;
 use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Exports\Setting\KibEExport;
+use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
@@ -344,15 +346,93 @@ class KIBEController extends Controller
     }
 
     public function export(Request $request){
-        return Excel::download(new KibEExport, date('Y-m-d') . ' KIBB.xlsx');
+        $filters = [
+            'jenis_aset' => $request->jenis_aset,
+            'room_location' => $request->room_location,
+            'location_id' => $request->location_id,
+            'condition' => $request->condition,
+        ];
+        return Excel::download(new KibEExport($filters), date('Y-m-d') . ' KIBB.xlsx');
     }
 
-    public function print()
+    public function print(Request $request)
     {
         $title ='Laporan Aset KIB E';
-        $records = Aset::with('coad')->where('type','KIB E')->whereIn('status',['actives','in repair','in deletion','maintenance'])->filters()->get();
+        $query = Aset::with('coad')
+        ->where('type', 'KIB E')
+        ->whereIn('status', ['actives', 'in repair', 'in deletion', 'maintenance']);
 
-        return $this->render($this->views.'.cetak1',compact('records','title'));
+        if ($request->jenis_aset !== null) {
+            $query->where('jenis_aset', $request->jenis_aset);
+        }
+
+        if ($request->room_location !== null) {
+            $query->where('room_location', $request->room_location);
+        }
+
+        if ($request->location_id !== null) {
+            $query->where(function ($query) use ($request) {
+                $query->whereHas('usulans', function ($q) use ($request) {
+                    $q->whereHas('perencanaan', function ($qq) use ($request) {
+                        $qq->where('struct_id', $request->location_id);
+                    });
+                })->orWhere('location_hibah_aset', $request->location_id);
+            });
+        }
+
+        if ($request->condition !== null) {
+            $query->where('condition', $request->condition);
+        }
+
+        $records = $query->filters()->get();
+        //$records = Aset::with('coad')->where('type','KIB E')->whereIn('status',['actives','in repair','in deletion','maintenance'])->filters()->get();
+        $view1 = view($this->views.'.cetak',compact('records','title'))->render();
+        // $view2 = view($this->views.'.cetakDetail',compact('detail','record','title','gambar_logo_1','gambar_logo_2'))->render();
+        $html = $view1;
+        $pdf = PDF::loadHTML($html)->setPaper('a3', 'landscape');
+        //$pdf = PDF::loadView($this->views.'.cetakDetail', compact('detail','record'))->setPaper('a4', 'portrait');;
+        
+        // Mengatur response untuk menampilkan PDF di browser
+        return $pdf->stream('document.pdf');
+        //return $this->render($this->views.'.cetak',compact('records','title'));
+    }
+
+    public function printKIR(Request $request)
+    {
+        $title ='Laporan Aset KIB E';
+        if($request->room_location == null){
+            return $this->rollback(
+                [
+                    'message' => 'Silahkan Pilih Ruang Lokasi Aset'
+                ]
+            );
+            // $unit = Auth()->user()->position->location_id;
+            // $ruang = '-';
+            // // $records = null;
+            // $records = Aset::with('coad')->where('type','KIB B')->whereIn('status',['actives','in repair','in deletion','maintenance'])->whereHas('usulans',
+            // function ($q) use ($unit){
+            //     $q->whereHas('perencanaan', function($qq) use ($unit){
+            //         $qq->where('struct_id',$unit);
+            //     });
+            // })->filters()->get();
+            // return $this->render($this->views.'.cetakKIR',compact('records','title','ruang','unit'));
+        }else{
+            $records = Aset::with('coad')->where('type','KIB E')->where('room_location',$request->room_location)
+            ->whereIn('status',['actives','in repair','in deletion','maintenance'])->grid()->filters()->dtGet()->get();
+            $ruang = $request->room_location;
+            $ruang = Location::where('id',$ruang)->value('name');
+            $unit = Location::where('id',$request->room_location)->first();
+            // return $this->render($this->views.'.cetakKIR',compact('records','title','ruang','unit'));
+
+            $view1 = view($this->views.'.cetakKIR',compact('records','title','ruang','unit'))->render();
+            // $view2 = view($this->views.'.cetakDetail',compact('detail','record','title','gambar_logo_1','gambar_logo_2'))->render();
+            $html = $view1;
+            $pdf = PDF::loadHTML($html)->setPaper('a3', 'landscape');
+            //$pdf = PDF::loadView($this->views.'.cetakDetail', compact('detail','record'))->setPaper('a4', 'portrait');;
+            
+            // Mengatur response untuk menampilkan PDF di browser
+            return $pdf->stream('document.pdf');
+        }
     }
 
 }

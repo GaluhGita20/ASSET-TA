@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Exports\Setting\KibAExport;
 use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 //use Yajra\DataTables\Facades\DataTables;
 
 class KIBAController extends Controller
@@ -284,7 +285,13 @@ class KIBAController extends Controller
     }
 
     public function export(Request $request){
-        return Excel::download(new KibAExport, date('Y-m-d') . ' KIBB.xlsx');
+        $filters = [
+            'jenis_aset' => $request->jenis_aset,
+            'room_location' => $request->room_location,
+            'location_id' => $request->location_id,
+            'condition' => $request->condition,
+        ];
+        return Excel::download(new KibAExport($filters), date('Y-m-d') . ' KIBB.xlsx');
     }
 
     public function print()
@@ -292,7 +299,18 @@ class KIBAController extends Controller
         $title ='Laporan Aset KIB A';
         $records = Aset::with('coad')->where('type','KIB A')->where('status','actives')->filters()->get();
 
-        return $this->render($this->views.'.cetak',compact('records','title'));
+        // $records = $query->filters()->get();
+        // dd($records);
+
+        // $gambar_logo_1 = public_path('assets/images/KLU_logo.png');
+        // $gambar_logo_2 = public_path(config('base.logo.auth'));
+        // $detail = PerencanaanDetail::where('perencanaan_id',$record->id)->get();
+        $view1 = view($this->views.'.cetak',compact('records','title'))->render();
+        // $view2 = view($this->views.'.cetakDetail',compact('detail','record','title','gambar_logo_1','gambar_logo_2'))->render();
+        $html = $view1;
+        $pdf = PDF::loadHTML($html)->setPaper('a3', 'landscape');
+        return $pdf->stream('document.pdf');
+        // return $this->render($this->views.'.cetak',compact('records','title'));
     }
 
 }

@@ -11,6 +11,7 @@ use App\Support\Base;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Exports\Setting\KibFExport;
+use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 //use Yajra\DataTables\Facades\DataTables;
 
@@ -315,15 +316,55 @@ class KIBFController extends Controller
     }
 
     public function export(Request $request){
-        return Excel::download(new KibFExport, date('Y-m-d') . ' KIBB.xlsx');
+        $filters = [
+            'jenis_aset' => $request->jenis_aset,
+            'room_location' => $request->room_location,
+            'location_id' => $request->location_id,
+            'condition' => $request->condition,
+        ];
+        return Excel::download(new KibFExport($filters), date('Y-m-d') . ' KIBB.xlsx');
     }
 
-    public function print()
+    public function print(Request $request)
     {
         $title ='Laporan Aset KIB F';
-        $records = Aset::with('coad')->where('type','KIB F')->filters()->get();
+        $query = Aset::with('coad')
+        ->where('type', 'KIB F')
+        ->whereIn('status', ['actives', 'in repair', 'in deletion', 'maintenance']);
 
-        return $this->render($this->views.'.cetak',compact('records','title'));
+        if ($request->jenis_aset !== null) {
+            $query->where('jenis_aset', $request->jenis_aset);
+        }
+
+        if ($request->room_location !== null) {
+            $query->where('room_location', $request->room_location);
+        }
+
+        if ($request->location_id !== null) {
+            $query->where(function ($query) use ($request) {
+                $query->whereHas('usulans', function ($q) use ($request) {
+                    $q->whereHas('perencanaan', function ($qq) use ($request) {
+                        $qq->where('struct_id', $request->location_id);
+                    });
+                })->orWhere('location_hibah_aset', $request->location_id);
+            });
+        }
+
+        if ($request->condition !== null) {
+            $query->where('condition', $request->condition);
+        }
+
+        $records = $query->filters()->get();
+        //$records = Aset::with('coad')->where('type','KIB F')->filters()->get();
+        $view1 = view($this->views.'.cetak',compact('records','title'))->render();
+        // $view2 = view($this->views.'.cetakDetail',compact('detail','record','title','gambar_logo_1','gambar_logo_2'))->render();
+        $html = $view1;
+        $pdf = PDF::loadHTML($html)->setPaper('a3', 'landscape');
+        //$pdf = PDF::loadView($this->views.'.cetakDetail', compact('detail','record'))->setPaper('a4', 'portrait');;
+        
+        // Mengatur response untuk menampilkan PDF di browser
+        return $pdf->stream('document.pdf');
+        //return $this->render($this->views.'.cetak',compact('records','title'));
     }
 
 }

@@ -38,7 +38,7 @@
 
                         <div class="col-sm-12">
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">{{ __('Tanggal Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-2 col-form-label">{{ __('Tanggal Pengajuan') }}</label>
 
                                 <div class="col-sm-10 col-form-label">
                                     <input name="submission_date" class="form-control base-plugin--datepicker"
