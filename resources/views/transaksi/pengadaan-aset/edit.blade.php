@@ -141,7 +141,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Jumlah Beli') }}<span style=" color: red;margin-left: 5px;">*</span></label>
@@ -157,9 +157,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Pagu') }}<span style=" color: red;margin-left: 5px;">*</span></label>
@@ -175,9 +175,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Harga Unit') }}<span style=" color: red;margin-left: 5px;">*</span></label>
@@ -194,7 +194,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -214,6 +214,11 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        {{--  --}}
+                        <input type="hidden" name='pagus' id='pagus' value="{{$record->budget_limit}}">
+                        {{--  --}}
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -237,12 +242,12 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Total Biaya') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Total Biaya') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
                                         <input type="text" min="0" name="total_cost" id="total_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                            placeholder="{{ __('Biaya Total') }}" value="{{ $record->total_cost }}"  readonly oninput="updateTotal()">
+                                            placeholder="{{ __('Biaya Total') }}"  value="{{ $record->total_cost }}" min="0" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -462,81 +467,56 @@
 @push('scripts')
 
 <script>
+    var tot = document.getElementById('pagus').value;
+    tot= tot.replace(/[^0-9]/g, '');
+    tot = parseInt(tot);
 
     function updateTotal() {
-        var quantity = document.getElementById('qty').value;
-        var unit_cost = document.getElementById('unit_cost').value;
+
         var tax = document.getElementById('tax_cost').value;
         var shiping = document.getElementById('shiping_cost').value;
-        var pagu = document.getElementById('budget_limit').value;
+        var total_cost = document.getElementById('total_cost').value;
+        // var pagus =  document.getElementById('pagus').value;
 
-        quantity= quantity.replace(/[^0-9]/g, '');
-        unit_cost= unit_cost.replace(/[^0-9]/g, '');
         tax= tax.replace(/[^0-9]/g, '');
         shiping= shiping.replace(/[^0-9]/g, '');
-        pagu= pagu.replace(/[^0-9]/g, '');
+        total= total_cost.replace(/[^0-9]/g, '');
+        // pagus= pagus.replace(/[^0-9]/g, '');
 
-        quantity = parseInt(quantity);
-        unit_cost = parseInt(unit_cost);
         tax = parseInt(tax);
         shiping = parseInt(shiping);
-        pagu = parseInt(pagu);
+        total = parseInt(total);
+
+        if (isNaN(tax)) {
+            tax = 0;
+        }
         
-        if(quantity > 0 && unit_cost > 0){
-            console.log(quantity);
-            var total_unit = parseInt(quantity) * parseInt(unit_cost);
-            var total = parseInt(quantity) * parseInt(unit_cost) + tax + shiping;
-            if(total_unit > pagu){
-                alert("Nilai Harga Unit Melebihi Pagu Anggaran!");
-                document.getElementById('total_cost').value = 0;
-            }else{
-                document.getElementById('total_cost').value = parseInt(total);
-            }
-            // console.log(total)
+        if (isNaN(shiping)) {
+            shipping = 0;
         }
 
-        
+        console.log(tot+shiping+tax);
+
+        if (shiping > 0 || tax > 0) {
+            console.log('a');
+            hasil = tot + tax + shiping;
+            document.getElementById('total_cost').value = parseInt(hasil);
+        } else if (shiping == 0 && tax == 0) {
+            console.log('b');
+            document.getElementById('total_cost').value = parseInt(tot);
+        }else if(shiping == 0 && tax != 0){
+            console.log('c');
+            hasil = tot + tax;
+            document.getElementById('total_cost').value = parseInt(hasil);
+        } else if(shiping != 0 && tax == 0){
+            console.log('d');
+            hasil = tot + shiping;
+            document.getElementById('total_cost').value = parseInt(hasil);
+        } 
+        else {
             
-           // document.getElementById('HPS_unit_cost').value = parseInt(price)
+            document.getElementById('total_cost').value = parseInt(tot);
+        }
     }
 </script>
-
-{{-- <script>
-    function updateTotal() {
-        // Ambil nilai dari input jumlah barang dan harga per barang
-        if(document.getElementById('qty').value > 0 && document.getElementById('unit_cost').value > 0)
-            var quantity = parseInt(document.getElementById('qty').value);
-            var price = parseInt(document.getElementById('unit_cost').value);
-            var tax = parseInt(document.getElementById('tax_cost').value);
-            var shiping = parseInt(document.getElementById('shiping_cost').value);
-            var pagu = parseInt(document.getElementById('budget_limit').value);
-
-        // Hitung total harga
-            var total = (quantity * price) + tax + shiping;
-
-            if(total >  pagu){
-                alert("Nilai total melebihi batas anggaran!");
-
-                total = 0;
-            }
-
-            // Tampilkan total harga pada elemen dengan id 'total'
-            console.log(total)
-            document.getElementById('total_cost').value = total;
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Cek apakah total_cost sudah tersimpan di local storage
-        var storedTotal = localStorage.getItem('total_cost');
-
-        if (storedTotal !== null) {
-            // Jika sudah tersimpan, tampilkan nilai pada input dengan id 'total_cost'
-            document.getElementById('total_cost').value = storedTotal;
-        }
-
-        // Panggil fungsi updateTotal untuk memastikan nilai lainnya terupdate
-        updateTotal();
-    });
-</script> --}}
-    
 @endpush

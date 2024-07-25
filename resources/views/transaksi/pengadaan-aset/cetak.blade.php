@@ -175,27 +175,140 @@
         @endphp
         <div class="code" style="text-align: center; padding:10px;">
             <h3 style="border-bottom: 4px solid black; display: inline-block;">BERITA ACARA PENYERAHAN HASIL PEKERJAAN KEPADA KPA</h3>
-            <p style="margin-top: -15px; font-size:14px;">Nomor : {{$record->no_spk.'/'.Carbon::parse($record->spk_start_date)->formatLocalized('%d/%B/%Y')}}</p>
+            <p style="margin-top: -15px; font-size:14px;">Nomor : {{$record->no_spk}}</p>
         </div>
         
         <div class="isi">
-            <span>Pada hari ini Rabu, Tanggal Enam, bulan Oktober tahun Dua Ribu Dua Puluh Satu, yang bertanda tangan di bawah ini</span>
+            @php
+            $days = [
+                'Sunday' => 'Minggu',
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jumat',
+                'Saturday' => 'Sabtu'
+            ];
+            
+            $months = [
+                'January' => 'Januari',
+                'February' => 'Februari',
+                'March' => 'Maret',
+                'April' => 'April',
+                'May' => 'Mei',
+                'June' => 'Juni',
+                'July' => 'Juli',
+                'August' => 'Agustus',
+                'September' => 'September',
+                'October' => 'Oktober',
+                'November' => 'November',
+                'December' => 'Desember'
+            ];
+            
+            function terbilang($angka) {
+                $angka = (float)$angka;
+                $bilangan = array(
+                    '',
+                    'Satu',
+                    'Dua',
+                    'Tiga',
+                    'Empat',
+                    'Lima',
+                    'Enam',
+                    'Tujuh',
+                    'Delapan',
+                    'Sembilan',
+                    'Sepuluh',
+                    'Sebelas'
+                );
+            
+                if ($angka < 12) {
+                    return $bilangan[$angka];
+                } else if ($angka < 20) {
+                    return $bilangan[$angka - 10] . ' Belas';
+                } else if ($angka < 100) {
+                    $hasil_bagi = (int)($angka / 10);
+                    $hasil_mod = $angka % 10;
+                    return trim(sprintf('%s Puluh %s', $bilangan[$hasil_bagi], $bilangan[$hasil_mod]));
+                } else if ($angka < 200) {
+                    return sprintf('Seratus %s', terbilang($angka - 100));
+                } else if ($angka < 1000) {
+                    $hasil_bagi = (int)($angka / 100);
+                    $hasil_mod = $angka % 100;
+                    return trim(sprintf('%s Ratus %s', $bilangan[$hasil_bagi], terbilang($hasil_mod)));
+                } else if ($angka < 2000) {
+                    return sprintf('Seribu %s', terbilang($angka - 1000));
+                } else if ($angka < 1000000) {
+                    $hasil_bagi = (int)($angka / 1000);
+                    $hasil_mod = $angka % 1000;
+                    return sprintf('%s Ribu %s', terbilang($hasil_bagi), terbilang($hasil_mod));
+                } else if ($angka < 1000000000) {
+                    $hasil_bagi = (int)($angka / 1000000);
+                    $hasil_mod = $angka % 1000000;
+                    return trim(sprintf('%s Juta %s', terbilang($hasil_bagi), terbilang($hasil_mod)));
+                } else if ($angka < 1000000000000) {
+                    $hasil_bagi = (int)($angka / 1000000000);
+                    $hasil_mod = fmod($angka, 1000000000);
+                    return trim(sprintf('%s Miliar %s', terbilang($hasil_bagi), terbilang($hasil_mod)));
+                } else if ($angka < 1000000000000000) {
+                    $hasil_bagi = (int)($angka / 1000000000000);
+                    $hasil_mod = fmod($angka, 1000000000000);
+                    return trim(sprintf('%s Triliun %s', terbilang($hasil_bagi), terbilang($hasil_mod)));
+                } else {
+                    return 'Angka terlalu besar';
+                }
+            }
+            
+            $day = $days[date('l')];
+            $tgl = terbilang(date('j'));
+            $bulan = $months[date('F')];
+            $year = terbilang(date('Y'));
+            @endphp
+            
+            <span>Pada hari ini {{ $day }}, Tanggal {{ $tgl }}, bulan {{ $bulan }} tahun {{ $year }}, yang bertanda tangan di bawah ini</span>
+            
             
             {{-- isi penerima --}}
+
+            @php
+                use App\Models\Auth\User;
+
+                // Mengambil nama dan NIP berdasarkan id
+                $ppk = User::where('id', $record->created_by)->value('name');
+                $ppk_nip = User::where('id', $record->created_by)->value('nip');
+
+                // Mengambil nama dan NIP direktur menggunakan whereHas
+                $direktur = User::whereHas('position', function($q) {
+                    $q->where('name', 'Kepala Direktur');
+                })->value('name');
+                $direktur_nip = User::whereHas('position', function($q) {
+                    $q->where('name', 'Kepala Direktur');
+                })->value('nip');
+
+                $material = User::whereHas('position', function($q) {
+                    $q->where('name', 'Kepala Seksi Sarana dan Prasarana Logistik');
+                })->value('name');
+
+                $material_nip = User::whereHas('position', function($q) {
+                    $q->where('name', 'Kepala Seksi Sarana dan Prasarana Logistik');
+                })->value('nip');
+                
+            @endphp
+
             <div id="lampiran" class="col-md-6">
                 <table style="margin-left:-3px;">
                     <tr>
                         <td width="50px;">1</td>
                         <td>Nama</td>
                         <td>:</td>
-                        <td>Teguh</td>
+                        <td>{{$ppk}}</td>
                         <td></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>NIP</td>
                         <td>:</td>
-                        <td>10001</td>
+                        <td>{{$ppk_nip}}</td>
                         <td></td>
                     </tr>
                     <tr>
@@ -224,14 +337,14 @@
                         <td width="50px;">2</td>
                         <td>Nama</td>
                         <td>:</td>
-                        <td>Teguh</td>
+                        <td>{{$direktur}}</td>
                         <td></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>NIP</td>
                         <td>:</td>
-                        <td>10001</td>
+                        <td>{{$direktur_nip}}</td>
                         <td></td>
                     </tr>
                     <tr>
@@ -253,31 +366,18 @@
                     </tr>
                 </table>
             </div>
-            
-            {{-- <div id="lampiran" class="col-md-6" style="line-height: 1.5; margin-top:20px;">
-                <span style="display: inline-block; width: 80px;">2</span>
-                <span style="display: inline-block; width: 80px; padding-left:7px;">Nama</span>: I Made Teguh Athana<br />
-                <span style="display: inline-block; width: 80px; padding-left:90px;">NIP</span>: 1980000000000 <br />
-                <span style="display: inline-block; width: 80px; padding-left:89px;">Jabatan</span>: Direktur UPTD RSUD Kabupaten Lombok Utara Selaku Kuasa Pengguna Anggaran 
-                (KPA) UPTD RSUD Kabupaten 
-                <span style="display: inline-block; width: 80px; padding-left:95px;"></span>Lombok Utara <br/>
-                <span style="display: inline-block; width: 80px; padding-left:90px;">Alamat</span>: Jalan Tioq Tata Tunaq Tanjung Lombok Utara <br/>
-                <span style="display: inline-block; width: 80px; padding-left:7px;"></span> selanjutnya disebut sebagai</span> <b>PIHAK KEDUA</b>
-            </div> --}}
-            {{-- isi penerima --}}
     
             <div style="line-height: 1.5; margin-top:10px;">
                 <p>
                     Dengan ini <b>PIHAK PERTAMA</b> selaku PPK dan <b>PIHAK KEDUA</b> selaku KPA telah setuju dan sepakat untuk
-                    melakukan Serah Terima Barang/Jasa atau Hasil Belanja Modal Peralatan dan Mesin - Alat Kedokteran dan Kesehatan;
-                    Alat Kedokteran Bedah sesuai Kontrak Nomor : {{$record->no_spk}}, tanggal {{ \Carbon\Carbon::parse($record->spk_start_date)->format('j F Y')}}, yang diselenggarakan pada :
+                    melakukan Serah Terima Barang/Jasa atau Hasil Belanja Modal {{$record->trans_name}} sesuai Kontrak Nomor : {{$record->no_spk}}, tanggal {{ \Carbon\Carbon::parse($record->receipt_date)->format('j F Y')}}, yang diselenggarakan pada :
                 </p>
                 <div id="tgl-beli" style="margin-top: -15px;">
                     <table style="margin-left:-3px;">
                         <tr>
                             <td>Tanggal</td>
                             <td>:</td>
-                            <td>{{\Carbon\Carbon::parse($record->receipt_date)->format('j F Y')}}</td>
+                            <td>{{\Carbon\Carbon::now()->format('j F Y')}}</td>
                         </tr>
                         <tr>
                             <td>Bertempat di</td>
@@ -336,31 +436,49 @@
                         <th style="text-align: center">Nama Aset</th>
                         <th style="text-align: center">Kuantitas</th>
                         <th style="text-align: center">Harga Satuan (Rupiah)</th>
-                        <th style="text-align: center">Ongkos Kirim (Rupiah)</th>
+                        {{-- <th style="text-align: center">Ongkos Kirim (Rupiah)</th> --}}
                         <th style="text-align: center">Total Harga (Rupiah)</th>
                     </tr>
-                    @php 
-                        $i = 1;
+
+                    @php
+                        $i=0;
                     @endphp
-    
+
+                    @foreach ($detailData as $item)
+                    
+                        @php
+                            $i++;
+                        @endphp
+                        
+                        <tr>
+                            <td style="width: 2px;" style="text-align: center">{{$i++}}</td>
+                            <td style="text-align: center">{{$item->asetd->name}}</td>
+                            <td style="text-align: center">{{$item->qty_agree}}</td>
+                            <td style="text-align: center">{{(number_format($item->HPS_unit_cost, 0, ',', ','))}}</td>
+                            <td style="text-align: center">{{(number_format($item->HPS_total_agree, 0, ',', ','))}}</td>
+                        </tr>
+
+                    @endforeach
+
                     <tr>
-                        <td style="width: 2px;" style="text-align: center">{{$i}}</td>
-                        <td style="text-align: center">{{$detailData->asetd->name}}</td>
-                        <td style="text-align: center">{{$record->qty}}</td>
-                        <td style="text-align: center">{{(number_format($record->unit_cost, 0, ',', ','))}}</td>
-                        <td style="text-align: center">{{(number_format($record->shiping_cost, 0, ',', ','))}}</td>
-                        <td style="text-align: center">{{(number_format($record->total_cost, 0, ',', ','))}}</td>
+                        <td colspan="4">Ongkos Kirim (Rupiah)</td>
+                        <td style="text-align: center">{{(number_format($record->shiping_cost, 0, ',', ','))}}</th>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4">Pajak (Rupiah)</td>
+                        <td style="text-align: center">{{(number_format($record->tax_cost, 0, ',', ','))}}</th>
                     </tr>
     
                     <tr>
-                        <td colspan="5">Jumlah</td>
+                        <td colspan="4">Total Harga (Rupiah)</td>
                         <td style="text-align: center">{{(number_format($record->total_cost, 0, ',', ','))}}</th>
                     </tr>
                     <tr>
                         @php
                             $terbilang = angkaTerbilang($record->total_cost)
                         @endphp
-                        <td colspan="6" style="text-align: center"><b>Terbilang : {{ucwords($terbilang)}} Rupiah</b></td>
+                        <td colspan="5" style="text-align: center"><b>Terbilang : {{ucwords($terbilang)}} Rupiah</b></td>
                         
                     </tr>
                     
@@ -376,7 +494,7 @@
                 </div>
 
                 <p style="text-align: center;">
-                    Tanjung, {{ \Carbon\Carbon::parse($record->spk_start_date)->format('j F Y')}}
+                    Tanjung, {{ \Carbon\Carbon::now()->format('j F Y')}}
                 </p>
 
                 <div id="ttd">
@@ -386,8 +504,8 @@
                             <td style="text-align: center;">PIHAK KEDUA </br> Direktur UPTD RSUD Kabupaten Lombok Utara Selaku Kuasa Pengguna Anggaran (KPA)</td>
                         </tr>
                         <tr>
-                            <td style="text-align: center;" rowspan="8"><b>(dr. Ahmad Haerul Umam)</b><br>NIP. 19911125202321001</td>
-                            <td style="text-align: center;" rowspan="8"><b>(Sri Adriani, Amd.Keb)</b><br>NIP. 19911125202321001</td>
+                            <td style="text-align: center;" rowspan="8"><b>({{$ppk}})</b><br>NIP. {{$ppk_nip}}</td>
+                            <td style="text-align: center;" rowspan="8"><b>({{$direktur}})</b><br>NIP. {{$direktur_nip}}</td>
                         </tr>
                     </table>
                 </div>

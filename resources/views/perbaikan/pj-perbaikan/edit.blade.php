@@ -305,7 +305,7 @@
 
                         <div class="col-sm-12">
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">{{ __('Status Pengajuan Disposisi') }}</label>
+                                <label class="col-sm-2 col-form-label">{{ __('Status Pengajuan Sparepat') }}</label>
                                 <div class="col-sm-10 col-form-label">
                                     <select name="is_disposisi" class="form-control" disabled>
                                         <option value="yes" {{ $record->is_disposisi == "yes" ? 'selected':'' }}>{{ __('Yes') }}</option>
@@ -340,13 +340,13 @@
                                 <label class="col-sm-2 col-form-label">{{ __('Hasil Perbaikan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 <div class="col-sm-10 col-form-label">
                                     @if(!empty($record->repair_date))
-                                        <select name="repair_results" class="form-control">
+                                        <select name="repair_results" id="repair_results" class="form-control">
                                             <option value="" selected>{{ __('Pilih Hasil Perbaikan') }}</option>
                                             <option value="SELESAI" {{ $record->repair_results == "SELESAI" ? 'selected':'' }}>{{ __('SELESAI') }}</option>
                                             <option value="ALAT TIDAK BISA DIGUNAKAN" {{ $record->repair_results == "ALAT TIDAK BISA DIGUNAKAN" ? 'selected':'' }}>{{ __('ALAT TIDAK BISA DIGUNAKAN') }}</option>
                                         </select>
                                     @else
-                                        <select name="repair_results" class="form-control" disabled>
+                                        <select name="repair_results" id="repair_results" class="form-control" disabled>
                                             <option value="" selected>{{ __('Pilih Hasil Perbaikan') }}</option>
                                             <option value="SELESAI" {{ $record->repair_results == "SELESAI" ? 'selected':'' }}>{{ __('SELESAI') }}</option>
                                             <option value="ALAT TIDAK BISA DIGUNAKAN" {{ $record->repair_results == "ALAT TIDAK BISA DIGUNAKAN" ? 'selected':'' }}>{{ __('ALAT TIDAK BISA DIGUNAKAN') }}</option>
@@ -403,7 +403,29 @@
                 </div>
             </div>
         </div>
-    @endif  
+    @endif 
+
+    @php
+        $aset = \App\Models\Inventaris\Aset::where('id', $record->kib_id)->where('type','KIB F')->first();
+        $trans= \App\Models\Perbaikan\TransPerbaikanDisposisi::where('perbaikan_id',$record->id)->where('status','completed');
+    @endphp
+
+    @if($record->is_disposisi == 'yes' && $aset != null && $trans != null)
+    <div class="row mb-3">
+        <div class="col-sm-12">
+            <div class="card card-custom">
+                <div class="card-header">
+                    <h3 class="card-title">Update KIB Aset {{ $record->asets->usulans->asetd->name}}</h3>
+                </div>
+                <div class="card-body p-8" id="updateKib" style="display: none">
+                    @include('perbaikan.pj-perbaikan.updateKibF.detail')
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    
+    
 
     <!-- card 3 -->
     <div class="row mb-3">
@@ -543,3 +565,43 @@
     @endif
 @show
 @endsection
+
+
+@push('scripts')
+
+<script>
+    function setPercepatan() {
+        // Ambil elemen input percepatan
+        var percepatanInput = document.getElementById('percepatan');
+        var percepatanInput2 = document.getElementById('percepatan2');
+
+        if (percepatanInput.style.display === 'none') {
+            percepatanInput.style.display = 'block';
+            percepatanInput2.style.display = 'none';
+        } else {
+            percepatanInput.style.display = 'none';
+            percepatanInput2.style.display = 'block';
+        }
+    }
+</script>
+
+<script>
+
+$(function () {
+    $(document).ready(function() {
+        $('#repair_results').on('change', function() {
+            var rep = $(this); // Mengambil elemen select yang sedang berubah
+            console.log(rep.val());
+            var element = document.getElementById('updateKib');// Mengambil elemen dengan ID updateKib
+            if (rep.val() == 'SELESAI') {
+                element.style.display = 'block'; // Menampilkan elemen
+            } else {
+                element.style.display = 'none'; // Menyembunyikan elemen
+            }
+        });
+    });
+
+})
+</script>
+
+@endpush

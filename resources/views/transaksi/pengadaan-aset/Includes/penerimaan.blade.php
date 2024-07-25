@@ -11,8 +11,8 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="form-group row">
-                            <label class="col-2 col-form-label">{{ __('Bukti Nota Pembelian') }}<span style=" color: red;margin-left: 5px;">*</span></label>
-                            <div class="col-10 parent-group">
+                            <label class="col-6 col-form-label">{{ __('Upload File SPM, File Faktur Tagihan, File Dokumen Kontrak dan File Hasil Uji Fungsi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                            <div class="col-12 parent-group">
                                 <div class="custom-file">
                                     <input type="hidden"
                                         name="uploads[uploaded]"
@@ -28,7 +28,7 @@
                                     <label class="custom-file-label" for="file">Choose File</label>
                                 </div>
 
-                                <div class="form-text text-muted">*Maksimal 20MB</div>
+                                <div class="form-text text-muted">*Maksimal 20MB, Silahkan Untuk Upload File SPM, File Faktur Tagihan, File Dokumen Kontrak dan File Hasil Uji Fungsi Aset</div>
                                 @foreach ($record->files as $file)
                                 <div class="progress-container w-100" data-uid="{{ $file->id }}">
                                 
@@ -60,8 +60,44 @@
                         </div>
                     </div>
 
-                    
                     <div class="col-sm-6">
+                        <div class="form-group row">
+                            <div class="col-4 pr-0">
+                                <label class="col-form-label">{{ __('Kode Faktur / Invoice') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                            </div>
+                            <div class="col-8 parent-group">
+                                <input type="text" class="form-control" name="faktur_code" value="{{ $record->faktur_code }}" placeholder="{{ __('Kode Faktur') }}" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+                            <div class="col-4 pr-0">
+                                <label class="col-form-label">{{ __('Kode SPM') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                            </div>
+                            <div class="col-8 parent-group">
+                                <input type="text" class="form-control" name="spm_code" value="{{ $record->spm_code }}" placeholder="{{ __('Kode SPM') }}" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 mt-3">
+                        <div class="form-group row">
+                            <div class="col-4 pr-0">
+                                <label class="col-form-label">{{ __('Tanggal SPM') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                            </div>
+                            <div class="col-8 parent-group">
+                                @if($record->spm_date == null)
+                                    <input class="form-control base-plugin--datepicker" name="spm_date"  placeholder="{{ __('Tanggal SPM') }}" >
+                                @else
+                                    <input class="form-control base-plugin--datepicker" name="spm_date" value="{{$record->spm_date->format('d/m/Y')}}" placeholder="{{ __('Tanggal SPM') }}">
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 mt-3">
                         <div class="form-group row">
                             <div class="col-4 pr-0">
                                 <label class="col-form-label">{{ __('Tanggal Penerimaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
@@ -76,16 +112,6 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
-                        <div class="form-group row">
-                            <div class="col-4 pr-0">
-                                <label class="col-form-label">{{ __('Kode Faktur Penerimaan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
-                            </div>
-                            <div class="col-8 parent-group">
-                                <input type="text" class="form-control" name="faktur_code" value="{{ $record->faktur_code }}" placeholder="{{ __('Kode Faktur Penerimaan') }}" >
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="col-sm-12">
                         <div class="form-group row">
@@ -98,7 +124,8 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-12">
+                    
+                    {{-- <div class="col-sm-12">
                         <div class="form-group row">
                             <div class="col-2 pr-0">
                                 <label class="col-form-label">{{ __('Hasil Uji Fungsi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
@@ -107,7 +134,7 @@
                                 <textarea class="base-plugin--summernote" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" data-height="200">{{ $record->asset_test_results }}</textarea>
                             </div>
                         </div>
-                    </div> 
+                    </div>  --}}
 
                     
                     <div class="col-sm-12">

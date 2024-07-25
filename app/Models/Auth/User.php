@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Telegram\Bot\Laravel\Facades\Telegram;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -46,6 +47,7 @@ class User extends Authenticatable
         'phone',
         'position_id',
         'status',
+        'telegram_user_id'
     ];
 
     /**

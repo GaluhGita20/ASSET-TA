@@ -23,7 +23,11 @@
                             <div class="col-10 parent-group">
                                 <input type="hidden" id="usulanId" name="usulan_id" value="{{ $usulan->id }}">
                                {{-- <input type="hidden" id="trans_id" name="trans_id" value="{{ $trans->id }}">  --}}
-                               <input type="hidden" id="jumlah_semua" name="jumlah_semua" value="{{ $jumlah}}">
+                               @if(!empty($jumlah))
+                                <input type="hidden" id="jumlah_semua" name="jumlah_semua" value="{{ $jumlah}}">
+                               @else
+                                <input type="hidden" id="jumlah_semua" name="jumlah_semua" value="1">
+                               @endif
                                <input type="hidden" id="jumlah_semua" name="cst_val" value="C">
                                <input type="hidden" id="type" name="type" value="KIB C">
                             </div>
@@ -280,10 +284,16 @@
                                 <div class="col-md-8 parent-group">
                                     <select name="vendor_id" class="form-control base-plugin--select2-ajax vendor_id" disabled>
                                         <option value="">{{ __('Pilih Salah Satu') }}</option>
-                                        @if ($usulan->trans->vendor_id)
-                                            <option value="{{ $usulan->trans->vendors->id }}" selected>
-                                                {{ $usulan->trans->vendors->name }}
+                                        @if(!empty($perbaikan))
+                                            <option value="{{ $perbaikan->vendors->id }}" selected>
+                                                {{ $perbaikan->vendors->name }}
                                             </option>
+                                        @else
+                                            @if ($usulan->trans->vendor_id)
+                                                <option value="{{ $usulan->trans->vendors->id }}" selected>
+                                                    {{ $usulan->trans->vendors->name }}
+                                                </option>
+                                            @endif
                                         @endif
                                     </select>
                                 </div>
@@ -297,14 +307,28 @@
                                     <label class="col-form-label">{{ __('Harga') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->trans->unit_cost }}" readonly>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                rupiah
-                                            </span>
+                                    @if(!empty($perbaikan))
+                                        @php
+                                            $total = $perbaikan->total_cost + $usulan->HPS_unit_cost;
+                                        @endphp
+                                        <div class="input-group">
+                                            <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $total }}" readonly>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    rupiah
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @else
+                                        <div class="input-group">
+                                            <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->HPS_unit_cost }}" readonly>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    rupiah
+                                                </span>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -367,23 +391,43 @@
 
                         <div class="col-sm-6" id="percepatan" style="display:none">
                             <div class="form-group row">
-                                <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
-                                </div>
-                                <div class="col-8 parent-group">
-                                    <input type="number" class="form-control" id="qty" name="qty" max="{{ $jumlah }}" min="1" value="1">
-                                </div>
+                                
+                                @if(!empty($jumlah))
+                                    <div class="col-4 pr-0">
+                                        <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    </div>
+                                    <div class="col-8 parent-group">
+                                        <input type="number" class="form-control" id="qty" name="qty" max="{{ $jumlah }}" placeholder="{{ __('Jumlah Maksimum '.$jumlah.' ') }}" min="1" value="1" disabled>
+                                    </div>
+                                @else
+                                    <div class="col-4 pr-0">
+                                        <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    </div>
+                                    <div class="col-8 parent-group">
+                                        <input type="number" class="form-control" id="qty" name="qty" max="1"  min="1" value="1" disabled>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
                         <div class="col-sm-6" id="percepatan2" style="display:block">
                             <div class="form-group row">
+                                @if(!empty($jumlah))
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <input type="number" class="form-control" id="qty" name="qty" max="{{ $jumlah }}" placeholder="{{ __('Jumlah Maksimum '.$jumlah.' ') }}" min="1" value="1" disabled>
                                 </div>
+                                @else
+                                <div class="col-4 pr-0">
+                                    <label class="col-form-label">{{ __('Jumlah') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                </div>
+                                <div class="col-8 parent-group">
+                                    <input type="number" class="form-control" id="qty" name="qty" max="1"  min="1" value="1" disabled>
+                                </div>
+                                @endif
+                                
                             </div>
                         </div>
 

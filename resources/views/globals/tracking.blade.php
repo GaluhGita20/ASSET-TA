@@ -24,8 +24,26 @@
                 <span class="timeline-badge bg-{{ $val->show_color }} mt-5px"></span>
                 <div class="timeline-content d-flex align-items-start justify-content-between">
                     <span class="mr-3">
-                        @if($val->role->name == 'Umum')
-                            Departemen
+
+                    @if($val->module == 'perubahan-usulan-umum' || $val->module == 'perubahan-perencanaan')
+                        @if($val->role->name == 'Umum' && $val->module =='perubahan-usulan-umum' && $val->order == 2)
+                            Departemen Penunjang
+                        @elseif($val->role->name == 'Umum' && $val->module =='perubahan-usulan-umum' && $val->order == 1)
+                            Departemen Unit
+                        @elseif($val->role->name == 'Umum' && $val->module =='perubahan-perencanaan')
+                            Departemen Penunjang
+                        @else
+                            {{ $val->role->name }}
+                        @endif
+                    @else    
+                        @if($val->role->name == 'Umum' && $val->module !='perencanaan-aset' && $val->module !='perencanaan-aset-pelayanan' || $val->role->name == 'Umum' && $val->module !='perubahan-usulan-umum' && $val->module !='perubahan-perencanaan' )
+                            Departemen Unit
+                        @elseif($val->role->name == 'Umum' && $val->module =='perencanaan-aset' || $val->role->name == 'Umum' && $val->module =='perubahan-perencanaan')
+                            Departemen Penunjang
+                        @elseif($val->role->name == 'Umum' && $val->module =='perencanaan-aset-pelayanan' && $val->order == 1 )
+                            Departemen Unit
+                        @elseif($val->role->name == 'Umum' && $val->module =='perencanaan-aset-pelayanan' && $val->order == 2)
+                            Departemen Penunjang
                         @elseif($val->role->name == 'BPKAD' && $val->module =='pemutihan-aset')
                             Kepala Badan
                         @elseif($val->role->name == 'BPKAD' && $val->module =='penghapusan-aset')
@@ -33,6 +51,7 @@
                         @else
                             {{ $val->role->name }}
                         @endif
+                    @endif
                         <span class="text-{{ $val->show_color }}">({{ $val->show_type }})</span>
                         @if ($val->status == 'approved' && $val->user)
                             <div class="text-muted font-italic">
@@ -69,15 +88,45 @@
                     <div class="timeline-content d-flex align-items-start justify-content-between">
                         <span class="mr-3">
 
-                            @if($val->role->name == 'Umum')
-                                Departemen
-                            @elseif($val->role->name == 'BPKAD' && $val->module =='pemutihan-aset')
-                                Kepala Badan
-                            @elseif($val->role->name == 'BPKAD' && $val->module =='penghapusan-aset')
-                                Bidang Pengelolaan Aset Daerah
-                            @else
-                                {{ $val->role->name }}
+                            @if($val->module == 'perubahan-usulan-umum' || $val->module == 'perubahan-perencanaan')
+                                @if($val->role->name == 'Umum' && $val->module =='perubahan-usulan-umum' && $val->order == 2)
+                                    Departemen Penunjang
+                                @elseif($val->role->name == 'Umum' && $val->module =='perubahan-usulan-umum' && $val->order == 1)
+                                    Departemen Unit
+                                @elseif($val->role->name == 'Umum' && $val->module =='perubahan-perencanaan')
+                                    Departemen Penunjang
+                                @else
+                                    {{ $val->role->name }}
+                                @endif
+                            @elseif( $val->module == 'usulan_pembelian-sperpat-umum' || $val->module == 'usulan_pembelian-sperpat')
+                                @if($val->role->name == 'Umum' && $val->module =='usulan_pembelian-sperpat-umum' && $val->order == 2)
+                                    Departemen Penunjang
+                                @elseif($val->role->name == 'Umum' && $val->module =='usulan_pembelian-sperpat-umum' && $val->order == 1)
+                                    Departemen Unit
+                                @elseif($val->role->name == 'Umum' && $val->module =='usulan_pembelian-sperpat')
+                                    Departemen Penunjang
+                                @else
+                                    {{ $val->role->name }}
+                                @endif
+                            @else    
+                                @if($val->role->name == 'Umum' && $val->module !='perencanaan-aset' && $val->module !='perencanaan-aset-pelayanan')
+                                    Departemen Unit
+                                @elseif($val->role->name == 'Umum' && $val->module =='perencanaan-aset')
+                                    Departemen Penunjang
+                                @elseif($val->role->name == 'Umum' && $val->module =='perencanaan-aset-pelayanan' && $val->order == 1 )
+                                    Departemen Unit
+                                @elseif($val->role->name == 'Umum' && $val->module =='perencanaan-aset-pelayanan' && $val->order == 2)
+                                    Departemen Penunjang
+                                @elseif($val->role->name == 'BPKAD' && $val->module =='pemutihan-aset')
+                                    Kepala Badan
+                                @elseif($val->role->name == 'BPKAD' && $val->module =='penghapusan-aset')
+                                    Bidang Pengelolaan Aset Daerah
+                                @else
+                                    {{ $val->role->name }}
+                                @endif
                             @endif
+
+
                             <span class="text-{{ $val->show_color }}">({{ $val->show_type }})</span>
                             @if ($val->status == 'approved' && $val->user)
                                 <div class="text-muted font-italic">

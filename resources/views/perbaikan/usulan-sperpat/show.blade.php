@@ -22,6 +22,20 @@
                     @include('globals.notes')
                     @csrf
                     <div class="row">
+                        <div class="alert alert-custom alert-light-primary fade show py-3"  role="alert">
+                            <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+                            <div class="alert-text text-primary">
+                                <div class="text-bold">{{ __('Informasi') }}:</div>
+                                @if($data['umur_tahun'] <= 5)
+                                    <div class="mb-10px" style="white-space: pre-wrap;">Aset Ini Sudah Mengalami Perbaikan Sebanyak {{ count($data['perbaikan']) }} kali dan Nilai Aset Saat Ini Rp {{number_format($data['nilai'], 2) }} Rupiah dengan Umur Aset Sudah Mencapai {{ $data['umur_tahun'] }} tahun {{ $data['umur_bulan'] }} bulan, dan Biaya Perbaikan Aset Sebesar Rp {{number_format($data['biaya_perbaikan'], 2) }} Rupiah @if($data['biaya_perbaikan'] > $data['nilai_rekomen_50']) dan Melebihi 50 % dari Nilai Aset Saat Ini, Maka Sistem Merekomendasikan Untuk Melakukan Penghapusan Aset @else Maka Sistem Merekomendasikan Untuk Melakukan Perbaikan Aset karena Biaya Perbaikan Yang Tidak Mencapai 50 % dari Harga Aset Saat Ini @endif
+                                    </div>
+                                @else
+                                    <div class="mb-10px" style="white-space: pre-wrap;">Aset Ini Sudah Mengalami Perbaikan Sebanyak {{ count($data['perbaikan']) }} kali dan Nilai Aset Saat Ini Rp {{number_format($data['nilai'], 2) }} Rupiah dengan Umur Aset Sudah Mencapai {{ $data['umur_tahun'] }} tahun {{ $data['umur_bulan'] }} bulan, dan Biaya Perbaikan Aset Sebesar Rp {{number_format($data['biaya_perbaikan'], 2) }} Rupiah @if($data['biaya_perbaikan'] > $data['nilai_rekomen_30']) dan Melebihi 50 % dari Nilai Aset Saat Ini, Maka Sistem Merekomendasikan Untuk Melakukan Penghapusan Aset @else Maka Sistem Merekomendasikan Untuk Melakukan Perbaikan Aset karena Biaya Perbaikan Yang Tidak Mencapai 30 % dari Harga Aset Saat Ini @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">{{ __('No Surat') }}</label>
@@ -63,29 +77,30 @@
                                 <div class="col-sm-10 col-form-label">
                                     <select class="form-control" name="repair_type" value="{{$record->repair_type}}" data-placeholder="Tipe Perbaikan" disabled>
                                         <option disabed value="">Jenis Perbaikan</option>
-                                        <option value="Tanah" {{ $record->repair_type =='sperpat' ? 'selected' : '-' }}>Pembelian Sperpat</option>
-                                        <option value="Peralatan Mesin"  {{ $record->repair_type =='vendor' ? 'selected' : '-' }} >Sewa Vendor</option>
+                                        <option value="sperpat" {{ $record->repair_type =='sperpat' ? 'selected' : '-' }}>Pembelian Sperpat</option>
+                                        <option value="vendor"  {{ $record->repair_type =='vendor' ? 'selected' : '-' }} >Sewa Vendor</option>
+                                        <option value="sperpat dan vendor"  {{ $record->repair_type =='sperpat dan vendor' ? 'selected' : '-' }} >Beli Sperpat dan Sewa Vendor</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
+                        @if($record->source_fund_id)
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 {{-- <div class="col-2"> --}}
                                     <label class="col-sm-2 col-form-label">{{ __('Sumber Pendanaan') }}</label>
                                 {{-- </div> --}}
                                 <div class="col-sm-10 col-form-label">
-                                    <select name="source_fund_id" id="source_fund_id" class="form-control base-plugin--select2-ajax">
-                                        @if ($record->source_fund_id)
+                                    <select name="source_fund_id" id="source_fund_id" class="form-control base-plugin--select2-ajax" disabled>
                                             <option value="{{ $record->source_fund_id }}" selected>
                                                 {{ $record->danad->name }}
                                             </option>
-                                        @endif
                                     </select>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <div class="col-sm-12">
                             <div class="form-group row">
@@ -110,14 +125,14 @@
                             </div>
                         </div>
 
-                        @if($record->repair_type == 'vendor')
+                        @if($record->repair_type == 'vendor' || $record->repair_type == 'sperpat dan vendor')
                             <div class="col-sm-12">
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Sewa Vendor') }}</label>
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Jasa Vendor') }}</label>
                                     <div class="col-sm-10 col-form-label">
                                         <div class="input-group">
                                             <input type="text" min=0 id="total_cost" name="total_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                                placeholder="{{ __('Biaya Sewa Vendor') }}"  value="{{$record->total_cost}}" disabled>
+                                                placeholder="{{ __('Biaya Sewa Vendor') }}"  value="{{$record->total_cost_vendor}}" disabled>
                                             <div class="input-group-append">
                                                 <span class="input-group-text" >
                                                     Rupiah
@@ -128,6 +143,9 @@
                                 </div>
                             </div>
                         @endif
+
+
+                        
                     </div>
                 </div>
             </div>
@@ -135,7 +153,7 @@
     </div>
     <!-- end of header -->
 
-    @if($record->repair_type == 'sperpat')
+    @if($record->repair_type == 'sperpat' || $record->repair_type == 'sperpat dan vendor')
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
@@ -157,6 +175,7 @@
             <div class="card card-custom">
                 @if (request()->route()->getName() == $routes.'.approval')
                 <div class="card-footer">
+                    
                     <div class="d-flex justify-content-between">
                         @include('layouts.forms.btnBack')
                         @if(auth()->user()->hasRole('Sub Bagian Program Perencanaan'))

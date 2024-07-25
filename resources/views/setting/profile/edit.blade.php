@@ -48,4 +48,10 @@
 			</select>
 		</div>
 	</div>
+	{{-- <div class="form-group row">
+		<label class="col-sm-12 col-form-label">{{ __('ID Telegram') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+		<div class="col-sm-12 parent-group"> 
+			<input type="text" name="telegram_user_id" value="{{$record->telegram->user_id}}" class="form-control" placeholder="{{ __('ID Telegram') }}">
+		</div>
+	</div> --}}
 @endsection

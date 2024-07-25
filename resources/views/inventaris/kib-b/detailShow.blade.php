@@ -360,10 +360,10 @@
                                 </div>
                                 <div class="col-8 parent-group"> 
                                     <select name="room_location" class="form-control" disabled>
-                                        @if(!empty($record->room_lacation)) 
-                                            <option value="{{ $record->room_location }}" selected>{{ $record->locations->name }}</option>
-                                        @else
+                                        @if(empty($record->room_location)) 
                                             <option value="" selected>-</option>
+                                        @else
+                                            <option value="{{ $record->room_location }}" selected>{{ $record->locations->name }}</option>
                                         @endif
                                     </select>
                                 </div>

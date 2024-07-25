@@ -72,14 +72,61 @@ class FlowController extends Controller
                 $orders = $record->flows()->get()->groupBy('order');
                 foreach ($orders as $i => $flows) {
                     foreach ($flows as $j => $flow) {
-                        if($flow->role->name == 'Umum'){
-                            $flowd = 'Departemen';
-                        }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
-                            $flowd = 'Kepala Badan BPKAD';
-                        }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
-                            $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
+                        if($flow->menu_id == 15){
+                            if($flow->role->name == 'Umum' && $flow->position->id == 4){
+                                $flowd = 'Departemen Penunjang';
+                            }else if($flow->role->name == 'Umum' && $flow->position->id  == 3){
+                                $flowd = 'Departemen Unit';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
+                                $flowd = 'Kepala Badan BPKAD';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
+                                $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
+                            }else{
+                                $flowd = $flow->role->name;
+                            }
+                        }elseif($flow->menu_id == 1){
+                            if($flow->role->name == 'Umum'){
+                                $flowd = 'Departemen Penunjang';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
+                                $flowd = 'Kepala Badan BPKAD';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
+                                $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
+                            }else{
+                                $flowd = $flow->role->name;
+                            }
+                        }elseif($flow->menu_id == 12){
+                            if($flow->role->name == 'Umum'){
+                                $flowd = 'Departemen Penunjang';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
+                                $flowd = 'Kepala Badan BPKAD';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
+                                $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
+                            }else{
+                                $flowd = $flow->role->name;
+                            }
+                            
+                        }elseif($flow->menu_id == 18){
+                            if($flow->role->name == 'Umum' && $flow->position->id == 4){
+                                $flowd = 'Departemen Penunjang';
+                            }else if($flow->role->name == 'Umum' && $flow->position->id  == 3){
+                                $flowd = 'Departemen Unit';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
+                                $flowd = 'Kepala Badan BPKAD';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
+                                $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
+                            }else{
+                                $flowd = $flow->role->name;
+                            }
                         }else{
-                            $flowd = $flow->role->name;
+                            if($flow->role->name == 'Umum'){
+                                $flowd = 'Departemen Unit';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 9){
+                                $flowd = 'Kepala Badan BPKAD';
+                            }elseif($flow->role->name == 'BPKAD' && $flow->menu_id == 7){
+                                $flowd = 'Bidang Pengelolaan Aset Daerah BPKAD';
+                            }else{
+                                $flowd = $flow->role->name;
+                            }
                         }
 
                         $html .= '<span class="label label-light-'.$colors[$flow->type].' font-weight-bold label-inline text-nowrap" data-toggle="tooltip" title="'.$flow->show_type.'">'.$flowd.'</span>';

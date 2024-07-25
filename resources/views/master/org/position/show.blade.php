@@ -33,6 +33,13 @@
 			<input type="text" name="name" class="form-control" value="{{ $record->name }}" placeholder="{{ __('Nama') }}" readonly>
 		</div>
 	</div>
+
+	{{-- <div class="form-group row">
+		<label class="col-sm-12 col-form-label">{{ __('Username Telegram') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+		<div class="col-sm-12 parent-group"> 
+			<input type="text" name="telegram_user_id" value="{{$record->telegram_user_id}}" class="form-control" placeholder="{{ __('Username Telegram') }}" disabled>
+		</div>
+	</div> --}}
 @endsection
 @section('buttons')
 @endsection

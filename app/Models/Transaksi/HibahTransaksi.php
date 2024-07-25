@@ -6,6 +6,7 @@ use App\Models\Model;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Master\Aset\Aset;
+// use App\Models\Master\Org\OrgStruct;
 use App\Models\Traits\HasApprovals;
 use App\Models\Traits\HasFiles;
 use App\Support\Base;
@@ -347,13 +348,43 @@ class HibahTransaksi extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
-        //  -4161016242
+        $approval1 = $this->whereHas('approvals', function ($q) {
+            $q->where('target_id',$this->id)->where('status','!=','approved')->where('role_id',5);
+        })->count();
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        $chat_keuangan = OrgStruct::where('name', 'Sub Bagian Keuangan')->value('telegram_id');
+        $chat_direksi = OrgStruct::where('name', 'Direksi RSUD')->value('telegram_id');
+        $chatId = '-4287618762'; //grup notif ppk
+
+        $send_chat = [];
+        if ($this->status == 'draft') {
+            $send_chat = array_filter([$chatId]);
+        } elseif ($this->status == 'waiting.approval' && $approval1 > 0 ) {
+            $send_chat = array_filter([$chatId, $chat_keuangan]);
+            $pesan = $pesan.' '.' dan Kepada Bagian Keuangan Mohon Untuk Melakukan Verifikasi';
+        }elseif($this->status == 'rejected' && $approval1 > 0){
+            $send_chat = array_filter([$chatId]); //ditolak departemen
+        } elseif ($this->status == 'waiting.approval' && $approval1 == 0) {
+            $send_chat = array_filter([$chatId, $chat_direksi]);
+            $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Verifikasi';
+        }elseif($this->status == 'rejected' && $approval1 == 0){ //ditolak keuangan && direksi
+            $send_chat = array_filter([$chatId]);
+        } 
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
+        // $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
+        // //  -4161016242
+
+        // Telegram::sendMessage([
+        //     'chat_id' => $chatId,
+        //     'text' => $pesan,
+        // ]);
     }
 
     public function checkAction($action, $perms, $record = null)

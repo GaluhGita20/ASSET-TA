@@ -279,7 +279,7 @@
                                                     <span class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
                                                         data-toggle="tooltip"
                                                         @if($flow->role->name == 'Umum')
-                                                            title="{{ $flow->show_type }}">Departemen
+                                                            title="{{ $flow->show_type }}">Departemen Unit
                                                         @else 
                                                             title="{{ $flow->show_type }}">{{ $flow->role->name }}
                                                         @endif
@@ -325,13 +325,7 @@
                                     @include('layouts.forms.btnBack')
                                 </div>
                                 <div class="btn-group dropup">
-                                    {{-- <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mr-1 fa fa-save"></i> {{ __('Simpan') }}</button> --}}
-                                    {{-- <div class="dropdown-menu dropdown-menu-right"> --}}
-                                        <button type="submit" class="btn btn-primary align-items-center base-form--submit-page" data-submit="0">
-                                            <i class="mr-1 flaticon-interface-10 text-white"></i>
-                                            {{ __('Submit') }}
-                                        </button>
-                                    {{-- </div> --}}
+                                    @include('layouts.forms.btnDropdownSubmit')
                                 </div>
                             </div>
                         </div>

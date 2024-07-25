@@ -41,9 +41,9 @@ class TransaksiRequest extends FormRequest
             //         return $query->where('struct_id', request()->input('struct_id'));
             //     })->ignore($id),
             // ],
-            'budget_limit' => 'required',
-            'qty' => 'required',
-            'unit_cost' => 'required',
+            // 'budget_limit' => 'required',
+            // 'qty' => 'required',
+            // 'unit_cost' => 'required',
             'shiping_cost' => 'required',
             'tax_cost' => 'required',
             'total_cost' => 'required',
@@ -63,8 +63,8 @@ class TransaksiRequest extends FormRequest
             'no_spk.required' => 'Nomor Kontrak wajib diisi.',
             'spk_start_date.required' => 'Tanggal Mulai Kontrak wajib diisi.',
             'spk_end_date.required' => 'Tanggal Selesai Kontrak wajib diisi.',
-            'budget_limit.required' => 'Pagu wajib diisi.',
-            'qty.required' => 'Jumlah Pembelian wajib diisi.',
+            // 'budget_limit.required' => 'Pagu wajib diisi.',
+            // 'qty.required' => 'Jumlah Pembelian wajib diisi.',
         ];
     }
 }

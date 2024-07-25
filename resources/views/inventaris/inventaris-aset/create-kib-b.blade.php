@@ -284,7 +284,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->trans->unit_cost }}" readonly>
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="unit_cost" value="{{ $usulan->HPS_unit_cost }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah

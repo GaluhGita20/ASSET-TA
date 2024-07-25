@@ -121,7 +121,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
@@ -138,9 +138,9 @@
                                         </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Pagu') }}</label>
@@ -156,9 +156,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Harga Unit Barang') }}</label>
@@ -175,7 +175,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -229,6 +229,15 @@
                                                 rupiah
                                             </span>
                                         </div>
+
+                                        {{-- <input type="text" min=0 id="total_cost" name="total_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                            placeholder="{{ __('Harga Total') }}" value="0"  readonly>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" >
+                                                Rupiah
+                                            </span>
+                                        </div> --}}
+
                                     </div>
                                 </div>
                             </div>
@@ -236,23 +245,8 @@
 
                         <div class="col-sm-12">
                             <div class="form-group row">
-                                <label class="col-2 col-form-label">{{ __('Lampiran Nota Pembelian') }}</label>
+                                <label class="col-2 col-form-label">{{ __('Nota Pembelian dan Hasil Uji Fungsi') }}</label>
                                 <div class="col-10 parent-group">
-                                    {{-- <div class="custom-file">
-                                        <input type="hidden"
-                                            name="uploads[uploaded]"
-                                            class="uploaded"
-                                            value="0">
-                                        <input type="file" multiple
-                                            class="custom-file-input base-form--save-temp-files"
-                                            data-name="uploads"
-                                            data-container="parent-group"
-                                            data-max-size="30024"
-                                            data-max-file="100"
-                                            accept="*" disabled>
-                                        <label class="custom-file-label" for="file">Choose File</label>
-                                    </div> --}}
-    
                                     <div class="form-text text-muted">*Maksimal 20MB</div>
                                     @foreach ($record->files as $file)
                                     <div class="progress-container w-100" data-uid="{{ $file->id }}">
@@ -419,7 +413,7 @@
                             </div>
                         </div> --> --}}
 
-                        <div class="col-sm-12">
+                        {{-- <div class="col-sm-12">
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
                                     <label class="col-form-label">{{ __('Hasil Uji Fungsi Aset') }}</label>
@@ -428,7 +422,7 @@
                                     <textarea class="base-plugin--summernote" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" readonly data-height="200" disabled>{{ $record->asset_test_results }}</textarea>
                                 </div>
                             </div>
-                        </div> 
+                        </div>  --}}
             
                         
                         <div class="col-sm-12">

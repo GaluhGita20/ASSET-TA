@@ -50,6 +50,9 @@ class TransPerbaikanDisposisi extends Model
         'status',
         'receipt_date',
         'faktur_code',
+        'spm_code',
+        'total_cost_vendor',
+        'ppk_id'
     ];
 
     protected $casts = [
@@ -105,59 +108,89 @@ class TransPerbaikanDisposisi extends Model
     public function scopeGrid($query)
     {
         $user = auth()->user();
-        // return $query->when(empty(array_intersect(['Sarpras','BPKAD'], $user->roles->pluck('name')->toArray()))
-        // )->when(auth()->user()->roles->pluck('id')->contains(4), function ($query) {
-        //     $query->orWhereHas('approvals', function ($q) {
-        //         $q->where('order', 1)->whereIn('status', ['new','rejected']);
-        //     });
-        // })
-        // ->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
-        //     $query->whereHas('approvals', function ($subQuery) {
-        //         $subQuery->where('module','trans-sperpat')->where('order', 1)->where('status', 'approved');
-        //     })
-        //     ->whereHas('approvals', function ($subQuery) {
-        //         $subQuery->where('module','trans-sperpat')->where('order', 2)->where('status', 'new');
-        //     });
-        // });
-        return $query->when(empty(array_intersect(['Sarpras','Keuangan','BPKAD'], $user->roles->pluck('name')->toArray())),
-            function ($q) use ($user) { 
-                $q->WhereHas('approvals', function ($q) use ($user) {
-                    $q->when($user->id, function ($qq) use ($user) {
-                        $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
-                    },function ($qq) use ($user) {
-                        $qq->orWhereIn('role_id', $user->getRoleIds())
-                        ->orWhere('position_id', $user->position->id);
+        return $query->when(
+            empty(array_intersect(['Sarpras', 'BPKAD'], $user->roles->pluck('name')->toArray())),
+            function ($q) use ($user) {
+                // $q->whereHas('approvals', function ($q) use ($user) {
+                //     $q->when($user->id, function ($qq) use ($user) {
+                //         $qq->whereIn('role_id', $user->getRoleIds())->where('status', 'new');
+                //     }, function ($qq) use ($user) {
+                //         $qq->orWhereIn('role_id', $user->getRoleIds())
+                //         ->orWhere('position_id', $user->position->id);
+                //     });
+                // });
+        
+                $q->when($user->position->imKepalaDeparetemen(), function ($qq) use ($user) {
+                    $qq->whereHas('codes', function ($qqq) use ($user){
+                        return $qqq->whereIn('departemen_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+                    });
+                }, function ($qq) use ($user) {
+                    $qq->whereHas('codes', function ($qqq) use ($user){
+                        // return $qqq->whereIn('departemen_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+                        return $qqq->where('departemen_id', $user->position->location->id);
+                    });
+                });
+            })
+            ->when(auth()->user()->position->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan', function ($query) {
+                $query->orWhereHas('approvals', function ($q) {
+                    $q->where('order', 2)->orWhere('order',1)->where('status', 'approved');
+                });
+            })
+            ->when(auth()->user()->position->location->name == 'Bidang Penunjang Medik dan Non Medik', function ($query) {
+                $query->orWhereHas('approvals', function ($q) {
+                    $q->where('order', 1)->where('status', 'approved');
+                });
+            })
+            ->when(auth()->user()->position->location->name == 'Sub Bagian Keuangan', function ($query) {
+                $query->orWhereHas('approvals', function ($q) {
+                    $q->where('module','trans-sperpat')->where('order', 1)->where('status', '<>','approved');
+                });
+            })->when(auth()->user()->position->location->name == 'Direksi RSUD', function ($query) {
+                $query->orWhereHas('approvals', function ($q) {
+                    $q->where('module','trans-sperpat')->where('order', 1)->where('status','approved');
+                });
+            });
+    }
+
+
+    public function scopeGridSperpat($query)
+    {
+        $user = auth()->user();
+        return $query->when(
+            empty(array_intersect(['Sarpras', 'BPKAD'], $user->roles->pluck('name')->toArray())),
+            function ($q) use ($user) {
+                $q->when($user->position->imKepalaDeparetemen(), function ($qq) use ($user) {
+                    $qq->whereHas('codes', function ($qqq) use ($user){
+                        return $qqq->whereIn('departemen_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+                    });
+                }, function ($qq) use ($user) {
+                    $qq->whereHas('codes', function ($qqq) use ($user){
+                        // return $qqq->whereIn('departemen_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+                        return $qqq->where('departemen_id', $user->position->location->id);
                     });
                 });
             }
         )
-        ->latest();
-
-
-        // return $query->when(empty(array_intersect(['Direksi','Keuangan','Sarpras'], $user->roles->pluck('name')->toArray())),
-        //     function ($q) use ($user) { 
-        //         $q->WhereHas('approvals', function ($q) use ($user) {
-        //             $q->when($user->id, function ($qq) use ($user) {
-        //                 $qq->WhereIn('role_id', $user->getRoleIds())->where('status','new');
-        //             },function ($qq) use ($user) {
-        //                 $qq->orWhereIn('role_id', $user->getRoleIds())
-        //                 ->orWhere('position_id', $user->position->id);
-        //             });
-        //         });
-        //     }
-        // )
-        // ->latest();
-        // return $query->when(!in_array($user->position->location->id, [8,17]), 
-        // function ($q) use ($user) { 
-        //     return $q->when($user->position->imKepalaDeparetemen(), 
-        //         function ($qq) use ($user) {
-        //             return $qq->whereIn('departemen_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
-        //         },
-        //         function ($qq) use ($user) {
-        //             return $qq->where('departemen_id', $user->position->location->id); 
-        //         }
-        //     );
-        // })->latest();
+        ->when(auth()->user()->position->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan', function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+                $q->where('order',1)->where('module','usulan_pembelian-sperpat')->where('status', 'approved');
+            });
+        })
+        ->when(auth()->user()->position->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan', function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+                $q->where('order',2)->where('module','usulan_pembelian-sperpat-umum')->where('status', 'approved');
+            });
+        })
+        ->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+                $q->where('role_id', 3)->where('status', 'approved');
+            });
+        })
+        ->when(auth()->user()->position->location->name == 'Bidang Penunjang Medik dan Non Medik', function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+                $q->where('order', 1)->where('module','usulan_pembelian-sperpat-umum')->where('status', 'approved');
+            });
+        });
     }
 
     public function scopeGridStatusCompleted($query)
@@ -206,6 +239,17 @@ class TransPerbaikanDisposisi extends Model
                     ]
                 );
             }
+
+            // dd($request->all());
+            $dep = Perbaikan::where('id',$request->perbaikan_id)->value('departemen_id');
+            $parent = OrgStruct::where('id',$dep)->value('parent_id');
+
+            if($parent == 3 || $dep == 3){
+                $module = 'usulan_pembelian-sperpat';
+            }else{
+                $module = 'usulan_pembelian-sperpat-umum';
+            }
+
             $this->fill($data);
             $time = now()->format('Y-m-d');
             $this->submission_date =  $time;
@@ -223,60 +267,85 @@ class TransPerbaikanDisposisi extends Model
     {
         $this->beginTransaction();
         try {
-            // if($request->procurement_year < now()->format('Y')){
-            //     return $this->rollback(
-            //         [
-            //             'message' => 'Periode Usulan Sperpat Sudah Lewat!'
-            //         ]
-            //     );
-            // }
 
             $data = $request->all();
             // dd($data);
             $this->fill($data);
 
             // dd($request->all());
-            if($request->is_submit == 1){
-
-                if($this->repair_type == 'vendor'){
-                    if($request->total_cost == null){
-                        return $this->rollback(
-                            [
-                                'message' => 'Biaya Total Sewa Vendor Wajib Diisi!'
-                            ]
-                        );
-                    }
-    
-                    $total = str_replace(['.', ','], '', $request->total_cost);
-                    $this->total_cost= (int)$total;
+            if($this->repair_type == 'vendor' || $this->repair_type == 'sperpat dan vendor' ){
+                if($request->total_cost_vendor == null){
+                    return $this->rollback(
+                        [
+                            'message' => 'Biaya Jasa Vendor Wajib Diisi!'
+                        ]
+                    );
                 }
-            }
 
-
-
-            if($this->status == 'completed'){
-                // dd('tes');
-                $tax = str_replace(['.', ','], '', $request->tax_cost);
-                $shiping = str_replace(['.', ','], '', $request->shiping_cost);
                 $total = str_replace(['.', ','], '', $request->total_cost);
+                $this->total_cost= (int)$total;
+
+                $total_2 = str_replace(['.', ','], '', $request->total_cost_vendor);
+                $this->total_cost_vendor= (int)$total_2;
+            }
+            
+
+
+
+            // if($this->status == 'completed'){
+            //     // dd('tes');
+            //     $tax = str_replace(['.', ','], '', $request->tax_cost);
+            //     $shiping = str_replace(['.', ','], '', $request->shiping_cost);
+            //     $total = str_replace(['.', ','], '', $request->total_cost);
+            //     $this->tax_cost = (int)$tax;
+            //     $this->shiping_cost = (int)$shiping;
+            //     $this->total_cost = (int)$total + (int)$shiping + (int)$tax;
+            //     $this->spk_start_date = $spk_start;
+            //     $this->spk_end_date = $spk_start;
+            //     $this->spk_range_time = $selisih;
+            //     $this->receipt_date = $receipt;
+
+            //     if($this->repair_type == 'vendor'){
+            //         $total = str_replace(['.', ','], '', $request->total_cost);
+            //         $this->total_cost= (int)$total;
+            //     }
+           // }
+
+
+            if($request->module == 'trans-sperpat' && $this->status == 'completed'){
                 
                 $spk_start = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
                 $spk_end = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
                 $receipt = Carbon::createFromFormat('d/m/Y', $request->receipt_date);
                 $selisih = $spk_start->diffInDays($spk_end);
                 
+                $tax = str_replace(['.', ','], '', $request->tax_cost);
+                $shiping = str_replace(['.', ','], '', $request->shiping_cost);
+                
                 $this->tax_cost = (int)$tax;
                 $this->shiping_cost = (int)$shiping;
-                $this->total_cost = (int)$total + (int)$shiping + (int)$tax;
+                
+                
+                if($request->repair_type == 'sperpat dan vendor' ){
+                    $total_v = str_replace(['.', ','], '', $request->total_cost_vendor);
+                    $total_s = str_replace(['.', ','], '', $request->ts_cost);
+                    $this->total_cost = (int)$total_v + (int)$total_s + (int)$shiping + (int)$tax;
+                    
+    
+                }elseif($this->repair_type == 'vendor') {
+                    $total_v = str_replace(['.', ','], '', $request->total_cost_vendor);
+                    $this->total_cost= (int)$total_v + (int)$shiping + (int)$tax;
+                    # code...
+                }else{
+                    $total = str_replace(['.', ','], '', $request->ts_cost);
+                    $this->total_cost= (int)$total + (int)$shiping + (int)$tax;
+                }
+
                 $this->spk_start_date = $spk_start;
                 $this->spk_end_date = $spk_start;
                 $this->spk_range_time = $selisih;
                 $this->receipt_date = $receipt;
 
-                if($this->repair_type == 'vendor'){
-                    $total = str_replace(['.', ','], '', $request->total_cost);
-                    $this->total_cost= (int)$total;
-                }
             }
 
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
@@ -309,6 +378,115 @@ class TransPerbaikanDisposisi extends Model
         }
     }
 
+
+    //kondisi aset
+    private $damageWeights = [
+        'Rusak Berat' => 4,
+        'Rusak Ringan' => 2
+    ];
+    
+    //nilai aset
+    private $valueWeights = [
+        ['min' => 44000, 'max' => 2022999, 'weight' => 8],
+        ['min' => 2023000, 'max' => 4001999, 'weight' => 7],
+        ['min' => 4002000, 'max' => 5980999, 'weight' => 6],
+        ['min' => 5981000, 'max' => 7959999, 'weight' => 5],
+        ['min' => 7960000, 'max' => 9938999, 'weight' => 4],
+        ['min' => 9939000, 'max' => 11917999, 'weight' => 3],
+        ['min' => 11918000, 'max' => 13896999, 'weight' => 2],
+        ['min' => 13897000, 'max' => 15876000, 'weight' => 1]
+    ];
+    
+    //umur aset
+    private $economicLifeWeights = [
+        ['max' => 2, 'weight' => 5],
+        ['min' => 3, 'weight' => 2] // Assume anything greater than 2 years has the weight 2
+    ];
+    
+    public function calculateUtilityScore($assets) {
+        $damageWeight = $this->getDamageWeight($asset['condition']);
+        $valueWeight = $this->getValueWeight($asset['value']);
+        $economicLifeWeight = $this->getEconomicLifeWeight($asset['economic_life']);
+        $asset['utility_score'] = ($damageWeight * 0.4) + ($valueWeight * 0.4) + ($economicLifeWeight * 0.2);
+        return $assets;
+    }
+
+    public function getDamageWeight($condition) {
+        return $this->damageWeights[$condition] ?? 0;
+    }
+
+    public function getValueWeight($value) {
+        foreach ($this->valueWeights as $range) {
+            if ($value >= $range['min'] && $value <= $range['max']) {
+                return $range['weight'];
+            }
+        }
+        return 0;
+    }
+
+    public function getEconomicLifeWeight($economicLife) {
+        foreach ($this->economicLifeWeights as $range) {
+            if (!isset($range['min']) && $economicLife <= $range['max']) {
+                return $range['weight'];
+            }
+            if (!isset($range['max']) && $economicLife >= $range['min']) {
+                return $range['weight'];
+            }
+        }
+        return 0;
+    }
+    
+    // // Contoh penggunaan
+    // $assets = [
+    //     ['condition' => 'Rusak Berat', 'value' => 5000000, 'economic_life' => 1],
+    //     ['condition' => 'Rusak Ringan', 'value' => 3000000, 'economic_life' => 4],
+    //     ['condition' => 'Rusak Berat', 'value' => 8000000, 'economic_life' => 3]
+    // ];
+    
+    // $calculator = new MautCalculator();
+    // $assetsWithUtilityScores = $calculator->calculateUtilityScore($assets);
+    
+    // foreach ($assetsWithUtilityScores as $asset) {
+    //     echo "Aset dengan kondisi {$asset['condition']} memiliki skor utility {$asset['utility_score']}\n";
+    // }
+    
+
+    public function handleStoreOrUpdateHarga($request, $statusOnly = false)
+    {
+        $this->beginTransaction();
+        try {
+
+            $data = $request->all();
+            // dd($data);
+            $this->fill($data);
+
+            if($this->repair_type == 'vendor' || $this->repair_type == 'sperpat dan vendor' ){
+                if($request->total_cost_vendor == null || $request->total_cost_vendor <= 0 ){
+                    return $this->rollback(
+                        [
+                            'message' => 'Biaya Jasa Vendor Wajib Diisi!'
+                        ]
+                    );
+                }
+
+                $total_2 = str_replace(['.', ','], '', $request->total_cost_vendor);
+                $this->total_cost_vendor= (int)$total_2;
+            }
+            
+
+            $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+
+            $this->save();
+            $this->saveLogNotify();
+            
+            
+            $redirect = route(request()->get('routes') . '.index');
+            return $this->commitSaved(compact('redirect'));
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
     public function handleTransStoreOrUpdate($request, $statusOnly = false)
     {
         $this->beginTransaction();
@@ -317,15 +495,34 @@ class TransPerbaikanDisposisi extends Model
             //dd($request->all());
             $tax = str_replace(['.', ','], '', $request->tax_cost);
             $shiping = str_replace(['.', ','], '', $request->shiping_cost);
-            $ts = str_replace(['.', ','], '', $request->ts_cost);
-
-            // if($this->repair_type == 'sperpat'){
-            $total = (int)$tax + (int)$shiping + (int)$ts;
-            // }else{
-            //     $ta = str_replace(['.', ','], '', $request->total_cost);
-            //     $total = (int)$ta;
-            // }
+            // $ts = str_replace(['.', ','], '', $request->ts_cost);
             
+            //dd($request->all());
+            if($request->repair_type == 'sperpat dan vendor' ){
+                $total_v = str_replace(['.', ','], '', $request->ts_cost_vendor);
+                $total_s = str_replace(['.', ','], '', $request->ts_cost);
+                $total = (int)$total_v + (int)$total_s + (int)$shiping + (int)$tax;
+                $this->total_cost_vendor = (int)$total_v;
+
+            }elseif($this->repair_type == 'vendor') {
+                $total_v = str_replace(['.', ','], '', $request->ts_cost_vendor);
+                $total= (int)$total_v + (int)$shiping + (int)$tax;
+                $this->total_cost_vendor = (int)$total_v;
+                # code...
+            }else{
+                $ts = str_replace(['.', ','], '', $request->ts_cost);
+                $total= (int)$ts + (int)$shiping + (int)$tax;
+                $this->total_cost_vendor = 0;
+                # code...
+            }
+
+            // dd(auth()->user()->roles->pluck('id')->contains(8), auth()->user()->id);
+            if(auth()->user()->roles->pluck('id')->contains(8)){
+                $this->ppk_id = auth()->user()->id;
+            }else{
+                $this->ppk_id = null;
+            }
+
             $spk_start = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
             $spk_end = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
             $receipt = Carbon::createFromFormat('d/m/Y', $request->receipt_date);
@@ -337,6 +534,7 @@ class TransPerbaikanDisposisi extends Model
             $this->tax_cost = (int)$tax;
             $this->shiping_cost = (int)$shiping;
             $this->total_cost = $total;
+
             $this->spk_start_date = $spk_start;
             $this->spk_end_date = $spk_end;
             $this->no_spk = $request->no_spk;
@@ -344,20 +542,15 @@ class TransPerbaikanDisposisi extends Model
             $this->sper_status = 'completed';
             $this->spk_range_time = $selisih;
             $this->receipt_date = $receipt;
+            $this->spm_code = $request->spm_code;
 
-            // if($this->repair_type == 'vendor'){
-            //     $total = str_replace(['.', ','], '', $request->total_cost);
-            //     $this->total_cost= (int)$total;
-            // }
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
 
             
             $this->save();
 
             if($request->is_submit == 1){
-                
                 $this->handleSubmitSaveTrans($request);
-                
             }else{
                 $this->saveLogNotify();
             }
@@ -479,11 +672,56 @@ class TransPerbaikanDisposisi extends Model
         }
     }
 
+
+    public function handleDetailStoreOrUpdateHarga($request, UsulanSperpat $detail)
+    {
+        $this->beginTransaction();
+        try {
+
+            if($request->unit_cost == null || $request->unit_cost <= 0){
+                return $this->rollback(
+                    [
+                        'message' => 'Harga Unit Harus Diisi!'
+                    ]
+                );
+            }
+
+            $unit_cost = str_replace(['.', ','], '', $request->unit_cost);
+            $unit_cost = (int)$unit_cost; // Konversi ke integer atau bisa juga float tergantung kebutuhan
+
+            $detail->unit_cost = $unit_cost;
+            
+            $qty = $detail->qty; 
+            $tot_harga = $qty * $unit_cost;
+
+            $detail->save(); // Simpan detail sebelum mengupdate relasi
+
+            $this->details()->where('id',$detail->id)->update(['total_cost' => $tot_harga]); // Pastikan ini adalah metode yang benar untuk update relasi
+            $this->save();
+            $this->saveLogNotify();
+
+            return $this->commitSaved();
+            
+        } catch (\Exception $e) {
+            return $this->rollbackSaved($e);
+        }
+    }
+
+
     public function handleReject($request)
     {
         $this->beginTransaction();
         try {
-            $this->rejectApproval($request->module, $request->note);
+            $dep =  Perbaikan::where('id',$this->perbaikan_id)->value('departemen_id');
+            $parent = OrgStruct::where('id',$dep)->value('parent_id');
+
+            if($parent == 3 || $dep == 3){
+                $module = 'usulan_pembelian-sperpat';
+            }else{
+                $module = 'usulan_pembelian-sperpat-umum';
+            }
+
+            $this->rejectApproval($module, $request->note);
             $this->update(['sper_status' => 'rejected']);
             $this->saveLogNotify();
 
@@ -532,7 +770,16 @@ class TransPerbaikanDisposisi extends Model
         $this->beginTransaction();
         try {
             $this->update(['sper_status' => 'waiting.approval']);
-            $this->generateApproval($request->module);
+            $dep = Perbaikan::where('id',$this->perbaikan_id)->value('departemen_id');
+            $parent = OrgStruct::where('id',$dep)->value('parent_id');
+
+            if($parent == 3 || $dep == 3){
+                $module = 'usulan_pembelian-sperpat';
+            }else{
+                $module = 'usulan_pembelian-sperpat-umum';
+            }
+
+            $this->generateApproval($module);
             $this->saveLogNotify();
             $redirect = route(request()->get('routes') . '.index');
             return $this->commitSaved(compact('redirect'));
@@ -561,23 +808,61 @@ class TransPerbaikanDisposisi extends Model
                         $this->saveLogNotify();
                     }
                 } else {
-                    $this->approveApproval($request->module);
-                    if ($this->firstNewApproval($request->module)) {
-                        if($request->source_fund_id == null){
-                            return $this->rollback(
-                                [
-                                    'message' => 'Sumber Pendanaan Wajib Diisi !'
-                                ]
-                            );
-                        }else{
+                    $dep =  Perbaikan::where('id',$this->perbaikan_id)->value('departemen_id');
+                    $parent = OrgStruct::where('id',$dep)->value('parent_id');
+
+                    if($parent == 3 || $dep == 3){
+                        $module = 'usulan_pembelian-sperpat';
+                    }else{
+                        $module = 'usulan_pembelian-sperpat-umum';
+                    }
+
+                    $this->approveApproval($module);
+
+                    $p1 = $this->whereHas('approvals', function ($q) {
+                        $q->where('target_id',$this->id)->where('module','usulan_pembelian-sperpat')->where('role_id',3)->where('status','!=','approved')->where('order',2);
+                    })->count();
+
+                    $p2 = $this->whereHas('approvals', function ($q){
+                        $q->where('target_id',$this->id)->where('module','usulan_pembelian-sperpat-umum')->where('role_id',5)->where('status','!=','approved')->where('order',2);
+                    })->count();
+
+                    $p3 = $this->whereHas('approvals', function ($q){
+                        $q->where('target_id',$this->id)->where('module','usulan_pembelian-sperpat-umum')->where('role_id',3)->where('status','!=','approved')->where('order',3);
+                    })->count();
+
+                    $p4 = $this->whereHas('approvals', function ($q){
+                        $q->where('target_id',$this->id)->where('module','usulan_pembelian-sperpat-umum')->where('role_id',2)->where('status','!=','approved')->where('order',4);
+                    })->count();
+
+                    $p5 = $this->whereHas('approvals', function ($q){
+                        $q->where('target_id',$this->id)->where('module','usulan_pembelian-sperpat')->where('role_id',2)->where('status','!=','approved')->where('order',3);
+                    })->count();
+
+                    if($p4 != 0 && $p3 == 0 && $p2 == 0 && $module == 'usulan_pembelian-sperpat-umum' && $request->source_fund_id == null){
+                        return $this->rollback(
+                            [
+                                'message' => 'Sumber Pendanaan Harus Diisi!'
+                            ]
+                        );
+                    }elseif($p5 != 0 && $p1 == 0 && $module == 'usulan_pembelian-sperpat' && $request->source_fund_id == null){
+                        //dd($p2);
+                        return $this->rollback(
+                            [
+                                'message' => 'Sumber Pendanaan Harus Diisi!'
+                            ]
+                        );
+                    }else{
+                        if($request->source_fund_id != null){
                             $this->update(['source_fund_id' => $request->source_fund_id]);
                         }
-
-                        $this->update(['sper_status' => 'waiting.approval']);
-                        $this->saveLogNotify();
-                    } else {
-                        $this->update(['sper_status' => 'completed']);
-                        $this->saveLogNotify();
+                        if ($this->firstNewApproval($module)) {
+                            $this->update(['sper_status' => 'waiting.approval']);
+                            $this->saveLogNotify();
+                        } else {
+                            $this->update(['sper_status' => 'completed']);
+                            $this->saveLogNotify();
+                        }
                     }
                 }
     
@@ -660,8 +945,6 @@ class TransPerbaikanDisposisi extends Model
                         $this->addNotify([
                             'message' => 'Waiting Verify ' . $data,
                             'url' => route($routes . '.approval', $this->id),
-                            // dd('tes'),
-    
                             'user_ids' => $this->getNewUserIdsApproval(request()->get('module')),
                         ]);
     
@@ -769,12 +1052,111 @@ class TransPerbaikanDisposisi extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4136008848'; // Ganti dengan chat ID penerima notifikasi
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        //usulan pembelian sperpat
+        $dep =  Perbaikan::where('id',$this->perbaikan_id)->value('departemen_id');
+        $parent = OrgStruct::where('id',$dep)->value('parent_id');
+
+        if($parent == 3 || $dep == 3){
+            $module = 'usulan_pembelian-sperpat';
+        }else{
+            $module = 'usulan_pembelian-sperpat-umum';
+        }
+
+        // pembelian sperpat umum
+        $approval1_u = $this->whereHas('approvals', function ($q) use ($module){
+            $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',5)->where('order',1);
+        })->count();
+
+        $approval2_u = $this->whereHas('approvals', function ($q) use ($module){
+            $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',5)->where('order',2);
+        })->count();
+
+        $approval3_u = $this->whereHas('approvals', function ($q) use ($module){
+            $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',3)->where('order',3);
+        })->count();
+
+        //transaksi pembelian sperpat
+        $approval1 = $this->whereHas('approvals', function ($q) use ($module) {
+            $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',5)->where('order',1);
+        })->count();
+
+        $approval2 = $this->whereHas('approvals', function ($q) use ($module) {
+            $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',3)->where('order',2);
+        })->count();
+
+        $kepala_dep = OrgStruct::where('id', $parent)->value('telegram_id');
+        $chat_perencanaan = OrgStruct::where('name', 'Sub Bagian Program Perencanaan dan Pelaporan')->value('telegram_id');
+        $penunjang = OrgStruct::where('name', 'Bidang Penunjang Medik dan Non Medik')->value('telegram_id');
+        $chat_direksi = OrgStruct::where('name', 'Direksi RSUD')->value('telegram_id');
+        $chat_keuangan = OrgStruct::where('name', 'Sub Bagian Keuangan')->value('telegram_id');
+        $chat_ipsrs = OrgStruct::where('name', 'IPSRS')->value('telegram_id');
+        $chatId = '-4136008848'; //grup notif perbaikan
+        $chatPPK = '-4287618762';
+
+        $send_chat = [];
+        if($this->sper_status != 'completed'){
+            if ($this->sper_status == 'draft') {
+                $send_chat = array_filter([$chatId, $chat_ipsrs]);
+            }elseif ($this->sper_status == 'waiting.approval' && $approval1 > 0 && $module == 'usulan_pembelian-sperpat') { //verify tahap 1
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $penunjang]);
+                $pesan = $pesan.' '.' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Selanjutnya';
+            }elseif ($this->sper_status == 'waiting.approval' && $approval1_u > 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 1 umum
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $kepala_dep]);
+                $pesan = $pesan.' '.' dan Kepada Departemen Unit Mohon Untuk Melakukan Approval';
+            } elseif ($this->sper_status == 'waiting.approval' && $approval1_u == 0 && $approval2_u > 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 2 umum
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $penunjang]);
+                $pesan = $pesan.' '.' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Selanjutnya';
+            } elseif ($this->sper_status == 'waiting.approval' && $approval1 == 0 && $approval2 > 0 && $module == 'usulan_pembelian-sperpat') { //verify tahap 2
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_perencanaan]);
+                $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Selanjutnya';
+            } elseif ($this->sper_status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u > 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 2 umum
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_perencanaan]);
+                $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Selanjutnya';
+            } elseif ($this->sper_status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u == 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 2 umum
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_direksi]);
+                $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Approval Selanjutnya';
+            } elseif ($this->sper_status == 'waiting.approval' && $approval1 == 0 && $approval2 == 0 && $module == 'usulan_pembelian-sperpat') { //verify tahap 2
+                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_direksi]);
+                $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Approval Selanjutnya';
+            }elseif($this->sper_status == 'rejected' && $module == 'usulan_pembelian-sperpat-umum' || $this->sper_status == 'rejected' && $module == 'usulan_pembelian-sperpat'){ //rejected ipsrs
+                $send_chat = array_filter([$chatId, $chat_ipsrs]);
+            } else {
+                $send_chat = array_filter([$chatId,$chat_ipsrs]);
+            }
+        }else{
+            $module = 'trans-sperpat';
+            $approval1 = $this->whereHas('approvals', function ($q) use ($module) {
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('order',1);
+            })->count();
+    
+            $approval2 = $this->whereHas('approvals', function ($q) use ($module) {
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('order',2);
+            })->count();
+
+            // dd($this->status,$approval1, $approval2,$module);
+            if ($this->status == 'draft') {
+                $send_chat = array_filter([$chatPPK, $chat_ipsrs]);
+            } elseif ($this->status == 'waiting.approval' && $approval1 > 0 &&  $module == 'trans-sperpat' ) { //verify tahap 1
+                $send_chat = array_filter([$chatPPK, $chat_ipsrs, $chat_keuangan]);
+                $pesan = $pesan.' '.' dan Kepada Bagian Keuangan Mohon Untuk Melakukan Verifikasi';
+            } elseif ($this->status == 'waiting.approval' && $approval2 > 0 &&  $module == 'trans-sperpat' ) { //verify tahap 2
+                $send_chat = array_filter([$chatPPK, $chat_ipsrs, $chat_direksi]);
+                $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Verifikasi Selanjutnya';
+            }elseif($this->status == 'rejected' &&  $module == 'trans-sperpat' ){ //rejected ipsrs
+                $send_chat = array_filter([$chatPPK, $chat_ipsrs]);
+            } else {
+                $send_chat = array_filter([$chatPPK,$chat_ipsrs]);
+            }
+        }
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
     }
 
     public function checkAction($action, $perms, $record = null)

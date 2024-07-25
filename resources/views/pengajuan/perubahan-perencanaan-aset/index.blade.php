@@ -6,9 +6,18 @@
             <input type="text" class="form-control filter-control" data-post="code" placeholder="{{ __('No Surat') }}">
         </div>
         <div class="col-12 col-sm-6 col-xl-3 pb-2 mr-n6">
-            <select class="form-control filter-control base-plugin--select2-ajax" name="struct_id" data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
+            @if($module != 'perubahan-usulan-umum')
+                <select class="form-control filter-control base-plugin--select2-ajax" name="struct_id" data-url="{{ route('ajax.selectPenunjang', 'object_aset') }}"
+                    data-placeholder="{{ __('Unit Kerja') }}" data-post="struct_id">
+                </select>
+            @else
+                <select class="form-control filter-control base-plugin--select2-ajax" name="struct_id" data-url="{{ route('ajax.selectUmum', 'object_aset') }}"
+                    data-placeholder="{{ __('Unit Kerja') }}" data-post="struct_id">
+                </select>
+            @endif
+            {{-- <select class="form-control filter-control base-plugin--select2-ajax" name="struct_id" data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
                 data-placeholder="{{ __('Unit Kerja') }}" data-post="struct_id">
-            </select>
+            </select> --}}
         </div>
         <div class="col-12 col-sm-6 col-xl-2 pb-2 mr-n6">
             <select class="form-control base-plugin--select2-ajax filter-control"
@@ -38,22 +47,35 @@
 			</select>
 		</div>
     </div>
-    <div class="alert alert-custom alert-light-primary fade show py-3" style="left:-30pt;" role="alert">
-        <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
-        <div class="alert-text text-primary">
-            <div class="text-bold">{{ __('Informasi') }}:</div>
-            <div class="mb-10px" style="white-space: pre-wrap;">Segera Lengkapi Spesifikasi Usulan Aset Yang Baru Untuk Dilakukan Pembelian Aset Oleh PPK <br/>Perubahan Usulan Aset Dapat Dilakukan, Hanya Pada Usulan Aset Yang Sudah Disetujui Pada Proses Pengajuan Perencaan Aset
+
+    @if($module != 'perubahan-usulan-umum')
+        <div class="alert alert-custom alert-light-primary fade show py-3" style="left:-30pt;" role="alert">
+            <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+            <div class="alert-text text-primary">
+                <div class="text-bold">{{ __('Informasi') }}:</div>
+                <div class="mb-10px" style="white-space: pre-wrap;">Perubahan Usulan Hanya Dapat Dilakukan Oleh PPK, Karena Spesifikasi Usulan Aset Yang Diajukan Tidak Ada/ Tidak Lengkap / Tidak Tersedia Pada vendor, Silahkan Masing Masing Unit Penunjang Untuk Melengkapi Spesifikasi Aset Yang Baru
+                </div>
             </div>
         </div>
-    </div>
+    @else
+        <div class="alert alert-custom alert-light-primary fade show py-3" style="left:-30pt;" role="alert">
+            <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+            <div class="alert-text text-primary">
+                <div class="text-bold">{{ __('Informasi') }}:</div>
+                <div class="mb-10px" style="white-space: pre-wrap;">Perubahan Usulan Hanya Dapat Dilakukan Oleh PPK, Karena Spesifikasi Usulan Aset Yang Diajukan Tidak Ada/ Tidak Lengkap / Tidak Tersedia Pada vendor, Silahkan Masing Masing Unit Umum Untuk Melengkapi Spesifikasi Aset Yang Baru
+                </div>
+            </div>
+        </div>
+    @endif
+
 @endsection
 
 @section('buttons')
-    @if(auth()->user()->roles[0]->name == 'PPK')
+    {{-- @if(collect(auth()->user()->roles)->contains('name', 'PPK')) --}}
         @if (auth()->user()->checkPerms($perms.'.create'))
             @include('layouts.forms.btnAdd')
         @endif
-    @endif
+    {{-- @endif --}}
 @endsection
 
 @section('buttons')

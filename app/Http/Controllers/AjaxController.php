@@ -653,6 +653,30 @@ class AjaxController extends Controller
         $items = Perencanaan::where('status', 'completed')
         ->whereHas('details', function ($q) {
             $q->where('status', 'waiting purchase');
+        })->whereHas('struct', function($qq){
+            $qq->where('parent_id',3)->orWhere('id',3);
+        })
+        ->keywordBy('code')
+        ->get();
+
+        $results = [];
+
+        foreach ($items as $item) {
+            $results[] = [
+                'id' => $item->id,
+                'text' => $item->code, 
+                // 'text' => "Aset".' : '.$item->asetd->name.', '.'Spesifikasi'.' : '.$item->desc_spesification.', '.'Jumlah'.' : '.$item->qty_agree.', '.'Departemen'.' : '.$item->struct->name,
+            ];
+        }
+        return response()->json(compact('results'));
+    
+    }
+
+    public function selectCodePerencanaanUmum(Request $request){
+        $items = Perencanaan::where('status', 'completed')->whereHas('details', function ($q) {
+            $q->where('status', 'waiting purchase');
+        })->whereHas('struct', function($qq){
+            $qq->where('parent_id','<>',3)->where('id','<>',3);
         })
         ->keywordBy('code')
         ->get();
@@ -781,8 +805,22 @@ class AjaxController extends Controller
 
     public function selectPerbaikan()
     {
-        $items = Perbaikan::where('status','approved')->where('repair_results','BELUM')->where('is_disposisi','yes');
-        $items = $items->paginate();
+        $itemsQuery = Perbaikan::where('status', 'approved')
+            ->where('repair_results', 'BELUM')
+            ->where('is_disposisi', 'yes')->where('action_repair',null);
+
+        // Ambil semua ID dari query pertama
+        $itemsIds = $itemsQuery->pluck('id')->toArray();
+        $flags = Perbaikan::whereHas('sper', function ($query) use ($itemsIds) {
+            $query->whereIn('perbaikan_id', $itemsIds);
+        });
+        $flags = $flags->pluck('id')->toArray();
+
+        $flags = Perbaikan::whereNotIn('id',$flags)->where('action_repair',null);
+
+        // Lakukan paginasi pada query pertama
+        $items = $flags->paginate();
+
         return $this->responseSelect2($items, 'code', 'id');
     }
 
@@ -1082,12 +1120,109 @@ class AjaxController extends Controller
         return response()->json(compact('results', 'more'));
     }
 
+    public function selectUmum(Request $request)
+    {
+        $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name')->where('parent_id','<>',19)->where('parent_id','<>',3)->where('id','<>',3)
+        ->where('id','<>',19)->whereIn('level', ['bod', 'department','subdepartment']);
+        $items = $items->when(
+            $not = $request->not,
+            function ($q) use ($not) {
+                $q->where('id', '!=', $not);
+            }
+        )->get();
+        $results = [];
+        $more = false;
+
+        $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
+        $i = 0;
+        
+        foreach ($levels as $level) {
+            if ($items->where('level', $level)->count()) {
+                foreach ($items->where('level', $level) as $item) {
+                    if($item->parent_id != 3  || $item->id != 3){
+                        $results[$i]['text'] = strtoupper($item->show_level);
+                        $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                    }
+                }
+                $i++;
+            }
+        }
+
+        // $departemenList = OrgStruct::where('id', '<>', 3)->where('level', 'department')->where('name','<>','Bidang Pengelolaan Aset Daerah')->get();
+        // $direksi = OrgStruct::where('id', 2)->where('level', 'bod')->first();
+
+        // // Memasukkan setiap departemen ke dalam array $results
+        // foreach ($departemenList as $departemen) {
+        //     array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+        // }
+        // array_unshift($results, ['id' => $direksi->id, 'text' => $direksi->name]);
+
+        //array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+        return response()->json(compact('results', 'more'));
+    }
+
+    public function selectPenunjang(Request $request)
+    {
+        $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name')->where('parent_id','<>',19)->where('parent_id',3)->orWhere('id',3)->where('id','<>',2)
+        ->where('id','<>',19)->whereIn('level', ['bod', 'department','subdepartment']);
+        //$items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name')->where('parent_id','<>',19)->where('parent_id',3)->whereIn('level', ['subdepartment']);
+        $items = $items->when(
+            $not = $request->not,
+            function ($q) use ($not) {
+                $q->where('id', '!=', $not);
+            }
+        )->get();
+        
+        $results = [];
+        $more = false;
+
+        $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
+        $i = 0;
+        
+        foreach ($levels as $level) {
+            if ($items->where('level', $level)->count()) {
+                foreach ($items->where('level', $level) as $item) {
+                    // if($item->parent_id == 3 ){
+                        $results[$i]['text'] = strtoupper($item->show_level);
+                        $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                    // }
+                }
+                $i++;
+            }
+        }
+
+        // $departemen = OrgStruct::where('id', 3)->where('level', 'department')->where('name','<>','Bidang Pengelolaan Aset Daerah')->first();
+
+        
+        // array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+        
+
+        //array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+        return response()->json(compact('results', 'more'));
+    }
+
+
+
+
     public function selectStruct($search, Request $request)
     {
-        $imKepalaDepartemen =$request->input('departemen_id');
-        if($imKepalaDepartemen){
+        $imKepalaDepartemen = $request->input('departemen_id');
+        // dd($request->input('departemen_id'));
+        if($imKepalaDepartemen != 'u' && $imKepalaDepartemen != 'p' && $imKepalaDepartemen != null){
             $search = 'parent_subsection';
-        }   
+        } 
+
+        $penunjang = $request->input('departemen_id');
+        if($penunjang == 'p'){
+            $search = 'penunjang';
+        } 
+
+        $umum = $request->input('departemen_id');
+        if($umum == 'u'){
+            $search = 'umum';
+        } 
+
+        // dd($request->input('find_umum'));
 
         $items = OrgStruct::keywordBy('name')->orderBy('level')->orderBy('name');
         switch ($search) {
@@ -1099,6 +1234,12 @@ class AjaxController extends Controller
                 break;
             case 'object_aset':
                 $items = $items->whereIn('level', ['department', 'subdepartment', 'subsection'])->where('parent_id','<>',19);
+                break;
+            case 'penunjang':
+                $items = $items->whereIn('level', ['subdepartment'])->where('parent_id','<>',19);
+                break;
+            case 'umum':
+                $items = $items->whereIn('level', ['subdepartment'])->where('parent_id','<>',19);
                 break;
             case 'parent_bod':
                 $items = $items->whereIn('level', ['root']);
@@ -1139,12 +1280,12 @@ class AjaxController extends Controller
         $levels = ['root','bod', 'department', 'subdepartment', 'subsection'];
         $i = 0;
         
-        if($imKepalaDepartemen){
+        if($imKepalaDepartemen != 'u' && $imKepalaDepartemen != 'p' && $imKepalaDepartemen != null){
             foreach ($levels as $level) {
                 if ($items->where('level', $level)->count()) {
                     foreach ($items->where('level', $level) as $item) {
                         if($item->parent_id == $request->input('departemen_id') ){
-                           // $results[$i]['text'] = strtoupper($item->show_level);
+                            $results[$i]['text'] = strtoupper($item->show_level);
                             $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
                         }
                     }
@@ -1153,7 +1294,41 @@ class AjaxController extends Controller
             }
             $departemen  = OrgStruct::where('id',$imKepalaDepartemen)->first();
             array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
-           // $results[] = ['id' => $departemen->id, 'text' => $departemen->name];
+        }elseif($penunjang == 'p'){
+            foreach ($levels as $level) {
+                if ($items->where('level', $level)->count()) {
+                    foreach ($items->where('level', $level) as $item) {
+                        if($item->parent_id == 3 ){
+                            $results[$i]['text'] = strtoupper($item->show_level);
+                            $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                        }
+                    }
+                    $i++;
+                }
+            }
+            $departemen  = OrgStruct::where('id',3)->where('level','department')->first();
+            array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+
+        }elseif($umum == 'u'){
+            foreach ($levels as $level) {
+                if ($items->where('level', $level)->count()) {
+                    foreach ($items->where('level', $level) as $item) {
+                        if($item->parent_id != 3 ){
+                            $results[$i]['text'] = strtoupper($item->show_level);
+                            $results[$i]['children'][] = ['id' => $item->id, 'text' => $item->name];
+                        }
+                    }
+                    $i++;
+                }
+            }
+
+            $departemenList = OrgStruct::where('id', '<>', 3)->where('level', 'department')->where('name','<>','Bidang Pengelolaan Aset Daerah')->get();
+
+            // Memasukkan setiap departemen ke dalam array $results
+            foreach ($departemenList as $departemen) {
+                array_unshift($results, ['id' => $departemen->id, 'text' => $departemen->name]);
+            }
+
         }else{
             foreach ($levels as $level) {
                 if ($items->where('level', $level)->count()) {

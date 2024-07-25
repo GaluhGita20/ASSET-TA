@@ -67,6 +67,11 @@
                                     </div>
                                     <div class="col-10 parent-group">
                                         <textarea class="form-control" name="spesifikasi" id="spesifikasi" value ="{{$record->detailUsulan->desc_spesification}}" disabled>{{$record->detailUsulan->desc_spesification}}</textarea>
+                                        <span style="font-size: 11px">{{ __('*Contoh Bahan: Kaca
+                                            Ukuran: 100 Ml
+                                            Panjang: 20 cm
+                                            Lebar : 20 cm
+                                            Frekuensi: 100Hz') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +142,7 @@
                                         <label class="col-form-label">{{ __('Catatan Perubahan') }}</label>
                                     </div>
                                     <div class="col-10 parent-group">
-                                        <textarea class="form-control" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" value="{{$record->note}}" disabled>{{$record->note}}</textarea>
+                                        <textarea class="base-plugin--summernote" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" value="{{$record->note}}" disabled>{{$record->note}}</textarea>
                                     </div>
                                 </div>
                             </div>

@@ -19,6 +19,15 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="alert alert-custom alert-light-primary fade show py-3"  role="alert">
+                        <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+                        <div class="alert-text text-primary">
+                            <div class="text-bold">{{ __('Informasi') }}:</div>
+                            <div class="mb-10px" style="white-space: pre-wrap; text-align:justify;">Nilai Buku Aset Ini yaitu Rp {{ number_format($data['nilai'], 2) }} dengan Umur Aset Sudah Mencapai {{ $data['umur_tahun'] }} tahun {{ $data['umur_bulan'] }} bulan ,  @if($data['MAUT_score']['utility_score'] > 0.55) Berdasarkan Analisis Nilai MAUT , Maka Sistem Menyarankan Untuk Melakukan Penghapusan Aset dari Pada Melakukan Perbaikan Aset Karena Nilai MAUT yaitu sebesar {{number_format($data['MAUT_score']['utility_score'], 2)}} @else dan Berdasarkan Perhitungan Nilai MAUT Aset yaitu memiliki Skor {{number_format($data['MAUT_score']['utility_score'], 2)}} , jadi belum layak untuk dihapus dari sistem @endif .
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group row">

@@ -28,6 +28,7 @@ class BodRequest extends FormRequest
                 }),
             ],
         ];
+
                 // 'code' =>[
                 //     'required',
                 //     'unique:ref_org_structs,code,'.$id.',id,level,bod'
@@ -42,6 +43,7 @@ class BodRequest extends FormRequest
             'parent_id.required' => 'Nama Induk Perusahaan Harus Diisi',
             'parent_id.unique' => 'Nama Departemen Ini Sudah Tersedia',
             'name.required' => 'Nama Departemen Diperlukan',
+            //'telegram_id.required' => 'Kode ID grup telegram harus diisi' 
         ];
     }
 }

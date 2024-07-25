@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Nama Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Nama Aset') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     <input type="hidden" class="form-control" name="kib_id" value="{{ $record->id }}">
                                     <input type="text" class="form-control" name="names" value="{{ $record->usulans->asetd->name }}" disabled>
@@ -32,7 +32,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Merek') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Merek') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     @if(!empty($record->merek_type_item))
                                     <input type="text" name="merek" class="form-control" value="{{ $record->merek_type_item }}" disabled>
@@ -45,7 +45,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Nomor Seri') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Nomor Seri') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     @if(!empty($record->no_factory_item))
                                     <input type="text" name="no_seri" class="form-control" value="{{ $record->no_factory_item }}" disabled>
@@ -67,7 +67,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Tahun Perolehan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Tahun Perolehan') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     <input type="text" class="form-control" value="{{ $record->usulans->trans->receipt_date->format('Y') }}" disabled>
                                 </div>
@@ -86,7 +86,7 @@
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
-                                    <label class="col-form-label">{{ __('Nilai Buku') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <label class="col-form-label">{{ __('Nilai Buku') }}</label>
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
@@ -103,7 +103,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Unit Lokasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Unit Lokasi Aset') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     <select class="form-control"  name="departemen_id">
                                         @if(!empty($record->usulans->perencanaan))
@@ -118,7 +118,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Ruang Lokasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Ruang Lokasi Aset') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     @if(!empty($record->locations->name))
                                         <input type="text" class="form-control" value="{{ $record->locations->name }}" disabled>
@@ -131,7 +131,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Tanggal Pengajuan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                <label class="col-sm-4 col-form-label">{{ __('Tanggal Pengajuan') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     <input type="text" class="form-control" name="dates" value = "{{ now()->format('d/m/Y') }}" data-date-end-date="{{ now() }}" disabled>
                                 </div>

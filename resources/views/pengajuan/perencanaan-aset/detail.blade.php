@@ -126,10 +126,27 @@
                                                 @foreach ($flows as $j => $flow)
                                                     <span class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
                                                         data-toggle="tooltip"
-                                                        @if($flow->role->name == 'Umum')
-                                                            title="{{ $flow->show_type }}">Departemen
-                                                        @else 
-                                                            title="{{ $flow->show_type }}">{{ $flow->role->name }}
+
+                                                        @if($flow->menu_id == 15)
+                                                            @if($flow->role->name == 'Umum' && $flow->position->id == 4)
+                                                                title="{{ $flow->show_type }}">Departemen Penunjang
+                                                            @elseif($flow->role->name == 'Umum' && $flow->position->id  == 3)
+                                                                title="{{ $flow->show_type }}">Departemen Unit
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
+                                                        @elseif($flow->menu_id == 1)
+                                                            @if($flow->role->name == 'Umum')
+                                                                title="{{ $flow->show_type }}">Departemen Penunjang
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
+                                                        @else
+                                                            @if($flow->role->name == 'Umum')
+                                                                title="{{ $flow->show_type }}">Departemen Unit
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
                                                         @endif
                                                     </span>
                                                 

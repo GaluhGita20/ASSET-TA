@@ -16,6 +16,7 @@ use App\Http\Requests\Inventaris\KibFRequest;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Inventaris\Aset;
 use App\Models\Pengajuan\PerencanaanDetail;
+use App\Models\Pengajuan\Perbaikan;
 use App\Models\Transaksi\PembelianTransaksi;
 use App\Models\Master\Org\Position;
 use App\Support\Base;
@@ -52,7 +53,11 @@ class InventarisController extends Controller
     public function grid(Request $request)
     {
         $user = auth()->user();
+        // $perbaikan = Perbaikan::where('repair_results','SELESAI')->where('action_repair','<>',null)->value('kib_id');
+        // $aset = Aset::where('id',$perbaikan)->where('type','KIB F')->value('usulan_id');
+        
         $records = PerencanaanDetail::where('status','waiting register')->filters()->dtGet();
+
         return DataTables::of($records)
             ->addColumn('num', function ($detail) {
                 return request()->start;
@@ -75,7 +80,16 @@ class InventarisController extends Controller
                 $flag= Aset::where('usulan_id',$detail->id)->count();
                 if($flag > 0){
                     $sisa = abs($flag - $detail->qty_agree);
-                    return $sisa;
+                    // $kf = Aset::where('usulan_id',$detail->id)->where('type','KIB F')->where('status','notactive')->count();
+                    // if($kf == null){
+                    //     $kf = 0;
+                    // }else{
+                    //     if($detail->status =='completed'){
+                    //         return $kf;
+                    //     }
+                    // }
+
+                    return $sisa ;
                 }else{
                     return $detail->qty_agree ?  $detail->qty_agree  : '';
                 }

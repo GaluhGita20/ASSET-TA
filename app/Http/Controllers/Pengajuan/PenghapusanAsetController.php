@@ -7,6 +7,7 @@ use App\Http\Requests\Pengajuan\PenghapusanRequest;
 use App\Models\Pengajuan\Penghapusan;
 use App\Models\Pengajuan\Pemutihans;
 use App\Models\Globals\Approval;
+use App\Models\Inventaris\Aset;
 use App\Models\Master\Org\Position;
 use App\Support\Base;
 use Illuminate\Http\Request;
@@ -177,12 +178,45 @@ class PenghapusanAsetController extends Controller
     public function edit(Penghapusan $record)
     {
         $type ='edit';
-        return $this->render($this->views . '.show', compact('record','type'));
+
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+
+        return $this->render($this->views . '.show', compact('record','type','data'));
     }
 
     public function detail(Penghapusan $record)
     {
-        return $this->render($this->views . '.detail', compact('record'));
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+
+        return $this->render($this->views . '.detail', compact('record','data'));
     }
 
     public function update(Request $request, Penghapusan $record)
@@ -209,7 +243,23 @@ class PenghapusanAsetController extends Controller
 
     public function approval(Penghapusan $record)
     {
-        return $this->render($this->views . '.show', compact('record'));
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+
+        return $this->render($this->views . '.show', compact('record','data'));
     }
 
 
@@ -237,7 +287,23 @@ class PenghapusanAsetController extends Controller
 
     public function show(Penghapusan $record)
     {
-        return $this->render($this->views . '.show', compact('record'));
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+
+        return $this->render($this->views . '.show', compact('record','data'));
     }
 
     public function tracking(Penghapusan $record)

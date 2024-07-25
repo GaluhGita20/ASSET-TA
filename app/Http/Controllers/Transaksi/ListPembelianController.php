@@ -96,6 +96,10 @@ class ListPembelianController extends Controller
                 //return $detail->HPS_total_cost ? $detail->HPS_total_cost : '';
                 return number_format($detail->HPS_total_agree, 0, ',', ',');
             })
+            ->addColumn('source_fund', function ($detail) {
+                //return $detail->HPS_total_cost ? $detail->HPS_total_cost : '';
+                return $detail->danad->name;
+            })
             ->editColumn(
                 'checkbox',
                 function ($detail) {
@@ -162,6 +166,7 @@ class ListPembelianController extends Controller
                         // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
                         $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
                         $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                        $this->makeColumn('name:source_fund|label:Sumber Dana|className:text-center|width:200px'),
                         $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
                         // $this->makeColumn('name:actionDetail|label:action|className:text-center|width:50px'),
                     ],
@@ -181,6 +186,7 @@ class ListPembelianController extends Controller
                         // $this->makeColumn('name:jenis_usulan|label:Jenis Usulan (Unit)|className:text-center|width:200px'),
                         $this->makeColumn('name:HPS_total_agree|label:Total Harga (Rupiah)|className:text-center|width:200px'),
                         $this->makeColumn('name:struct|label:Unit Pengusul|className:text-center|width:200px'),
+                        $this->makeColumn('name:source_fund|label:Sumber Dana|className:text-center|width:200px'),
                         // $this->makeColumn('name:checkbox|label:check|className:text-center|width:50px'),
                         // $this->makeColumn('name:actionDetail|label:action|className:text-center|width:50px'),
                     ],
@@ -216,6 +222,7 @@ class ListPembelianController extends Controller
         }else{{ 
             //dd($request->all());
             $record = new PerencanaanDetail;
+            
             // Menghapus semua data di dalam sesi dengan nama 'nama_sesi'
             request()->session()->forget('usulan_id');
     

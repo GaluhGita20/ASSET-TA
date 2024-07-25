@@ -1,11 +1,13 @@
 @extends('layouts.pageSubmit')
+@section('action', rut($routes . '.reject', $record->id))
 
-{{-- @section('action', route('pengajuan.perbaikan-aset.approve',$record->id)) --}}
+{{-- @extends('layouts.pageSubmit')
+
+@section('action', route($routes . '.update', $record->id)) --}}
 
 @section('card-body')
 @section('page-content')
     
-    @csrf
     <!-- header -->
     <div class="row mb-3">
         <div class="col-sm-12">
@@ -17,8 +19,25 @@
                         @include('layouts.forms.btnBackTop')
                     </div>
                 </div>
+                
 
                 <div class="card-body">
+                    @include('globals.notes')
+                    @csrf
+
+                    {{--  --}}
+                    <div class="alert alert-custom alert-light-primary fade show py-3"  role="alert">
+                        <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
+                        <div class="alert-text text-primary">
+                            <div class="text-bold">{{ __('Informasi') }}:</div>
+                            <div class="mb-10px" style="white-space: pre-wrap; text-align:justify;">Aset Ini Sudah Mengalami Perbaika Sebanyak {{ count($data['perbaikan']) }} kali dan Nilai Aset Saat Ini Rp {{ number_format($data['nilai'], 2) }} dengan Umur Aset Sudah Mencapai {{ $data['umur_tahun'] }} tahun {{ $data['umur_bulan'] }} bulan , jika Biaya Perbaikan Aset Lebih dari Rp {{ number_format($data['nilai_rekomen_50'], 2) }} , Sistem Merekomendasikan Untuk Melakukan Penghapusan Aset daripada Melakukan Perbaikan Aset, atau Jika Biaya Perbaikan Melebihi Nilai Residu Aset Yaitu Rp {{ number_format($data['nilai_residu'], 2) }}, Maka Sistem Merekomendasikan Untuk Melakukan Penghapusan Aset daripada Melakukan Perbaikan Aset @if($data['MAUT_score']['utility_score'] > 0.55) dan Berdasarkan Analisis Nilai MAUT , Maka Sistem Menyarankan Untuk Melakukan Penghapusan Aset dari Pada Melakukan Perbaikan Aset Karena Nilai MAUT yaitu sebesar {{number_format($data['MAUT_score']['utility_score'], 2)}} @else dan Berdasarkan Analisis Nilai MAUT , Maka Sistem Meyarankan Untuk Melakukan Perbaikan Aset Karena Nilai MAUT yang Masih Rendah Yaitu {{number_format($data['MAUT_score']['utility_score'], 2)}} @endif .
+                            </div>
+                            
+                        </div>
+                    </div>
+                    {{--  --}}
+
+                    {{-- perbaikan , nilai , umur, nilai_rekomen, nilai residu--}}
 
                     <div class="row">
                         <div class="col-sm-6">
@@ -201,10 +220,11 @@
         </div>
     </div>
 
-
+    @if($record->status=='approved')
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
+
                 <div class="col-sm-12">
                     <div class="form-group row mt-2">
                         <label class="col-sm-2 col-form-label">{{ __('Tanggal Pemanggilan') }}</label>
@@ -215,14 +235,14 @@
                                 @if(auth()->user()->hasRole('Sarpras') && request()->route()->getName() == $routes.'.approval')
                                     <input name="repair_date" class="form-control filter-control base-plugin--datepicker">
                                 @else
-                                    <input name="repair_date" value="-" class="form-control" disabled>
+                                    <input name="repair_date" value="-" class="form-control">
                                 @endif
                             @endif
                         </div>
                     </div>
                 </div>
 
-                @if($record->status=='approved')
+                @if($record->status=='approved' && $record->check_up_result != null)
                 <div class="col-sm-12">
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">{{ __('Tindakan Perbaikan') }}</label>
@@ -245,38 +265,6 @@
                     </div>
                 </div>
 
-                <!-- <div class="col-sm-12">
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">{{ __('Bukti Perbaikan') }}</label>
-                        <div class="col-10 parent-group">
-                            <div class="form-text text-muted">*Maksimal 20MB</div>
-                                @foreach ($record->files()->where('flag', 'uploads')->get() as $file)
-                                <div class="progress-container w-100" data-uid="{{ $file->id }}">
-                                    <div class="alert alert-custom alert-light fade show py-2 px-3 mb-0 mt-2 success-uploaded" role="alert">
-                                        <div class="alert-icon">
-                                            <i class="{{ $file->file_icon }}"></i>
-                                        </div>
-                                        <div class="alert-text text-left">
-                                            <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
-                                            <div>Uploaded File:</div>
-                                            <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
-                                                {{ $file->file_name }}
-                                            </a>
-                                        </div>
-                                        <div class="alert-close">
-                                            <button type="button" class="close base-form--remove-temp-files" data-toggle="tooltip"
-                                                data-original-title="Remove">
-                                                <span aria-hidden="true">
-                                                    <i class="ki ki-close"></i>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                        </div>
-                    </div>
-                </div> -->
 
                 <div class="col-sm-12">
                     <div class="form-group row">  
@@ -296,30 +284,83 @@
             </div>
         </div>
     </div>
+    @endif
                         
     <!-- end of header -->
+    
+    @if (request()->route()->getName() == $routes.'.verify')
+    <div class="row">
+        <div class="col-md-6" style="margin-top:20px!important;">
+            <div class="card card-custom" style="height:100%;">
+                <div class="card-header">
+                    <h4 class="card-title">Alur Persetujuan</h4>
+                </div>
+                <div class="card-body" style="padding: 10px 1.75rem 10px 1.75rem;display:grid;">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="d-flex flex-column mr-5">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    @php
+                                        $module = 'perbaikan-aset';
+                                        $menu = \App\Models\Globals\Menu::where('module', $module)->first();
+                                    @endphp
+
+                                    @if ($menu->flows()->get()->groupBy('order')->count() == 0)
+                                        <span class="label label-light-info font-weight-bold label-inline mt-3"
+                                            data-toggle="tooltip">Data tidak tersedia.</span>
+                                    @else
+                                        @foreach ($orders = $menu->flows()->get()->groupBy('order') as $i => $flows)
+                                            @foreach ($flows as $j => $flow)
+                                                <span class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
+                                                    data-toggle="tooltip"
+                                                    @if($flow->role->name == 'Umum')
+                                                        title="{{ $flow->show_type }}">Departemen
+                                                    @else 
+                                                        title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                    @endif
+                                                </span>
+                                                @if (!($i === $orders->keys()->last() && $j === $flows->keys()->last()))
+                                                    <i class="fas fa-angle-double-right text-muted mx-2"></i>
+                                                @endif
+                                            @endforeach
+                                        @endforeach
+                                    @endif
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- card 3 -->
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
                 @if (request()->route()->getName() == $routes.'.approval')
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between">
-                        @if(auth()->user()->hasRole('Sarpras'))
-                        {{-- @if ($record->checkAction('approval', $perms)) --}}
-                            @include('layouts.forms.btnBack')
-                            <div class="btn-group dropdown">
-                                    <button type="button"
-                                        class="btn btn-primary align-items-center base-form--approveByUrl"
-                                        data-url="{{ $urlApprove ?? (!empty($record) && \Route::has($routes.'.approve') ? rut($routes.'.approve', $record->id) : '') }}">
-                                        <i class="mr-3 fa fa-check text-primary text-white"></i> {{ __('Approve') }}
-                                    </button>
-                                {{-- </div> --}}
-                            </div>
-                        @endif
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            @if(auth()->user()->hasRole('Sarpras'))
+                            {{-- @if ($record->checkAction('approval', $perms)) --}}
+                                @include('layouts.forms.btnBack')
+                                @include('layouts.forms.btnDropdownApproval3')
+                                        
+                            @elseif(auth()->user()->position->name == 'Kepala Bidang Pelayanan Medik dan Keperawatan' || auth()->user()->position->name == 'Kepala Bidang Penunjang Medik dan Non Medik')
+                                @include('layouts.forms.btnBack')
+                                <div class="d-flex flex-column mr-2 mt-2">
+                                    <p class="text-dark-50">
+                                        Pastikan Data Usulan Perbaikan Sudah disampaikan dengan lengkap
+                                    </p>
+                                </div>
+                                @include('layouts.forms.btnDropdownApproval2')
+                                
+                            @endif
+                            @include('layouts.forms.modalReject')
+                        </div>
                     </div>
-                </div>
                 @endif
             </div>
         </div>
@@ -430,3 +471,38 @@
     @endif
 @show
 @endsection
+
+
+
+                {{-- <!-- <div class="col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label">{{ __('Bukti Perbaikan') }}</label>
+                        <div class="col-10 parent-group">
+                            <div class="form-text text-muted">*Maksimal 20MB</div>
+                                @foreach ($record->files()->where('flag', 'uploads')->get() as $file)
+                                <div class="progress-container w-100" data-uid="{{ $file->id }}">
+                                    <div class="alert alert-custom alert-light fade show py-2 px-3 mb-0 mt-2 success-uploaded" role="alert">
+                                        <div class="alert-icon">
+                                            <i class="{{ $file->file_icon }}"></i>
+                                        </div>
+                                        <div class="alert-text text-left">
+                                            <input type="hidden" name="uploads[files_ids][]" value="{{ $file->id }}">
+                                            <div>Uploaded File:</div>
+                                            <a href="{{ $file->file_url }}" target="_blank" class="text-primary">
+                                                {{ $file->file_name }}
+                                            </a>
+                                        </div>
+                                        <div class="alert-close">
+                                            <button type="button" class="close base-form--remove-temp-files" data-toggle="tooltip"
+                                                data-original-title="Remove">
+                                                <span aria-hidden="true">
+                                                    <i class="ki ki-close"></i>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                        </div>
+                    </div>
+                </div> --> --}}

@@ -21,6 +21,18 @@
                 <div class="card-body">
                     @include('globals.notes')
                     @csrf
+                    @if(!empty($data))
+                        <div class="alert-text text-primary">
+                            <div class="text-bold">{{ __('Informasi') }}:</div>
+                            @if($data['umur_tahun'] <= 5)
+                                <div class="mb-10px" style="white-space: pre-wrap;">Aset Ini Sudah Mengalami Perbaikan Sebanyak {{ count($data['perbaikan']) }} kali dan Nilai Aset Saat Ini Rp {{number_format($data['nilai'], 2) }} Rupiah dengan Umur Aset Sudah Mencapai {{ $data['umur_tahun'] }} tahun {{ $data['umur_bulan'] }} bulan, dan Biaya Perbaikan Aset Sebesar Rp {{number_format($data['biaya_perbaikan'], 2) }} Rupiah @if($data['biaya_perbaikan'] > $data['nilai_rekomen_50']) dan Melebihi 50 % dari Nilai Aset Saat Ini, Maka Sistem Merekomendasikan Untuk Melakukan Penghapusan Aset @else Maka Sistem Merekomendasikan Untuk Melakukan Perbaikan Aset karena Biaya Perbaikan Yang Tidak Mencapai 50 % dari Harga Aset Saat Ini @endif
+                                </div>
+                            @else
+                                <div class="mb-10px" style="white-space: pre-wrap;">Aset Ini Sudah Mengalami Perbaikan Sebanyak {{ count($data['perbaikan']) }} kali dan Nilai Aset Saat Ini Rp {{number_format($data['nilai'], 2) }} Rupiah dengan Umur Aset Sudah Mencapai {{ $data['umur_tahun'] }} tahun {{ $data['umur_bulan'] }} bulan, dan Biaya Perbaikan Aset Sebesar Rp {{number_format($data['biaya_perbaikan'], 2) }} Rupiah @if($data['biaya_perbaikan'] > $data['nilai_rekomen_30']) dan Melebihi 50 % dari Nilai Aset Saat Ini, Maka Sistem Merekomendasikan Untuk Melakukan Penghapusan Aset @else Maka Sistem Merekomendasikan Untuk Melakukan Perbaikan Aset karena Biaya Perbaikan Yang Tidak Mencapai 30 % dari Harga Aset Saat Ini @endif
+                                </div>
+                            @endif
+                        </div>
+                    @endif
 
                     <div class="row">
                         <div class="col-sm-12">
@@ -66,6 +78,7 @@
                                         <option disabled value="">Jenis Perbaikan</option>
                                         <option value="sperpat" {{ $record->repair_type == 'sperpat' ? 'selected' : '' }}>Pembelian Sperpat</option>
                                         <option value="vendor" {{ $record->repair_type == 'vendor' ? 'selected' : '' }}>Sewa Vendor</option>
+                                        <option value="sperpat dan vendor" {{ $record->repair_type == 'sperpat dan vendor' ? 'selected' : '' }}>Pembelian Sperpat dan Jasa Vendor</option>
                                     </select>                                    
                                 </div>
                             </div>
@@ -94,21 +107,36 @@
                             </div>
                         </div>
 
-                        @if($record->repair_type == 'vendor')
+                        @if($record->repair_type == 'vendor' || $record->repair_type == 'sperpat dan vendor' )
                             <div class="col-sm-12">
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Sewa Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
-                                    <div class="col-sm-10 col-form-label">
-                                        <div class="input-group">
-                                            <input type="text" min=0 id="total_cost" name="total_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                                placeholder="{{ __('Biaya Sewa Vendor') }}" autofocus>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" >
-                                                    Rupiah
-                                                </span>
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Jasa Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    @if($record->total_cost_vendor != null)
+                                        <div class="col-sm-10 col-form-label">
+                                            <div class="input-group">
+                                                <input type="text" min=0 id="total_cost_vendor" name="total_cost_vendor" class="form-control base-plugin--inputmask_currency text-right"
+                                                    placeholder="{{ __('Biaya Sewa Vendor') }}" autofocus value="{{$record->total_cost_vendor}}">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text" >
+                                                        Rupiah
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    @else
+                                        <div class="col-sm-10 col-form-label">
+                                            <div class="input-group">
+                                                <input type="text" min=0 id="total_cost_vendor" name="total_cost_vendor" class="form-control base-plugin--inputmask_currency text-right"
+                                                    placeholder="{{ __('Biaya Sewa Vendor') }}" autofocus >
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text" >
+                                                        Rupiah
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
                                 </div>
                             </div>
                         @endif
@@ -120,7 +148,7 @@
     </div>
     <!-- end of header -->
 
-    @if($record->repair_type == 'sperpat')
+    @if($record->repair_type == 'sperpat' || $record->repair_type == 'sperpat dan vendor')
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">
@@ -184,7 +212,15 @@
                                 <div class="d-flex flex-column mr-5">
                                     <div class="d-flex align-items-center justify-content-center">
                                         @php
-                                            $module = 'usulan_pembelian-sperpat';
+                                            $dep =  \App\Models\Pengajuan\Perbaikan::where('id',$record->perbaikan_id)->value('departemen_id');
+                                            $parent = \App\Models\Master\Org\OrgStruct::where('id',$dep)->value('parent_id');
+
+                                            if($parent == 3 || $dep == 3){
+                                                $module = 'usulan_pembelian-sperpat';
+                                            }else{
+                                                $module = 'usulan_pembelian-sperpat-umum';
+                                            }
+                                            // $module = 'usulan_pembelian-sperpat';
                                             $menu = \App\Models\Globals\Menu::where('module', $module)->first();
                                         @endphp
 
@@ -198,9 +234,15 @@
                                                         data-toggle="tooltip"
                                                         @if($flow->role->name == 'Kepala Badan')
                                                             title="{{ $flow->show_type }}">Kepala BPKAD
-                                                        @else 
+                                                        @elseif($flow->order == 2 && $module == 'usulan_pembelian-sperpat-umum' || $flow->order == 1 && $module == 'usulan_pembelian-sperpat')
+                                                            title="{{ $flow->show_type }}">Departemen Penunjang
+                                                        @elseif($flow->order == 1 && $module == 'usulan_pembelian-sperpat-umum')
+                                                            title="{{ $flow->show_type }}">Departemen Umum
+                                                        @else
                                                             title="{{ $flow->show_type }}">{{ $flow->role->name }}
                                                         @endif
+
+                                                        
                                                     </span>
                                         
                                                     @if (!($i === $orders->keys()->last() && $j === $flows->keys()->last()))

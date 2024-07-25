@@ -186,17 +186,43 @@
             $menyetujui =  \App\Models\Master\Org\OrgStruct::where('id',$menyetujui_loc)->value('name');
             $loc = \App\Models\Master\Org\Position::where('location_id',$menyetujui_loc)->where('level','kepala')->value('id');
             $user_menyetujui = \App\Models\Auth\User::where('position_id',$loc)->value('name');
+
+            $kepala_unit = \App\Models\Auth\User::whereHas('position', function ($q) use ($record){
+                $q->where('location_id',$record->struct_id)->where('level','kepala');
+            })->value('name');
+
+            $kepala_unit_nip = \App\Models\Auth\User::whereHas('position', function ($q) use ($record){
+                $q->where('location_id',$record->struct_id)->where('level','kepala');
+            })->value('nip');
+
+            $kepala_dep = \App\Models\Auth\User::whereHas('position', function ($q){
+                $q->where('name','Kepala Direktur')->where('level','kepala');
+            })->value('name');
+
+            $kepala_dep_nip = \App\Models\Auth\User::whereHas('position', function ($q){
+                $q->where('name','Kepala Direktur')->where('level','kepala');
+            })->value('nip');
+
+            $perencanaan = \App\Models\Auth\User::whereHas('position', function ($q){
+                $q->where('name','Kepala Sub Bagian Program Perencanaan')->where('level','kepala');
+            })->value('name');
+
+            $perencanaan_nip = \App\Models\Auth\User::whereHas('position', function ($q){
+                $q->where('name','Kepala Sub Bagian Program Perencanaan')->where('level','kepala');
+            })->value('nip');
+
         @endphp
     
         <div id="ttd">
             <table>
                 <tr>
-                    <th style="text-align: center;">Mengetahui</th>
+                    <th style="text-align: center;">Menyetujui</th>
                     <th style="text-align: center;">Yang Mengusulkan</th>
                 </tr>
                 <tr>
-                    <td style="text-align: center;" rowspan="8">{{auth()->user()->position->name}}<br>dr. Ahmad Haerul Umam<br>NIP. 19911125202321001</td>
-                    <td style="text-align: center;" rowspan="8">{{$menyetujui}}<br>(Sri Adriani, Amd.Keb)<br>NIP. 19911125202321001</td>
+                    <td style="text-align: center;" rowspan="8">Kepala Sub Bagian Program Perencanaan<br>({{$perencanaan}})<br>NIP. {{$perencanaan_nip}}</td>
+                    <td style="text-align: center;" rowspan="8">Kepala Unit {{$record->struct->name}}<br>({{$kepala_unit}})<br>NIP. {{$kepala_unit_nip}}</td>
+                    {{-- <td style="text-align: center;" rowspan="8">{{$menyetujui}}<br>({{$kepala_unit}})<br>NIP. {{$kepala_unit_nip}}</td> --}}
                 </tr>
             </table>
         </div>
@@ -207,7 +233,7 @@
                     <th style="text-align: center;">Mengetahui</th>
                 </tr>
                 <tr>
-                    <td style="text-align: center;" rowspan="8">{{auth()->user()->position->name}}<br>dr. Ahmad Haerul Umam<br>NIP. 19911125202321001</td>
+                    <td style="text-align: center;" rowspan="8">Kepala Direktur<br>({{$kepala_dep}})<br>NIP. {{$kepala_dep_nip}}</td>
                 </tr>
             </table>
         </div>

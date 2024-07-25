@@ -18,6 +18,7 @@ class Position extends Model
         'level',
         'name',
         'code',
+        'telegram_user_id'
     ];
 
     /*******************************

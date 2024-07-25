@@ -14,12 +14,21 @@
                 </div>
 
                 <div class="col-10 parent-group">
-                    <select name="perencanaan_id" class="form-control base-plugin--select2-ajax perencanaan_id"
-                        data-url="{{ rut('ajax.selectCodePerencanaan') }}"
-                        data-url-origin="{{ rut('ajax.selectCodePerencanaan') }}"
-                        placeholder="{{ __('Pilih Salah Satu') }}" required>
-                        <option value="">{{ __('Pilih Nomor Surat Perencanaan') }}</option>
-                    </select>   
+                    @if($module == 'perubahan-usulan-umum')
+                        <select name="perencanaan_id" class="form-control base-plugin--select2-ajax perencanaan_id"
+                            data-url="{{ rut('ajax.selectCodePerencanaanUmum') }}"
+                            data-url-origin="{{ rut('ajax.selectCodePerencanaanUmum') }}"
+                            placeholder="{{ __('Pilih Salah Satu') }}" required>
+                            <option value="">{{ __('Pilih Nomor Surat Perencanaan') }}</option>
+                        </select>   
+                    @else
+                        <select name="perencanaan_id" class="form-control base-plugin--select2-ajax perencanaan_id"
+                            data-url="{{ rut('ajax.selectCodePerencanaan') }}"
+                            data-url-origin="{{ rut('ajax.selectCodePerencanaan') }}"
+                            placeholder="{{ __('Pilih Salah Satu') }}" required>
+                            <option value="">{{ __('Pilih Nomor Surat Perencanaan') }}</option>
+                        </select>   
+                    @endif
                 </div>
             </div>
 
@@ -45,6 +54,11 @@
                 </div>
                 <div class="col-10 parent-group">
                     <textarea class="form-control" name="spesifikasi" id="spesifikasi" placeholder="{{ __('Spesifikasi') }}" disabled></textarea>
+                    <span style="font-size: 11px">{{ __('*Contoh Bahan: Kaca
+                        Ukuran: 100 Ml
+                        Panjang: 20 cm
+                        Lebar : 20 cm
+                        Frekuensi: 100Hz') }}</span>
                 </div>
             </div>
 
@@ -93,7 +107,13 @@
                     <label class="col-form-label">{{ __('Catatan Perubahan') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                 </div>
                 <div class="col-10 parent-group">
-                    <textarea class="form-control" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" ></textarea>
+                    <textarea class="base-plugin--summernote" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" ></textarea>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-12 offset-md-4">
+                        <span style="font-size: 11px">{{ __('*Tambahkan Juga Spesifikasi Aset Yang Tersedia dan Harga Yang Tertera') }}</span>
+                    </div>
                 </div>
             </div>
         </div>

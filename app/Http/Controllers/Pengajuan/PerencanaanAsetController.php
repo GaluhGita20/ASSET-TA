@@ -38,7 +38,7 @@ class PerencanaanAsetController extends Controller
             'views' => $this->views,
             'perms' => $this->perms,
             'permission' => $this->perms . '.view',
-            'title' => 'Pengajuan Perencanaan',
+            'title' => 'Pengajuan Perencanaan Aset',
             'breadcrumb' => [
                 'Home' => route('home'),
                 // 'Pengajuan' => '#',
@@ -71,7 +71,9 @@ class PerencanaanAsetController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = Perencanaan::with('struct')
+        $records = Perencanaan::with('struct')->whereHas('struct', function ($q){
+            $q->whereIn('parent_id',[3])->orWhere('id',3);
+        })
             ->grid()->filters()
             ->dtGet();
 

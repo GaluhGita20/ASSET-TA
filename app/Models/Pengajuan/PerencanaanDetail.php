@@ -296,17 +296,23 @@ class PerencanaanDetail extends Model
         })->count();
 
         $aset = PerencanaanDetail::where('id',$idx[0])->first();
-        $filterAset = PerencanaanDetail::whereIn('id', $idx)
-            ->whereHas('asetd', function ($query) use($aset ) {
-                $query->where('id', $aset->ref_aset_id);
+
+        // $filterAset = PerencanaanDetail::whereIn('id', $idx)
+        //     ->whereHas('asetd', function ($query) use ($aset ) {
+        //         $query->where('id', $aset->ref_aset_id);
+        // })->count();
+
+        $filterDana = PerencanaanDetail::whereIn('id', $idx)
+            ->whereHas('danad', function ($query) use ($aset ) {
+                $query->where('id', $aset->source_fund_id);
         })->count();
 
         $message = 'none';
         if($filterTahun == 0){
             $message = 'Data Tahun Pengadaan Harus Tahun '.now()->year;
             return $message;
-        }elseif($filterAset != count($idx)){
-            $message = 'Silahkan Pilih Aset yang Sejenis';
+        }elseif($filterDana != count($idx)){
+            $message = 'Silahkan Pilih Aset dengan Sumber Pendanaan Yang Sama';
             return $message;
         }else{
             return $message;

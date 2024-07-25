@@ -61,12 +61,12 @@ class PengadaanAsetController extends Controller
             })
             ->addColumn('no_spk', function ($detail) {
                 // return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->formatLocalized('%d/%B/%Y').'/'.Carbon::parse($detail->spk_end_date)->formatLocalized('%d/%B/%Y'): '';
-                return $detail->no_spk ? $detail->no_spk.'/'.Carbon::parse($detail->spk_start_date)->formatLocalized('%d/%B/%Y'):'';
+                return $detail->no_spk ? $detail->no_spk:'';
             })
-            ->addColumn('spk_start_date', function ($detail) {
+            ->addColumn('start_spk', function ($detail) {
                 return  Carbon::parse($detail->spk_start_date)->formatLocalized('%d/%B/%Y');
             })
-            ->addColumn('spk_end_date', function ($detail) {
+            ->addColumn('end_spk', function ($detail) {
                 return  Carbon::parse($detail->spk_end_date)->formatLocalized('%d/%B/%Y');;
             })
             ->addColumn('spk_range_time', function ($detail) {
@@ -183,8 +183,8 @@ class PengadaanAsetController extends Controller
             'trans_name',
             'vendor_id',
             'no_spk',
-            'spk_start_date',
-            'spk_end_date',
+            // 'spk_start_date',
+            // 'spk_end_date',
             'spk_range_time',
             'jenis_pengadaan_id',
             'budget_limit',
@@ -210,9 +210,11 @@ class PengadaanAsetController extends Controller
                     $this->makeColumn('name:num|label:#'),
                     $this->makeColumn('name:trans_name|label:Transaksi Aset|className:text-left|width:200px'),
                     $this->makeColumn('name:vendor_id|label:Suplier|className:text-center|width:300px'),
-                    $this->makeColumn('name:no_spk|label:Nomor SPK/Tanggal SPK|className:text-center|width:200px'),
-                    $this->makeColumn('name:qty|label:Jumlah Pembelian (Unit)|className:text-center|width:100px'),
-                    $this->makeColumn('name:unit_cost|label:Harga Unit (Rupiah)|width:200px'),
+                    $this->makeColumn('name:no_spk|label:Nomor SPK|className:text-center|width:200px'),
+                    $this->makeColumn('name:start_spk|label:Tanggal Mulai Kontrak|className:text-center|width:200px'),
+                    $this->makeColumn('name:end_spk|label:Tanggal Selesai Kontrak|className:text-center|width:200px'),
+                    // $this->makeColumn('name:qty|label:Jumlah Pembelian (Unit)|className:text-center|width:100px'),
+                    // $this->makeColumn('name:unit_cost|label:Harga Unit (Rupiah)|width:200px'),
                     $this->makeColumn('name:shiping_cost|label:Biaya Pengiriman (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:tax_cost|label:Biaya Pajak (Rupiah)|className:text-center|width:200px'),
                     $this->makeColumn('name:total_cost|label:Total (Rupiah)|className:text-center|width:200px'),
@@ -363,7 +365,7 @@ class PengadaanAsetController extends Controller
 
     public function print(PembelianTransaksi $record, $title = '')
     {
-        $detailData = PerencanaanDetail::where('trans_id',$record->id)->first();
+        $detailData = PerencanaanDetail::where('trans_id',$record->id)->get();
         $gambar_logo_1 = public_path('assets/images/KLU_logo.png');
         $gambar_logo_2 = public_path(config('base.logo.auth'));
         // $detail = PerencanaanDetail::where('perencanaan_id',$record->id)->get();

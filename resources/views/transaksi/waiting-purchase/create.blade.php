@@ -121,7 +121,7 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
@@ -137,9 +137,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Pagu') }}</label>
@@ -155,9 +155,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Harga Unit') }}<span style=" color: red;margin-left: 5px;">*</span></label>
@@ -174,7 +174,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -184,7 +184,7 @@
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
                                         <input type="text" min=0 name="tax_cost" id="tax_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                            placeholder="{{ __('Biaya Pajak') }}" value="0"  oninput="updateTotal()">
+                                            placeholder="{{ __('Biaya Pajak') }}" value="0" min="0" oninput="updateTotal()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -195,6 +195,10 @@
                             </div>
                         </div>
 
+                        {{--  --}}
+                        <input type="hidden"  name='pagus' id='pagus' value="{{$pagu}}">
+
+                        {{--  --}}
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
@@ -203,7 +207,7 @@
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
                                         <input type="text" min=0 name="shiping_cost" id="shiping_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                            placeholder="{{ __('Biaya Pengiriman') }}" value="0"  oninput="updateTotal()">
+                                            placeholder="{{ __('Biaya Pengiriman') }}" value="0" min="0" oninput="updateTotal()">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -213,6 +217,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
@@ -221,7 +226,7 @@
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
                                         <input type="text" min="0" name="total_cost" id="total_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                            placeholder="{{ __('Biaya Total') }}" value="0" readonly>
+                                            placeholder="{{ __('Biaya Total') }}"  value="{{ $pagu }}" readonly>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -232,7 +237,7 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-12">
+                        {{-- <div class="col-sm-12">
                             <div class="form-group row">
                                 <label class="col-2 col-form-label">{{ __('Bukti Nota Pembelian ') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 <div class="col-10 parent-group">
@@ -253,7 +258,7 @@
                                     <div class="form-text text-muted">*Maksimal 20MB</div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
                     <div class="d-flex justify-content-between">
@@ -322,39 +327,44 @@
 
 @push('scripts')
 <script>
+
+var tot = document.getElementById('total_cost').value;
+tot= tot.replace(/[^0-9]/g, '');
+tot = parseInt(tot);
+
 function updateTotal() {
-    var quantity = document.getElementById('qty').value;
-    var unit_cost = document.getElementById('unit_cost').value;
+
     var tax = document.getElementById('tax_cost').value;
     var shiping = document.getElementById('shiping_cost').value;
-    var pagu = document.getElementById('budget_limit').value;
+    var total_cost = document.getElementById('total_cost').value;
+    var pagus =  document.getElementById('pagus').value;
 
-    quantity= quantity.replace(/[^0-9]/g, '');
-    unit_cost= unit_cost.replace(/[^0-9]/g, '');
     tax= tax.replace(/[^0-9]/g, '');
     shiping= shiping.replace(/[^0-9]/g, '');
-    pagu= pagu.replace(/[^0-9]/g, '');
+    total= total_cost.replace(/[^0-9]/g, '');
+    pagus= pagus.replace(/[^0-9]/g, '');
 
-    quantity = parseInt(quantity);
-    unit_cost = parseInt(unit_cost);
     tax = parseInt(tax);
     shiping = parseInt(shiping);
-    pagu = parseInt(pagu);
-    
-    if(quantity > 0 && unit_cost > 0){
-        console.log(quantity);
-        var total_unit = parseInt(quantity) * parseInt(unit_cost);
-        var total = parseInt(quantity) * parseInt(unit_cost) + tax + shiping;
-        if(total_unit > pagu){
-            alert("Nilai Harga Unit Melebihi Pagu Anggaran !");
-            document.getElementById('total_cost').value = 0;
-        }else{
-            document.getElementById('total_cost').value = parseInt(total);
-        }
-        // console.log(total)
+    total = parseInt(total);
+    pagus = parseInt(pagus);
+
+    if (isNaN(tax)) {
+        tax = 0;
     }
-        
-       // document.getElementById('HPS_unit_cost').value = parseInt(price)
+    
+    if (isNaN(shiping)) {
+        shipping = 0;
+    }
+
+    if (shiping > 0 || tax > 0) {
+        hasil = tot + tax + shiping;
+        document.getElementById('total_cost').value = parseInt(hasil);
+    } else if (shiping == 0 && tax == 0) {
+        document.getElementById('total_cost').value = parseInt(tot);
+    } else {
+        document.getElementById('total_cost').value = parseInt(tot);
+    }
 }
 </script>
 @endpush

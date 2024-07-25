@@ -252,13 +252,28 @@ class KIBFController extends Controller
                 }
             )
             ->addColumn('action',function ($record) use ($user) {
-                    $actions[] = [
-                        'type' => 'show',
-                        'page' => true,
-                        'id' => $record->id,
-                        'url' => route($this->routes . '.show', $record->id),
-                    ];
 
+                $actions[] = [
+                    'type' => 'show',
+                    'page' => true,
+                    'id' => $record->id,
+                    'url' => route($this->routes . '.show', $record->id),
+                ];
+
+                if($record->condition =='baik' && $record->status =='actives'){
+                    if (auth()->user()->checkPerms('perbaikan-aset.create')) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Perbaikan',
+                            'icon' => 'fa fa-wrench text-success',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.repair', $record->id),
+                        ];
+                    }
+                }
+
+                if($record->condition =='rusak berat' && $record->status =='actives'){
                     if (auth()->user()->checkPerms('penghapusan-aset.create')) {
                         $actions[] = [
                             'type' => 'edit',
@@ -269,9 +284,44 @@ class KIBFController extends Controller
                             'url' => route($this->routes . '.deletes', $record->id),
                         ];
                     }
+                }
+
+                return $this->makeButtonDropdown($actions);
+                    // $actions[] = [
+                    //     'type' => 'show',
+                    //     'page' => true,
+                    //     'id' => $record->id,
+                    //     'url' => route($this->routes . '.show', $record->id),
+                    // ];
+
+                    
+
+                    // if (auth()->user()->checkPerms('penghapusan-aset.create')) {
+                    //     $actions[] = [
+                    //         'type' => 'edit',
+                    //         'page' => true,
+                    //         'label' => 'Hapus',
+                    //         'icon' => 'fas fa-trash text-danger',
+                    //         'id' => $record->id,
+                    //         'url' => route($this->routes . '.deletes', $record->id),
+                    //     ];
+                    // }
+
+                    // if($record->condition =='baik' && $record->status =='actives'){
+                    //     if (auth()->user()->checkPerms('perbaikan-aset.create')) {
+                    //         $actions[] = [
+                    //             'type' => 'edit',
+                    //             'page' => true,
+                    //             'label' => 'Perbaikan',
+                    //             'icon' => 'fa fa-wrench text-success',
+                    //             'id' => $record->id,
+                    //             'url' => route($this->routes . '.repair', $record->id),
+                    //         ];
+                    //     }
+                    // }
 
 
-                    return $this->makeButtonDropdown($actions);
+                    //return $this->makeButtonDropdown($actions);
                 }
             )
             ->rawColumns(['source_acq','status','kondisi','action','name','jenis_aset','updated_by'])
@@ -306,9 +356,15 @@ class KIBFController extends Controller
 
     public function repair(Aset $record)
     {
-        // dd($record);
-        return $this->render('pengajuan.perbaikan-aset.create',compact('record'));
+        // return $this->render('pengajuan.penghapusan-aset.create',compact('record'));
+        return $this->render('perbaikan.perbaikan-aset.create',compact('record'));
     }
+    
+    // public function repair(Aset $record)
+    // {
+    //     // dd($record);
+    //     return $this->render('pengajuan.perbaikan-aset.create',compact('record'));
+    // }
 
     public function deletes(Aset $record)
     {
@@ -324,6 +380,8 @@ class KIBFController extends Controller
         ];
         return Excel::download(new KibFExport($filters), date('Y-m-d') . ' KIBB.xlsx');
     }
+
+
 
     public function print(Request $request)
     {

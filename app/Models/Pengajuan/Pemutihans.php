@@ -563,12 +563,29 @@ class Pemutihans extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4144015581'; // Ganti dengan chat ID penerima notifikasi
+    
+        $chat_grup = OrgStruct::where('name', 'Bidang Pengelolaan Aset Daerah')->value('telegram_id');
+        $chat_bpkad = OrgStruct::where('name', 'Direksi BPKAD')->value('telegram_id');
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        $send_chat = [];
+        if ($this->status == 'draft') {
+            $send_chat = array_filter([$chat_grup]);
+        } elseif ($this->status == 'waiting.approval') {
+            $send_chat = array_filter([$chat_grup, $chat_bpkad]);
+            $pesan = $pesan.' '.' dan Kepada Kepala Badan BPKAD Untuk Segera Melakukan Approval';
+        }elseif($this->status == 'rejected'){
+            $send_chat = array_filter([$chat_grup]);
+        }else{
+            $send_chat = array_filter([$chat_grup]);
+        }
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
     }
 
     public function checkAction($action, $perms, $record = null)

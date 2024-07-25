@@ -47,6 +47,7 @@
                                         <option disabled value="">Jenis Perbaikan</option>
                                         <option value="sperpat" {{ $record->repair_type == 'sperpat' ? 'selected' : '' }}>Pembelian Sperpat</option>
                                         <option value="vendor" {{ $record->repair_type == 'vendor' ? 'selected' : '' }}>Sewa Vendor</option>
+                                        <option value="sperpat dan vendor" {{ $record->repair_type == 'sperpat dan vendor' ? 'selected' : '' }}>Jasa Vendor dan Beli Sperpat</option>
                                     </select>                                    
                                 </div>
                             </div>
@@ -131,49 +132,85 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-6">
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Biaya Total Sperpat') }}</label>
-                                <div class="col-sm-8 col-form-label">  
-                                    @if($record->repair_type =='sperpat')
-                                        @if($ts_cost != null)
-                                            <div class="input-group">
-                                                <input type="text" min=0 id="ts_cost" name="ts_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                                    placeholder="{{ __('Biaya Pengiriman') }}" value="{{number_format($ts_cost, 0, ',', ',')}}" oninput="updateTotal()" disabled>
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text" >
-                                                        Rupiah
-                                                    </span>
-                                                </div>
-                                            </div> 
-                                            {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}" disabled>                          --}}
-                                        @else
-                                            <div class="input-group">
-                                                <input type="text" min=0 id="ts_cost" name="ts_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                                    placeholder="{{ __('Biaya Pengiriman') }}" value="-" oninput="updateTotal()" disabled>
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text" >
-                                                        Rupiah
-                                                    </span>
-                                                </div>
-                                            </div> 
-                                            {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="-"  disabled>  --}}
-                                        @endif
-                                    @else
+                        @if($record->repair_type == 'sperpat')
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Total Sperpat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <div class="col-sm-10 col-form-label">  
                                         <div class="input-group">
                                             <input type="text" min=0 id="ts_cost" name="ts_cost" class="form-control base-plugin--inputmask_currency text-right"
-                                                placeholder="{{ __('Biaya Pengiriman') }}" value="-" oninput="updateTotal()" disabled>
+                                                placeholder="{{ __('Biaya Sperpat') }}" value="{{number_format($ts_cost, 0, ',', ',')}}" oninput="updateTotal()" disabled>
                                             <div class="input-group-append">
                                                 <span class="input-group-text" >
                                                     Rupiah
                                                 </span>
                                             </div>
                                         </div> 
-                                        {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="{{ number_format($record->total_cost, 0, ',', ',')}}" disabled> --}}
-                                    @endif
+                                        {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}" disabled>        --}}
+                                        <input type="hidden" min=0 id="ts_cost" name="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}">  
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+
+                        @elseif($record->repair_type == 'vendor')
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Total Jasa Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <div class="col-sm-10 col-form-label">  
+                                        <div class="input-group">
+                                            <input type="text" min=0 id="ts_cost" name="ts_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                                placeholder="{{ __('Biaya Sperpat') }}" value="{{number_format($record->total_cost_vendor, 0, ',', ',')}}" oninput="updateTotal()" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" >
+                                                    Rupiah
+                                                </span>
+                                            </div>
+                                        </div> 
+                                        {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}" disabled>        --}}
+                                        <input type="hidden" min=0 id="ts_cost" name="ts_cost" value="{{ number_format($record->total_cost_vendor, 0, ',', ',')}}">  
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Total Jasa Vendor') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <div class="col-sm-10 col-form-label">  
+                                        <div class="input-group">
+                                            <input type="text" min=0 id="ts_cost_vendor" name="ts_cost_vendor" class="form-control base-plugin--inputmask_currency text-right"
+                                                placeholder="{{ __('Biaya Sperpat') }}" value="{{number_format($record->total_cost_vendor, 0, ',', ',')}}" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" >
+                                                    Rupiah
+                                                </span>
+                                            </div>
+                                        </div> 
+                                        {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}" disabled>        --}}
+                                        <input type="hidden" min=0 id="ts_cost_vendor" name="ts_cost_vendor" value="{{ number_format($record->total_cost_vendor, 0, ',', ',')}}">  
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">{{ __('Biaya Total Sperpat') }}<span style=" color: red;margin-left: 5px;">*</span></label>
+                                    <div class="col-sm-10 col-form-label">  
+                                        <div class="input-group">
+                                            <input type="text" min=0 id="ts_cost" name="ts_cost" class="form-control base-plugin--inputmask_currency text-right"
+                                                placeholder="{{ __('Biaya Sperpat') }}" value="{{number_format($ts_cost, 0, ',', ',')}}" disabled>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" >
+                                                    Rupiah
+                                                </span>
+                                            </div>
+                                        </div> 
+                                        {{-- <input type="text" class="form-control" name="ts_cost" id="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}" disabled>        --}}
+                                        <input type="hidden" min=0 id="ts_cost" name="ts_cost" value="{{ number_format($ts_cost, 0, ',', ',')}}">  
+                                    </div>
+                                </div>
+                            </div>
+
+                        @endif
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -268,7 +305,7 @@
 
                         <div class="col-sm-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">{{ __('Kode Faktur') }}</label>
+                                <label class="col-sm-4 col-form-label">{{ __('Kode Faktur / Invoice') }}</label>
                                 <div class="col-sm-8 col-form-label">
                                     @if($record->faktur_code != null)
                                         <input type="text" class="form-control" name="faktur_code" value="{{$record->faktur_code}}" disabled>                         
@@ -281,7 +318,20 @@
 
                         <div class="col-sm-12">
                             <div class="form-group row">
-                                <label class="col-2 col-form-label">{{ __('Bukti Faktur Pembelian') }}</label>
+                                <label class="col-sm-2 col-form-label">{{ __('Nomor SPM') }}</label>
+                                <div class="col-sm-10 col-form-label">
+                                    @if($record->spm_code)
+                                        <input type="text" class="form-control" name="spm_code" value="{{$record->spm_code}}" disabled>                         
+                                    @else
+                                        <input type="text" class="form-control" name="spm_code">  
+                                    @endif                       
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-2 col-form-label">{{ __('Bukti Faktur /Invoice , Dokumen SPM , Dokumen Kontrak') }}</label>
                                 <div class="col-10 parent-group">
                                     {{-- <div class="custom-file">
                                         <input type="hidden"
@@ -381,7 +431,7 @@
     </div>
     <!-- end of header -->
 
-    @if($record->repair_type == 'sperpat')
+    @if($record->repair_type == 'sperpat' || $record->repair_type == 'sperpat dan vendor' )
     <div class="row mb-3">
         <div class="col-sm-12">
             <div class="card card-custom">

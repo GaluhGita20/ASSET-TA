@@ -4,8 +4,6 @@
             <div class="card-header">
                 <h3 class="card-title">{{ __('Lampiran List Usulan Pembelian') }}</h3>
             </div>
-
-            
             
             <div class="card-body p-8">
                 <div class="row mb-3">

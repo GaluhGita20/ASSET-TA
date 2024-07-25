@@ -16,42 +16,46 @@ return [
     ],
     // PENGAJUAN
     [
-        'name' => 'perencanaan-aset',
+        'name' => 'perencanaan',
         'title' => 'Pengajuan Perencanaan',
-        'perms' => 'perencanaan-aset',
         'icon' => 'fa fa-road',
-        'url' => '/pengajuan/perencanaan-aset',
-        // 'submenu' => [
-        //     [
-        //         'name' => 'pengajuan_perencanaan-aset',
-        //         'perms' => 'pengajuan.perencanaan-aset',
-        //         'title' => 'Perencanaan',
-        //         'url' => '/pengajuan/perencanaan-aset',
-        //     ],
-            
-        //     [
-        //         'name' => 'pengajuan_berita-acara',
-        //         'perms' => 'pengajuan.berita-acara',
-        //         'title' => 'Berita Acara',
-        //         'url' => '/pengajuan/berita-acara',
-        //     ],
-        //     [
-        //         'name' => 'pengajuan_registrasi-aset',
-        //         'perms' => 'pengajuan.registrasi-aset',
-        //         'title' => 'Registrasi Aset',
-        //         'url' => '/pengajuan/registrasi-aset',
-        //     ],
-        // ]
+        'submenu' => [
+            [
+                'name' => 'perencanaan-aset',
+                'perms' => 'perencanaan-aset',
+                'title' => 'Unit Penunjang',
+                'url' => '/pengajuan/perencanaan-aset',
+            ],
+            [
+                'name' => 'perencanaan-aset-pelayanan',
+                'perms' => 'perencanaan-aset-pelayanan',
+                'title' => 'Unit Umum',
+                'url' => '/pengajuan/perencanaan-aset-pelayanan',
+            ],
+        ],
     ],
 
     // fitur belum jadi ===========================================================
-    // [
-    //     'name' => 'perubahan-usulan-aset',
-    //     'title' => 'Perubahan Perencanaan',
-    //     'perms' => 'perubahan-perencanaan',
-    //     'icon' => 'fa fa-file-alt',
-    //     'url' => '/pengajuan/perubahan-perencanaan-aset',
-    // ],
+    [
+        'name' => 'perubahan',
+        'title' => 'Perubahan Perencanaan',
+        'icon' => 'fa fa-file-alt',
+        'submenu' =>[
+            [
+                'name' => 'perubahan-perencanaan',
+                'perms' => 'perubahan-perencanaan',
+                'title' => 'Unit Penunjang',
+                'url' => '/pengajuan/perubahan-perencanaan-aset',
+            ],
+            [
+                'name' => 'perubahan-usulan-umum',
+                'perms' => 'perubahan-usulan-umum',
+                'title' => 'Unit Umum',
+                'url' => '/pengajuan/perubahan-usulan-umum',
+            ],
+        ],
+        
+    ],
     // fitur belum jadi ===========================================================
 
     // [
@@ -63,7 +67,7 @@ return [
     // ],
     [
         'name' => 'transaksi',
-        'title' => 'Transaksi Aset',
+        'title' => 'BAST Aset',
         'icon' => 'fa fa-money-bill',
         'submenu' => [
             [

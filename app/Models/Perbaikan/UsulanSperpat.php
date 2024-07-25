@@ -155,7 +155,19 @@ class UsulanSperpat extends Model
         try {
 
             $data = $request->all();
+
+
+            $dep = Perbaikan::where('id',$request->perbaikan_id)->value('departemen_id');
+            $parent = OrgStruct::where('id',$dep)->value('parent_id');
+
+            if($parent == 3 || $dep == 3){
+                $this->module = 'usulan_pembelian-sperpat';
+            }else{
+                $this->module = 'usulan_pembelian-sperpat-umum';
+            }
             // dd($data);
+
+            // dd($module);
 
             $this->fill($data);
             $qty = str_replace(['.', ','],'',$request->qty);
@@ -166,7 +178,6 @@ class UsulanSperpat extends Model
             $this->qty = (int)$qty;
             $this->unit_cost = (int)$unit_cost;
             $this->total_cost = (int)$unit_cost * (int)$qty;
-          
 
             $this->save();
 

@@ -93,11 +93,45 @@ Route::middleware('auth')->group(function () {
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
 
+
+                // pelayanan medik ===============================================================================================
+
+                Route::name('perencanaan-aset-pelayanan.')
+                ->prefix('perencanaan-aset-pelayanan')
+                ->group(
+                    function(){
+                        Route::post('{record}/updateSummary', 'PerencanaanAsetPelayananController@updateSummary')->name('updateSummary');
+                        Route::post('{record}/detailGrid', 'PerencanaanAsetPelayananController@detailGrid')->name('detailGrid');
+                        Route::get('detail/{record}', 'PerencanaanAsetPelayananController@detail')->name('detail');
+                        Route::get('detailCreate/{record}', 'PerencanaanAsetPelayananController@detailCreate')->name('detailCreate');
+                        Route::get('detailShow/{detail}', 'PerencanaanAsetPelayananController@detailShow')->name('detailShow');
+                        Route::get('detailEdit/{detail}', 'PerencanaanAsetPelayananController@detailEdit')->name('detailEdit');
+                        Route::get('detailEditHarga/{detail}', 'PerencanaanAsetPelayananController@detailEditHarga')->name('detailEditHarga');
+                        Route::get('detailApprove/{detail}', 'PerencanaanAsetPelayananController@detailApprove')->name('detailApprove');
+                        Route::get('historyDetail/{detail}', 'PerencanaanAsetPelayananController@historyDetail')->name('historyDetail');
+                        Route::delete('detailDestroy/{detail}', 'PerencanaanAsetPelayananController@detailDestroy')->name('detailDestroy');
+                        Route::post('detailUpHarga/{detail}', 'PerencanaanAsetPelayananController@detailUpHarga')->name('detailUpHarga');
+                        Route::post('detailUpdate/{detail}', 'PerencanaanAsetPelayananController@detailUpdate')->name('detailUpdate');
+                        Route::post('detailUpdateApprove/{detail}', 'PerencanaanAsetPelayananController@detailUpApprove')->name('detailUpdateApprove');
+                        Route::post('detailStore', 'PerencanaanAsetPelayananController@detailStore')->name('detailStore');
+                        Route::post('reject/{id}','PerencanaanAsetPelayananController@reject')->name('reject');
+
+                    }
+                );
+                
+                Route::grid('perencanaan-aset-pelayanan', 'PerencanaanAsetPelayananController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+                // ===============================================================================================================
+
+
                 Route::name('perubahan-perencanaan-aset.')
                 ->prefix('perubahan-perencanaan-aset')
                 ->group(
                     function(){
+                        Route::get('{record}/editHarga', 'PerubahanPerencanaanAsetController@editHarga')->name('editHarga');
                         Route::post('{record}/updateSummary', 'PerubahanPerencanaanAsetController@updateSummary')->name('updateSummary');
+                        Route::post('{record}/updateHarga', 'PerubahanPerencanaanAsetController@updateHarga')->name('updateHarga');
                         Route::post('reject/{id}','PerubahanPerencanaanAsetController@reject')->name('reject');
                         Route::get('updateSpesifikasi/{record}', 'PerubahanPerencanaanAsetController@updateSpesifikasi')->name('updateSpesifikasi');
                         Route::post('{record}/saveSpesifikasi', 'PerubahanPerencanaanAsetController@saveSpesifikasi')->name('saveSpesifikasi');
@@ -110,6 +144,20 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('perubahan-perencanaan-aset/detail/{record}', 'PerubahanPerencanaanAsetController@detail')->name('perubahan-perencanaan-aset.detail');
 
+                // ====================================
+                Route::get('perubahan-usulan-umum/{record}/editHarga', 'PerubahanPerencanaanAsetUmumController@editHarga')->name('perubahan-usulan-umum.editHarga');
+                Route::post('perubahan-usulan-umum/{record}/updateSummary', 'PerubahanPerencanaanAsetUmumController@updateSummary')->name('perubahan-usulan-umum.updateSummary');
+                Route::post('perubahan-usulan-umum/reject/{id}','PerubahanPerencanaanAsetUmumController@reject')->name('perubahan-usulan-umum.reject');
+                Route::get('perubahan-usulan-umum/updateSpesifikasi/{record}', 'PerubahanPerencanaanAsetUmumController@updateSpesifikasi')->name('perubahan-usulan-umum.updateSpesifikasi');
+                Route::post('perubahan-usulan-umum/{record}/saveSpesifikasi', 'PerubahanPerencanaanAsetUmumController@saveSpesifikasi')->name('perubahan-usulan-umum.saveSpesifikasi');
+                Route::post('perubahan-usulan-umum/{record}/updateHarga', 'PerubahanPerencanaanAsetUmumController@updateHarga')->name('perubahan-usulan-umum.updateHarga');
+                Route::grid('perubahan-usulan-umum', 'PerubahanPerencanaanAsetUmumController', [
+                    'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
+                ]);
+
+                Route::get('perubahan-usulan-umum/detail/{record}', 'PerubahanPerencanaanAsetUmumController@detail')->name('perubahan-usulan-umum.detail');
+
+                // ====================================
 
                 Route::post('penghapusan-aset/{record}/updateSummary', 'PenghapusanAsetController@updateSummary')->name('penghapusan-aset.updateSummary');
                 Route::get('penghapusan-aset/detail/{record}', 'PenghapusanAsetController@detail')->name('penghapusan-aset.detail');
@@ -137,6 +185,8 @@ Route::middleware('auth')->group(function () {
         ->name('perbaikan.')
         ->group(
             function () {
+
+                Route::get('perbaikan-aset/{record}/detail', 'PerbaikanAsetController@detail')->name('perbaikan-aset.detail');
                 Route::post('perbaikan-aset/{record}/updateSummary', 'PerbaikanAsetController@updateSummary')->name('perbaikan-aset.updateSummary');
                 Route::grid('perbaikan-aset', 'PerbaikanAsetController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
@@ -166,6 +216,13 @@ Route::middleware('auth')->group(function () {
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
 
+                Route::get('usulan-sperpat/editHarga/{record}', 'PerbaikanDisposisiController@editHarga')->name('usulan-sperpat.editHarga');
+                
+                Route::post('usulan-sperpat/{record}/updateHarga', 'PerbaikanDisposisiController@updateHarga')->name('usulan-sperpat.updateHarga');
+                
+                Route::get('usulan-sperpat/detail/{record}', 'PerbaikanDisposisiController@detail')->name('usulan-sperpat.detail');
+
+
                 Route::post('usulan-sperpat/detailStore', 'PerbaikanDisposisiController@detailStore')->name('usulan-sperpat.detailStore');
                 
                 Route::post('usulan-sperpat/detailUpdate/{detail}', 'PerbaikanDisposisiController@detailUpdate')->name('usulan-sperpat.detailUpdate');
@@ -179,12 +236,15 @@ Route::middleware('auth')->group(function () {
                 // Route::get('usulan-sperpat/detailEdit/{detail}', 'PerbaikanDisposisiController@detailEdit')->name('usulan-sperpat.detailEdit');
 
                 Route::delete('usulan-sperpat/detailDestroy/{detail}', 'PerbaikanDisposisiController@detailDestroy')->name('usulan-sperpat.detailDestroy');
-                Route::get('usulan-sperpat/detail/{record}', 'PerbaikanDisposisiController@detail')->name('usulan-sperpat.detail');
+                
                 Route::post('usulan-sperpat/{record}/detailGrid', 'PerbaikanDisposisiController@detailGrid')->name('usulan-sperpat.detailGrid');
                 Route::post('usulan-sperpat/{record}/updateSummary', 'PerbaikanDisposisiController@updateSummary')->name('usulan-sperpat.updateSummary');
                 Route::grid('usulan-sperpat', 'PerbaikanDisposisiController', [
                     'with' => ['submit', 'reject', 'approval', 'tracking', 'history', 'print'],
                 ]);
+
+                Route::post('usulan-sperpat/detailUpdateHarga/{detail}', 'PerbaikanDisposisiController@detailUpdateHarga')->name('usulan-sperpat.detailUpdateHarga');
+                Route::get('usulan-sperpat/{detail}/detailEditHarga', 'PerbaikanDisposisiController@detailEditHarga')->name('usulan-sperpat.detailEditHarga');
         });
 
 
@@ -302,7 +362,10 @@ Route::middleware('auth')->group(function () {
                 Route::post('getLapSperpat', 'AjaxController@getLapSperpat')->name('getLapSperpat');
                 Route::post('getLapPerbaikan', 'AjaxController@getLapPerbaikan')->name('getLapPerbaikan');
                 Route::post('getUsulanAsetById', 'AjaxController@getUsulanAsetById')->name('getUsulanAsetById');
-                
+
+                Route::post('select-umum', 'AjaxController@selectUmum')->name('selectUmum');
+                Route::post('select-penunjang', 'AjaxController@selectPenunjang')->name('selectPenunjang');
+                //Route::get('selectStructPenunjang', 'AjaxController@selectStructPenunjang')->name('selectStructPenunjang');
 
 
                 Route::post('cekSperpat', 'AjaxController@cekSperpat')->name('cekSperpat');
@@ -317,9 +380,9 @@ Route::middleware('auth')->group(function () {
                 Route::post('{search}/selectStruct', 'AjaxController@selectStruct')->name('selectStruct');
                 Route::post('selectPemeliharaan', 'AjaxController@selectPemeliharaan')->name('selectPemeliharaan');
 
-
                 //selectCodePerencanaan
                 Route::post('selectCodePerencanaan', 'AjaxController@selectCodePerencanaan')->name('selectCodePerencanaan');
+                Route::post('selectCodePerencanaanUmum', 'AjaxController@selectCodePerencanaanUmum')->name('selectCodePerencanaanUmum');
                 Route::post('selectUsulanDetail', 'AjaxController@selectUsulanDetail')->name('selectUsulanDetail');
 
                 Route::post('selectPemeliharaan', 'AjaxController@selectPemeliharaan')->name('selectPemeliharaan');

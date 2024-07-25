@@ -3,17 +3,13 @@
         <div class="alert-icon"><i class="fa fa-info-circle"></i></div>
         <div class="alert-text text-primary">
             <div class="text-bold">{{ __('Informasi') }}:</div>
-            <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Checklist Aset Sejenis Untuk Dibuatkan Transaksi Pembelian, Gunakan Filter Untuk Memudahkan Menemukan Aset Sejenis</div>
+            <div class="mb-10px" style="white-space: pre-wrap;">Silahkan Checklist Aset dengan Sumber Pendanaan Yang Sama Untuk Dibuatkan Laporan BAST (Berita ACara Serah Terima Aset), Gunakan Filter Untuk Memudahkan Menemukan Aset Sejenis (Nama Aset Yang Sama)</div>
         </div>
     </div>
 
     <tbody>
         <tr>
             <td class="pb-2 valign-top td-filter-reset width-80px">
-                {{-- <div class="reset-filter mr-1 hide">
-                    <button class="btn btn-secondary btn-icon width-full reset button" data-toggle="tooltip"
-                        data-original-title="Reset Filter"><i class="fas fa-sync"></i></button>
-                </div> --}}
                 <div class="label-filter mr-1">
                     <button class="btn btn-secondary btn-icon width-full filter button" data-toggle="tooltip"
                         data-original-title="Filter"><i class="fas fa-filter"></i></button>
@@ -43,9 +39,6 @@
                 </div>
 
             </td>
-
-
-
 
             {{-- <td>tes</td> --}}
             @if(auth()->user()->hasRole('PPK') )

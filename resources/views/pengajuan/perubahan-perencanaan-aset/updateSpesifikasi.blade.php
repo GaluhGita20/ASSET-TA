@@ -17,9 +17,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    {{-- @include('globals.notes') --}}
                     @csrf
-                    {{-- data --}}
                     <div class="row">
                         <div class="col-md-12">
                             
@@ -61,10 +59,15 @@
                 
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Spesifikasi Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <textarea class="form-control" name="spesifikasi" id="spesifikasi" placeholder="{{__('Masukan Spesifikasi Aset Yang Baru')}}" required></textarea>
+                                    <span style="font-size: 11px">{{ __('*Contoh Bahan: Kaca
+                                        Ukuran: 100 Ml
+                                        Panjang: 20 cm
+                                        Lebar : 20 cm
+                                        Frekuensi: 100Hz') }}</span>
                                 </div>
                             </div>
                 
@@ -80,11 +83,11 @@
                 
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Pagu Unit Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Harga Unit Aset') }}<span style=" color: red;margin-left: 5px;">*</span></label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <div class="input-group">
-                                        <input type="text" name="pagu_unit" id="pagu_unit" class="form-control base-plugin--inputmask_currency text-right" value="{{ number_format($record->detailUsulan->HPS_unit_cost, 0, ',', ',') }}" disabled>
+                                        <input type="text" name="pagu_unit" id="pagu_unit"  oninput="updateTotal()" class="form-control base-plugin--inputmask_currency text-right" value="{{ number_format($record->detailUsulan->HPS_unit_cost, 0, ',', ',') }}">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -94,14 +97,16 @@
 
                                 </div>
                             </div>
+
+                            {{-- <input type="hidden" name="pagu_total" id=""> --}}
                 
                             <div class="form-group row">
                                 <div class="col-2 pr-0">
-                                    <label class="col-form-label">{{ __('Pagu Total Aset') }}</label>
+                                    <label class="col-form-label">{{ __('Harga Total Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
                                     <div class="input-group">
-                                        <input type="text" name="pagu_total" id="pagu_totak" class="form-control base-plugin--inputmask_currency text-right" value="{{ number_format($record->detailUsulan->HPS_total_cost, 0, ',', ',') }}" disabled>
+                                        <input type="text" name="pagu_total" id="pagu_total" class="form-control base-plugin--inputmask_currency text-right" value="{{ number_format($record->detailUsulan->HPS_total_cost, 0, ',', ',') }}" disabled>
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 rupiah
@@ -127,7 +132,7 @@
                                     <label class="col-form-label">{{ __('Catatan Perubahan') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" value="{{$record->note}}" disabled>{{$record->note}}</textarea>
+                                    <textarea class="base-plugin--summernote" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" value="{{$record->note}}" disabled>{{$record->note}}</textarea>
                                 </div>
                                 <input type="hidden" name="note" value="{{$record->note}}">
                             </div>
@@ -138,9 +143,7 @@
             </div>
         </div>
     </div>
-    <!-- end of header -->
 
-    <!-- card 3 -->
     @php
         $colors = [
             1 => 'primary',
@@ -171,10 +174,26 @@
                                                 @foreach ($flows as $j => $flow)
                                                     <span class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
                                                         data-toggle="tooltip"
-                                                        @if($flow->role->name == 'Umum')
-                                                            title="{{ $flow->show_type }}">Departemen
-                                                        @else 
-                                                            title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                        @if($module =='perubahan-perencanaan')
+                                                            @if($flow->role->name == 'Umum' && $flow->order == 1)
+                                                                title="{{ $flow->show_type }}">Departemen Penunjang
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
+                                                        @elseif($module =='perubahan-usulan-umum' )
+                                                            @if($flow->role->name == 'Umum' && $flow->order == 1)
+                                                                title="{{ $flow->show_type }}">Departemen Unit
+                                                            @elseif($flow->role->name == 'Umum' && $flow->order == 2)
+                                                                title="{{ $flow->show_type }}">Departemen  Penunjang
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
+                                                        @else
+                                                            @if($flow->role->name == 'Umum')
+                                                                title="{{ $flow->show_type }}">Departemen Unit
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
                                                         @endif
                                                     </span>
 
@@ -217,17 +236,11 @@
                                     @include('layouts.forms.btnBack')
                                 </div>
                                 <div class="btn-group dropup">
-                                    {{-- <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mr-1 fa fa-save"></i> {{ __('Simpan') }}</button> --}}
-                                    {{-- <div class="dropdown-menu dropdown-menu-right"> --}}
                                         <button type="submit" class="btn btn-primary dropdown-item align-items-center base-form--submit-page" data-submit="2">
                                             <i class="mr-1 flaticon-interface-10 text-white"></i>
                                             {{ __('Submit') }}
                                         </button>
-                                    {{-- </div> --}}
                                 </div>
-
-                                {{-- @include('layouts.forms.btnDropdownSubmit') --}}
-
                             </div>
                         </div>
                     </div>
@@ -236,4 +249,37 @@
         </div>
     @endif
 @show
+
 @endsection
+
+
+@push('scripts')
+
+<script>
+
+    function updateTotal() {
+
+        var jumlah = document.getElementById('jumlah_disetujui').value;
+        var harga = document.getElementById('pagu_unit').value;
+        var total_cost = document.getElementById('pagu_total').value;
+        // var pagus =  document.getElementById('pagus').value;
+
+        jumlah= jumlah.replace(/[^0-9]/g, '');
+        harga= harga.replace(/[^0-9]/g, '');
+        total= total_cost.replace(/[^0-9]/g, '');
+
+        jumlah = parseInt(jumlah);
+        harga = parseInt(harga);
+        total = parseInt(total);
+
+        if (harga > 0) {
+            console.log('a');
+            hasil = jumlah * harga;
+            document.getElementById('pagu_total').value = parseInt(hasil);
+        }else {
+            document.getElementById('pagu_total').value = parseInt(0);
+        }
+    }
+</script>
+@endpush
+

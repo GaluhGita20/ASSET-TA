@@ -65,6 +65,11 @@
                                 </div>
                                 <div class="col-10 parent-group">
                                     <textarea class="form-control" name="spesifikasi" id="spesifikasi" value ="{{$record->detailUsulan->desc_spesification}}" disabled>{{$record->detailUsulan->desc_spesification}}</textarea>
+                                    <span style="font-size: 11px">{{ __('*Contoh Bahan: Kaca
+                                        Ukuran: 100 Ml
+                                        Panjang: 20 cm
+                                        Lebar : 20 cm
+                                        Frekuensi: 100Hz') }}</span>
                                 </div>
                             </div>
                 
@@ -127,7 +132,7 @@
                                     <label class="col-form-label">{{ __('Catatan Perubahan') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" value="{{$record->note}}" disabled>{{$record->note}}</textarea>
+                                    <textarea class="base-plugin--summernote"  name="note" placeholder="{{ __('Catatan Alasan Penolakan') }}" value="{{$record->note}}" disabled>{{$record->note}}</textarea>
                                 </div>
                                 <input type="hidden" name="note" value="{{$record->note}}">
                             </div>
@@ -170,7 +175,7 @@
         ];
     @endphp
 
-    @if (request()->route()->getName() == $routes.'.detail')
+    @if (request()->route()->getName() == $routes.'.detail' && collect(auth()->user()->roles)->contains('name', 'PPK'))
         <div class="row">
             <div class="col-md-6" style="margin-top:20px!important;">
                 <div class="card card-custom" style="height:100%;">
@@ -193,10 +198,27 @@
                                                 @foreach ($flows as $j => $flow)
                                                     <span class="label label-light-{{ $colors[$flow->type] }} font-weight-bold label-inline"
                                                         data-toggle="tooltip"
-                                                        @if($flow->role->name == 'Umum')
-                                                            title="{{ $flow->show_type }}">Departemen
-                                                        @else 
-                                                            title="{{ $flow->show_type }}">{{ $flow->role->name }}
+
+                                                        @if($module =='perubahan-perencanaan')
+                                                            @if($flow->role->name == 'Umum' && $flow->order == 1)
+                                                                title="{{ $flow->show_type }}">Departemen Penunjang
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
+                                                        @elseif($module =='perubahan-usulan-umum' )
+                                                            @if($flow->role->name == 'Umum' && $flow->order == 1)
+                                                                title="{{ $flow->show_type }}">Departemen Unit
+                                                            @elseif($flow->role->name == 'Umum' && $flow->order == 2)
+                                                                title="{{ $flow->show_type }}">Departemen Penunjang
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
+                                                        @else
+                                                            @if($flow->role->name == 'Umum')
+                                                                title="{{ $flow->show_type }}">Departemen Unit
+                                                            @else 
+                                                                title="{{ $flow->show_type }}">{{ $flow->role->name }}
+                                                            @endif
                                                         @endif
                                                     </span>
 

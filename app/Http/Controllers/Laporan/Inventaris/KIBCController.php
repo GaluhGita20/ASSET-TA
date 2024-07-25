@@ -283,7 +283,14 @@ class KIBCController extends Controller
 
 
     public function detailsGrid(Aset $record){
-        $records_inv = $record->logs()->whereModule('inventaris')->where('target_id',$record->id)->get();
+        $records_inv = $record->logs()->whereModule('inventaris')->where('target_id', $record->id)->get();
+
+        if ($records_inv->isEmpty()) {
+            $records_inv = Aset::where('id', $record->id)->get();
+        }
+
+        // dd($records_inv);
+
         $perbaikan = Perbaikan::where('kib_id',$record->id)->where('status','approved')->pluck('id')->toArray();
         
         
@@ -368,7 +375,7 @@ class KIBCController extends Controller
             )
             ->addColumn(
                 'tindakan',
-                function ($sortedRecords) use ($penghapusan2,$pemutihan2,$perbaikan2) {
+                function ($sortedRecords) use ($penghapusan2,$pemutihan2,$perbaikan2,$records_inv) {
                     // dd($penghapusan2->first()->id);
                     if($sortedRecords->module == 'perbaikan-aset'){
                         if($sortedRecords->message != $perbaikan2->first()->message){
@@ -391,6 +398,8 @@ class KIBCController extends Controller
                         }else{
                             return '<span class="badge bg-danger text-white"> Melakukan Pemutihan Aset</span>';
                         }
+                    }elseif($sortedRecords->module == null && $records_inv->first()->module == null){
+                        return '<span class="badge bg-success text-white"> Inventaris Aset </span>';
                     }
                     else{
                         return $sortedRecords->module ? '<span class="badge bg-success text-white"> Melakukan '.$sortedRecords->module.'</span>' : '-';
@@ -399,14 +408,15 @@ class KIBCController extends Controller
             )
             ->addColumn(
                 'keterangan',
-                function ($sortedRecords) use ($record,$perbaikan2) {
+                function ($sortedRecords) use ($record,$perbaikan2, $records_inv) {
                     if($sortedRecords->module == 'perbaikan-aset'){
                         if($sortedRecords->message == $perbaikan2->first()->message){
                             $pesan1 = Perbaikan::find($sortedRecords->target_id)->action_repair;
                             $pesan2 = Perbaikan::find($sortedRecords->target_id)->repair_results;
                             return $pesan1 ? $pesan1.' dengan hasil '.ucfirst(strtolower($pesan2)) : '-';
                             // return '<span class="badge bg-warning text-white"> Mengajukan Perbaikan Aset</span>';
-                        }else{
+                        }
+                        else{
                             // return '<span class="badge bg-warning text-white"> Melakukan Perbaikan Aset</span>';
                             $pesan = Perbaikan::find($sortedRecords->target_id)->problem;
                             return $pesan ? $pesan : '-';
@@ -419,6 +429,10 @@ class KIBCController extends Controller
                     }elseif ($sortedRecords->module == 'penghapusan-aset' && strpos($sortedRecords->message, 'Membuat Pengajuan') !== false){
                         $pesan = Penghapusan::find($sortedRecords->target_id)->value('desc_del');
                         return $pesan ? 'Mengajukan Penghapusan Karena '.$pesan : '-';
+                    }else{
+                        if($sortedRecords->module == null && $records_inv->first()->module == null){
+                            return 'Melakukan Inventarisasi Aset ';
+                        }
                     }
                     return $sortedRecords->message ? $sortedRecords->message : '-';
                 }

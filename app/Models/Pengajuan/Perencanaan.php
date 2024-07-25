@@ -105,13 +105,36 @@ class Perencanaan extends Model
             });
         });
         
-        // ->when(auth()->user()->roles->pluck('id')->contains(3), function ($query) {
-        //     $query->orWhereHas('approvals', function ($q) {
-        //     $q->where('order', 1)->where('status', 'approved');
-        //     });
-        // });
-        // return $query->latest();
     }
+
+
+    public function scopeGridPelayanan($query)
+    {
+        // dd(auth()->user()->position_id);
+        $user = auth()->user();
+        return $query->when(!in_array($user->position->location->id, [13,55,19]), 
+        function ($q) use ($user) { 
+            return $q->when($user->position->imKepalaDeparetemen(), 
+                function ($qq) use ($user) {
+                    return $qq->whereIn('struct_id', $user->position->location->getIdsWithChild()); //ambil anak dan kepala departemen
+                },
+                function ($qq) use ($user) {
+                    return $qq->where('struct_id', $user->position->location->id); 
+                }
+            );
+        })->when(auth()->user()->roles->pluck('id')->contains(2), function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+            $q->where('order', 3)->where('status', 'approved');
+            });
+        })
+        ->when(auth()->user()->position->id == 3, function ($query) {
+            $query->orWhereHas('approvals', function ($q) {
+            $q->where('order', 1)->where('status', 'approved');
+            });
+        });
+        
+    }
+
     // public function scopeGrid($query)
     // {
     //     $user = auth()->user();
@@ -155,8 +178,18 @@ class Perencanaan extends Model
 
     public function scopeFilters($query)
     {
+        // dd(request()->struct_id);
         return $query->filterBy(['code','procurement_year','status'])
-        ->filterBy(['struct_id'])->latest();
+        ->when(
+            $struct = request()->struct_id,
+            function ($q) use ($struct){
+                $q->where('struct_id',$struct);
+            })
+        ->latest();
+        // ->whereHas()
+
+        //->filterBy(['struct_id'])->latest();
+        //dd()
         // $position = auth()->user()->position_id;
         // $departemen = Position::with('location')->where('id',$position)->first();
         
@@ -258,7 +291,7 @@ class Perencanaan extends Model
             $dep = OrgStruct::where('id',$request->struct_id)->first('name');
             $format_angka = str_pad(($idMax+1) < 10 ? '0' . ($idMax+1) : ($idMax+1), 3, '0', STR_PAD_LEFT);
             
-            $this->code = $format_angka.'/'.$dep->name.'/'.now()->format('Y');
+            $this->code = $format_angka.'/'.$dep->name.'/'.$request->procurement_year;
             
             $this->status = 'draft';
             $time = now()->format('Y-m-d');
@@ -748,14 +781,110 @@ class Perencanaan extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4054507555'; // Ganti dengan chat ID penerima notifikasi
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        $module = request()->get('module');
+        //if($module == 'perencanaan-aset-pelayanan'){
+            $approval1_u = $this->whereHas('approvals', function ($q) use ($module) {
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',5)->where('order',1);
+            })->count();
+    
+            $approval2_u = $this->whereHas('approvals', function ($q) use ($module) {
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',5)->where('order',2);
+            })->count();
+    
+            $approval3_u = $this->whereHas('approvals', function ($q)  use ($module){
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',3)->where('order',3);
+            })->count();
+        //}else{
+            //perencanaan direksi
+            $approval1 = $this->whereHas('approvals', function ($q)  use ($module){
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',5)->where('order',1);
+            })->count();
+    
+            $approval2 = $this->whereHas('approvals', function ($q)  use ($module){
+                $q->where('target_id',$this->id)->where('module',$module)->where('status','!=','approved')->where('role_id',3)->where('order',2);
+            })->count();
+        //}
+
+        $parent = OrgStruct::where('id', $this->struct_id)->value('parent_id');
+        $chat_grup = OrgStruct::where('id', $this->struct_id)->value('telegram_id');
+        $chat_perencanaan = OrgStruct::where('name', 'Sub Bagian Program Perencanaan dan Pelaporan')->value('telegram_id');
+        $chat_direksi = OrgStruct::where('name', 'Direksi RSUD')->value('telegram_id');
+        $chat_departemen = OrgStruct::where('id', $parent)->value('telegram_id');
+        $penunjang = OrgStruct::where('name', 'Bidang Penunjang Medik dan Non Medik')->value('telegram_id');
+        $chatId = '-4054507555'; //grup notif perencanaan
+        
+        $send_chat = [];
+
+        // Inisialisasi variabel $pesan jika belum diinisialisasi
+        $pesan = isset($pesan) ? $pesan : '';
+       // dd($pesan);
+        // Penggunaan array untuk kondisi `elseif` yang kompleks
+        if($this->status == 'draft') {
+            $send_chat = array_filter([$chatId, $chat_grup]);
+        }elseif ($this->status == 'waiting.approval' && $approval1 > 0 && $module == 'perencanaan-aset') {
+            // Verify tahap 1
+            $send_chat = array_filter([$chatId, $chat_grup, $penunjang]);
+            $pesan .= ' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif ($this->status == 'waiting.approval' && $approval1_u > 0 && $module == 'perencanaan-aset-pelayanan') {
+            // Verify tahap 1 umum
+            $send_chat = array_filter([$chatId, $chat_grup, $chat_departemen]);
+            $pesan .= ' dan Kepada Departemen Unit Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u > 0 && $module == 'perencanaan-aset-pelayanan') {
+            // Verify tahap 2 umum
+            $send_chat = array_filter([$chatId, $chat_grup, $penunjang]);
+            $pesan .= ' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif ($this->status == 'waiting.approval' && $approval1 == 0 && $approval2 > 0 && $module == 'perencanaan-aset') {
+            // Verify tahap 2
+            $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+            $pesan .= ' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u > 0 && $module == 'perencanaan-aset-pelayanan') {
+            // Verify tahap 3 umum
+            $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+            $pesan .= ' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u == 0 && $module == 'perencanaan-aset-pelayanan') {
+            // Verify tahap 4 umum
+            $send_chat = array_filter([$chatId, $chat_grup, $chat_direksi]);
+            $pesan .= ' dan Kepada Direktur Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif ($this->status == 'waiting.approval' && $approval1 == 0 && $approval2 == 0 && $module == 'perencanaan-aset') {
+            // Verify tahap 3
+            $send_chat = array_filter([$chatId, $chat_grup, $chat_direksi]);
+            $pesan .= ' dan Kepada Direktur Mohon Untuk Melakukan Approval Dokumen Usulan';
+        } elseif (($this->status == 'rejected' && $module == 'perencanaan-aset-pelayanan') || ($this->status == 'rejected' && $module == 'perencanaan-aset')) {
+            // Rejected IPSRS
+            $send_chat = array_filter([$chatId, $chat_grup]);
+        } else {
+            $send_chat = array_filter([$chatId, $chat_grup]);
+        }
+
+        // Jika ada penanganan tambahan untuk $send_chat atau $pesan, bisa diletakkan di sini
+
+        // if ($this->status == 'draft') {
+        //     $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+        // } elseif ($this->status == 'waiting.approval' && $approval1 > 0 ) {
+        //     $send_chat = array_filter([$chatId, $chat_grup, $chat_departemen]);
+        //     $pesan = $pesan.' '.' dan Kepada Unit Departemen Untuk Segera Melakukan Approval Usulan';
+        // }elseif($this->status == 'rejected' && $approval1 > 0){
+        //     $send_chat = array_filter([$chatId, $chat_grup]); //ditolak departemen
+        // } elseif ($this->status == 'waiting.approval' && $approval1 == 0) {
+        //     $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+        //     $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Untuk Segera Melakukan Approval Usulan';
+        // }elseif($this->status == 'rejected' && $approval1 == 0){ //ditolak perencanaan && direksi
+        //     $send_chat = array_filter([$chatId, $chat_grup]);
+        // } else {
+        //     $send_chat = array_filter([$chatId, $chat_grup,  $chat_direksi]);
+        //     $pesan = $pesan.' '.' dan Kepada Direktur Untuk Segera Melakukan Approval Usulan';
+        // }
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
+
     }
-    //-4151848000
 
 
     public function checkAction($action, $perms, $record = null)
@@ -771,12 +900,6 @@ class Perencanaan extends Model
             case 'show':
             case 'history':
                 return true;
-            // case 'verification':
-            //     if ($this->status === 'waiting.verification') {
-            //         return $user->isVerificationKepalaDepartement($this->struct);
-            //     }
-            //     return false;
-            //     break;
             case 'approval':
                 if ($this->status === 'waiting.approval.revisi') {
                     if ($this->checkApproval(request()->get('module') . '_upgrade')) {

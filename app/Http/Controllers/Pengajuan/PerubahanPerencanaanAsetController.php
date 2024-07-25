@@ -27,7 +27,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PerubahanPerencanaanAsetController extends Controller
 {
-    protected $module = 'perubahan-usulan-aset';
+    protected $module = 'perubahan-perencanaan';
     protected $routes = 'pengajuan.perubahan-perencanaan-aset';
     protected $views = 'pengajuan.perubahan-perencanaan-aset';
     protected $perms = 'perubahan-perencanaan';
@@ -75,9 +75,14 @@ class PerubahanPerencanaanAsetController extends Controller
     public function grid()
     {
         $user = auth()->user();
-        $records = PerubahanPerencanaan::with('detailUsulan')
-            ->grid()->filters()
-            ->dtGet();
+        $records = PerubahanPerencanaan::with('detailUsulan')->whereHas('detailUsulan', function ($qqq){
+            $qqq->whereHas('perencanaan',function($y){
+                $y->whereHas('struct', function ($q){
+                    $q->where('parent_id',3)->orWhere('id',3); 
+                });
+            });
+        })
+        ->grid()->filters()->dtGet();
         return DataTables::of($records)
             ->addColumn('#', function ($record) {
                 return request()->start;
@@ -133,75 +138,14 @@ class PerubahanPerencanaanAsetController extends Controller
             ->addColumn('action', function ($record) use ($user) {
                 $actions = [];
 
-                if ($record->checkAction('show', $this->perms)) {
+                if($record->status == 'rejected'){
                     $actions[] = [
                         'type' => 'show',
                         'page' => true,
                         'id' => $record->id,
                         'url' => route($this->routes . '.show', $record->id),
                     ];
-                }
 
-                if ($record->checkAction('edit', $this->perms)) {
-                    $actions[] = [
-                        'type' => 'edit',
-                        'page' => true,
-                        'label' => 'Detail',
-                        'icon' => 'fa fa-plus text-info',
-                        'id' => $record->id,
-                        'url' => route($this->routes . '.detail', $record->id),
-                    ];
-                }
-
-                if ($record->checkAction('edit', $this->perms)) {
-                    $actions[] = [
-                        'type' => 'edit',
-                        'id' => $record->id,
-                        'url' => route($this->routes . '.edit', $record->id),
-                    ];
-                }
-
-                if ($record->checkAction('delete', $this->perms)) {
-                    $actions[] = [
-                        'type' => 'delete',
-                        'id' => $record->id,
-                        'method'=>'post',
-                        'url' => route($this->routes . '.destroy', $record->id),
-                    ];
-                }
-
-                $approval1 = $record->approvals()
-                    ->where('target_id', $record->id)
-                    ->where('status', '!=', 'approved')
-                    ->count();
-        
-                // dd($approval1);
-
-                if ($record->checkAction('approval', $this->perms) && $user->position->location->level == 'department') {
-                    // dd(auth()->user()->position->location_id);
-                    $actions[] = [
-                        'type' => 'approval',
-                        'label' => 'Approval',
-                        'page' => true,
-                        'id' => $record->id,
-                        'url' => route($this->routes . '.approval', $record->id)
-                    ];
-                }
-
-                if ($record->checkAction('approval', $this->perms) 
-                    && $approval1 == 1 
-                    && collect(auth()->user()->roles)->contains('name', 'PPK')){
-
-                    $actions[] = [
-                        'type' => 'approval',
-                        'label' => 'Approval',
-                        'page' => true,
-                        'id' => $record->id,
-                        'url' => route($this->routes . '.approval', $record->id)
-                    ];
-                }
-
-                if($record->status == 'waiting.update'){
                     $actions[] = [
                         'type' => 'edit',
                         'page' => true,
@@ -210,16 +154,104 @@ class PerubahanPerencanaanAsetController extends Controller
                         'id' => $record->id,
                         'url' => route($this->routes . '.updateSpesifikasi', $record->id),
                     ];
+
+                    if ($record->checkAction('history', $this->perms)) {
+                        $actions[] = 'type:history';
+                    }
+                }else{
+                    if ($record->checkAction('show', $this->perms)) {
+                        $actions[] = [
+                            'type' => 'show',
+                            'page' => true,
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.show', $record->id),
+                        ];
+                    }
+    
+                    if ($record->checkAction('edit', $this->perms)) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Detail',
+                            'icon' => 'fa fa-plus text-info',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.detail', $record->id),
+                        ];
+                    }
+    
+                    if ($record->checkAction('edit', $this->perms)) {
+                        $actions[] = [
+                            'type' => 'edit',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.edit', $record->id),
+                        ];
+                    }
+    
+                    if ($record->checkAction('delete', $this->perms)) {
+                        $actions[] = [
+                            'type' => 'delete',
+                            'id' => $record->id,
+                            'method'=>'post',
+                            'url' => route($this->routes . '.destroy', $record->id),
+                        ];
+                    }
+    
+                    $approval1 = $record->approvals()
+                        ->where('target_id', $record->id)
+                        ->where('status', '!=', 'approved')
+                        ->count();
+            
+                    // dd($approval1);
+    
+                    if ($record->checkAction('approval', $this->perms) && $user->position->location->level == 'department') {
+                        $actions[] = [
+                            'type' => 'approval',
+                            'label' => 'Approval',
+                            'page' => true,
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.approval', $record->id)
+                        ];
+    
+                        $actions[] = [
+                            'type' => 'edit',
+                            'label' => 'Edit Harga',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.editHarga', $record->id),
+                        ];
+                    }
+
+                    if ($record->checkAction('approval', $this->perms) && $user->position->location->name == 'Direksi RSUD' || $record->checkAction('approval', $this->perms) && $user->position->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan' ){
+    
+                        $actions[] = [
+                            'type' => 'approval',
+                            'label' => 'Approval',
+                            'page' => true,
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.approval', $record->id)
+                        ];
+                    }
+    
+                    if($record->status == 'waiting.update'){
+                        $actions[] = [
+                            'type' => 'edit',
+                            'page' => true,
+                            'label' => 'Update Data',
+                            'icon' => 'fa fa-plus text-info',
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.updateSpesifikasi', $record->id),
+                        ];
+                    }
+    
+    
+                    if ($record->checkAction('tracking', $this->perms)) {
+                        $actions[] = 'type:tracking';
+                    }
+    
+                    if ($record->checkAction('history', $this->perms)) {
+                        $actions[] = 'type:history';
+                    }
                 }
 
-
-                if ($record->checkAction('tracking', $this->perms)) {
-                    $actions[] = 'type:tracking';
-                }
-
-                if ($record->checkAction('history', $this->perms)) {
-                    $actions[] = 'type:history';
-                }
 
                 return $this->makeButtonDropdown($actions, $record->id);
             })
@@ -254,6 +286,12 @@ class PerubahanPerencanaanAsetController extends Controller
         return $this->render($this->views . '.edit', compact('record','type'));
     }
 
+    public function editHarga(PerubahanPerencanaan $record)
+    {
+        $type ='edit';
+        return $this->render($this->views . '.editHarga', compact('record','type'));
+    }
+
     public function detail(PerubahanPerencanaan $record)
     {
         $this->pushBreadcrumb(['Detail' => route($this->routes . '.detail', $record)]);
@@ -270,6 +308,11 @@ class PerubahanPerencanaanAsetController extends Controller
     public function update(PerubahanPerencanaanRequest $request, PerubahanPerencanaan $record)
     {
         return $record->handleStoreOrUpdate($request);
+    }
+
+    public function updateHarga(PerubahanPerencanaanRequest $request, PerubahanPerencanaan $record)
+    {
+        return $record->handleStoreOrUpdateHarga($request);
     }
     
     public function updateSummary(Request $request, PerubahanPerencanaan $record)

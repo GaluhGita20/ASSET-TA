@@ -406,12 +406,34 @@ class Penghapusan extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4132612354'; // Ganti dengan chat ID penerima notifikasi
+        $approval1 = $this->whereHas('approvals', function ($q) {
+            $q->where('target_id',$this->id)->where('status','!=','approved')->where('role_id',6);
+        })->count();
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        $chat_grup = OrgStruct::where('id', $this->departemen_id)->value('telegram_id');
+        $chat_material = OrgStruct::where('name', 'Seksi Sarana dan Prasarana Logistik')->value('telegram_id');
+        $chat_bpkad = OrgStruct::where('name', 'Bidang Pengelolaan Aset Daerah')->value('telegram_id');
+
+        $send_chat = [];
+        if ($this->status == 'draft') {
+            $send_chat = array_filter([$chat_grup]);
+        } elseif ($this->status == 'waiting.approval' && $approval1 > 0) {
+            $send_chat = array_filter([$chat_grup, $chat_material]);
+            $pesan = $pesan.' '.' dan Kepada Unit Material Untuk Segera Melakukan Pemeriksaan dan Melakukan Approval Jika Aset untuk Layak Dihapus';
+        }elseif($this->status == 'waiting.approval' && $approval1 == 0){
+            $send_chat = array_filter([$chat_grup, $chat_bpkad]);
+            $pesan = $pesan.' '.' dan Kepada BPKAD Untuk Segera Melakukan Pemeriksaan dan Melakukan Approval Jika Aset Layak untuk Dihapus';
+        }else{
+            $send_chat = array_filter([$chat_grup]);
+        }
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
     }
 
 
@@ -459,5 +481,77 @@ class Penghapusan extends Model
         }
 
         return false;
+    }
+
+     //kondisi aset
+     private $damageWeights = [
+        'rusak sedang' => 2,
+        'rusak berat' => 4
+    ];
+    
+    //nilai aset
+    private $valueWeights = [
+        ['min' => 44000, 'max' => 2022999, 'weight' => 8],
+        ['min' => 2023000, 'max' => 4001999, 'weight' => 7],
+        ['min' => 4002000, 'max' => 5980999, 'weight' => 6],
+        ['min' => 5981000, 'max' => 7959999, 'weight' => 5],
+        ['min' => 7960000, 'max' => 9938999, 'weight' => 4],
+        ['min' => 9939000, 'max' => 11917999, 'weight' => 3],
+        ['min' => 11918000, 'max' => 13896999, 'weight' => 2],
+        ['min' => 13897000, 'max' => 15876000, 'weight' => 1]
+    ];
+    
+    //umur aset
+    private $economicLifeWeights = [
+        ['max' => 2, 'weight' => 5],
+        ['min' => 3, 'weight' => 2] // Assume anything greater than 2 years has the weight 2
+    ];
+    
+    public function calculateUtilityScore($aset) {
+        $damageWeight = $this->getDamageWeight($aset->condition);
+        $valueWeight = $this->getValueWeight($aset->book_value);
+        $economicLifeWeight = $this->getEconomicLifeWeight(date_diff(date_create($aset->book_date), date_create(now()))->y);
+        
+        $min_book = Aset::where('type', $aset->type)->min('book_value');
+        $max_book = Aset::where('type', $aset->type)->max('book_value');
+
+        $min = $this->getValueWeight($min_book);
+        $max = $this->getValueWeight($max_book);
+
+        $damageWeight = ($damageWeight - 2) / (5 - 2);
+        if ($max != $min) {
+            $valueWeight = ($valueWeight - $min) / ($max - $min);
+        } else {
+            $valueWeight = 0; // Contoh, bisa disesuaikan dengan logika aplikasi Anda
+        }
+        $economicLifeWeight = ($economicLifeWeight - 2) / (5 - 2);
+
+        $aset['utility_score'] = ($damageWeight * 0.2) + ($valueWeight * 0.5) + ($economicLifeWeight * 0.3);
+        return $aset;
+    }
+
+    public function getDamageWeight($condition) {
+        return $this->damageWeights[$condition] ?? 0;
+    }
+
+    public function getValueWeight($value) {
+        foreach ($this->valueWeights as $range) {
+            if ($value >= $range['min'] && $value <= $range['max']) {
+                return $range['weight'];
+            }
+        }
+        return 0;
+    }
+
+    public function getEconomicLifeWeight($economicLife) {
+        foreach ($this->economicLifeWeights as $range) {
+            if (!isset($range['min']) && $economicLife <= $range['max']) {
+                return $range['weight'];
+            }
+            if (!isset($range['max']) && $economicLife >= $range['min']) {
+                return $range['weight'];
+            }
+        }
+        return 0;
     }
 }

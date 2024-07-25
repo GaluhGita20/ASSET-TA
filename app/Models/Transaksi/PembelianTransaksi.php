@@ -6,6 +6,7 @@ use App\Models\Model;
 use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Master\Aset\AsetRs;
+// use App\Models\Master\Org\OrgStruct;
 use App\Models\Traits\HasApprovals;
 use App\Models\Traits\HasFiles;
 use App\Support\Base;
@@ -50,6 +51,8 @@ class PembelianTransaksi extends Model
         'location_receipt',
         'status',
         'sp2d_date',
+        'spm_code',
+        'spm_date',
         'sp2d_code',
         'asset_test_results',
         'location_receipt',
@@ -60,6 +63,7 @@ class PembelianTransaksi extends Model
         'spk_end_date'          => 'date',
         'receipt_date'          => 'date',
         'sp2d_date'             => 'date',
+        'spm_date'              => 'date',
     ];
 
     /*******************************
@@ -77,6 +81,11 @@ class PembelianTransaksi extends Model
     public function setReceiptDateAttribute($value)
     {
         $this->attributes['receipt_date'] = Carbon::createFromFormat('d/m/Y', $value);
+    }
+
+    public function setSPMDateAttribute($value)
+    {
+        $this->attributes['spm_date'] = Carbon::createFromFormat('d/m/Y', $value);
     }
 
     public function setSP2DDateAttribute($value)
@@ -382,10 +391,7 @@ class PembelianTransaksi extends Model
     {
         $this->beginTransaction();
         try {
-           // dd($detail->id);
             $flag = PerencanaanDetail::where('trans_id', $this->id)->where('ref_aset_id',$request->ref_aset_id)->where('id','!=',$detail->id)->count();
-            
-            // dd($flag);
             if($flag > 0){
                 return $this->rollback(
                     [
@@ -416,7 +422,6 @@ class PembelianTransaksi extends Model
                 return $this->commitSaved();
                 
             }else{
-                // dd($request->all());
                 if($request->user_id != null){
                     $this->pengujianPengadaan()->sync($request->user_id ?? []);
                 }
@@ -453,13 +458,13 @@ class PembelianTransaksi extends Model
         $this->beginTransaction();
         try { 
 
-            if($request->unit_cost == 0){
-                return $this->rollback(
-                    [
-                        'message' => 'Harga Unit Masih 0 !'
-                    ]
-                );
-            }
+            // if($request->unit_cost == 0){
+            //     return $this->rollback(
+            //         [
+            //             'message' => 'Harga Unit Masih 0 !'
+            //         ]
+            //     );
+            // }
 
             if($request->total_cost == 0){
                 return $this->rollback(
@@ -471,10 +476,6 @@ class PembelianTransaksi extends Model
             $data = $request->all();
 
             $this->fill($data);
-
-            // $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
-
-            // dd('tes');
             if($request->sp2d_code != null){
                 $this->sp2d_code = $request->sp2d_code;
             }
@@ -482,8 +483,8 @@ class PembelianTransaksi extends Model
                 $this->sp2d_date = $request->sp2d_date;
             }
 
-            $value1 = str_replace(['.', ','],'',$request->unit_cost);
-            $this->unit_cost = (int)$value1;
+            // $value1 = str_replace(['.', ','],'',$request->unit_cost);
+            // $this->unit_cost = (int)$value1;
 
             $value2 = str_replace(['.', ','],'',$request->tax_cost);
             $this->tax_cost = (int)$value2;
@@ -491,8 +492,8 @@ class PembelianTransaksi extends Model
             $value3 = str_replace(['.', ','],'',$request->shiping_cost);
             $this->shiping_cost = (int)$value3;
 
-            $value4 = str_replace(['.', ','],'',$request->budget_limit);
-            $this->budget_limit = (int)$value4;
+            // $value4 = str_replace(['.', ','],'',$request->budget_limit);
+            // $this->budget_limit = (int)$value4;
 
             $value5 = str_replace(['.', ','],'',$request->total_cost);
             $this->total_cost = (int)$value5;
@@ -507,16 +508,17 @@ class PembelianTransaksi extends Model
             if($request->tax_cost == null){
                 $this->tax_cost = 0;
             }
+
             
             $start_time = Carbon::createFromFormat('d/m/Y', $request->spk_start_date);
             $end_time = Carbon::createFromFormat('d/m/Y', $request->spk_end_date);
             $selisih = $start_time->diffInDays($end_time);
             $this->spk_range_time = $selisih;
-    
+            
             $this->save();
             
             $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
-            // dd($request->all());
+
             
 
             $dataArray = json_decode($request->usulan_id, true);
@@ -530,7 +532,13 @@ class PembelianTransaksi extends Model
             if ($request->is_submit == 1) {
                 // dd($request->all);
                 $this->handleSubmitSave($request);
-            }else{
+            }elseif($request->is_submit == 0 && $request->faktur_code == null){
+                $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
+                $module='transaksi_waiting-purchase';
+                $this->addLog('Membuat ' . $request->trans_name);
+                $this->logs()->whereModule($module)->latest()->update(['module'=>'transaksi_pengadaan-aset']);
+            }
+            else{
                 $this->saveFilesByTemp($request->uploads, $request->module, 'uploads');
                 $module='transaksi_waiting-purchase';
                 $this->addLog('Memperbarui ' . $request->trans_name);
@@ -588,7 +596,7 @@ class PembelianTransaksi extends Model
 
     public function getPerencanaanPengadaan($record)
     {
-        // dd($record);
+
         $usulan = PerencanaanDetail::where('trans_id', $record)
         ->pluck('id');
 
@@ -605,7 +613,7 @@ class PembelianTransaksi extends Model
 
         $this->budget_limit = $pagu;
         $this->qty= $jumlah_beli;
-        $this->total_cost = $this->qty * $this->unit_cost + $this->tax_cost + $this->shiping_cost;
+        $this->total_cost = $this->total_cost;
         $this->save();
         
         return $data;
@@ -887,7 +895,7 @@ class PembelianTransaksi extends Model
                         'url' => route($routes . '.show', $this->id),
                         'user_ids' => [$this->created_by],
                     ]);
-                    $pesan = $user.' Menolak ' . $data;
+                    $pesan = $user.' Menolak ' . $data .' dengan alasan: ' . request()->get('note');
                     $this->sendNotification($pesan);
                 }
                 break;
@@ -904,12 +912,44 @@ class PembelianTransaksi extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
+        $approval1 = $this->whereHas('approvals', function ($q) {
+            $q->where('target_id',$this->id)->where('status','!=','approved')->where('role_id',5);
+        })->count();
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+
+        $chat_keuangan = OrgStruct::where('name', 'Sub Bagian Keuangan')->value('telegram_id');
+        $chat_direksi = OrgStruct::where('name', 'Direksi RSUD')->value('telegram_id');
+        //$chat_departemen = OrgStruct::where('id', $parent)->value('telegram_id');
+        $chatId = '-4287618762'; //grup notif ppk
+
+        $send_chat = [];
+        if ($this->status == 'draft') {
+            $send_chat = array_filter([$chatId]);
+        } elseif ($this->status == 'waiting.approval' && $approval1 > 0 ) {
+            $send_chat = array_filter([$chatId, $chat_keuangan]);
+            $pesan = $pesan.' '.' dan Kepada Bagian Keuangan Mohon Untuk Melakukan Verifikasi Dokumen';
+        }elseif($this->status == 'rejected' && $approval1 > 0){
+            $send_chat = array_filter([$chatId]); //ditolak departemen
+        } elseif ($this->status == 'waiting.approval' && $approval1 == 0) {
+            $send_chat = array_filter([$chatId, $chat_direksi]);
+            $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Segera Melakukan Verifikasi Dokumen';
+        }elseif($this->status == 'rejected' && $approval1 == 0){ //ditolak keuangan && direksi
+            $send_chat = array_filter([$chatId]);
+        } 
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
+        //$chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
+
+        // Telegram::sendMessage([
+        //     'chat_id' => $chatId,
+        //     'text' => $pesan,
+        // ]);
     }
 
     public function checkAction($action, $perms, $record = null)

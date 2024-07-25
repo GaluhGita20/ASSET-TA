@@ -121,7 +121,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Jumlah Beli') }}</label>
@@ -137,10 +137,10 @@
                                             </div>
                                         </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div> 
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Pagu') }}</label>
@@ -156,9 +156,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group row">
                                 <div class="col-4 pr-0">
                                     <label class="col-form-label">{{ __('Harga Unit Barang') }}</label>
@@ -175,7 +175,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-6">
                             <div class="form-group row">
@@ -331,7 +331,7 @@
                                     <label class="col-form-label">{{ __('Hasil Uji Fungsi Aset') }}</label>
                                 </div>
                                 <div class="col-10 parent-group">
-                                    <textarea class="form-control" name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" readonly>{{ $record->asset_test_results }}</textarea>
+                                    <textarea class="base-plugin--summernote"  name="asset_test_results" value="{{ $record->asset_test_results }}" placeholder="{{ __('Hasil Uji Fungs Aset') }}" disabled>{{ $record->asset_test_results }}</textarea>
                                 </div>
                             </div>
                         </div> 

@@ -532,12 +532,27 @@ class Pemeliharaan extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4170853844'; // Ganti dengan chat ID penerima notifikasi
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        $chat_grup = OrgStruct::where('id', $this->departemen_id)->value('telegram_id');
+        $chat_material = OrgStruct::where('name', 'Seksi Sarana dan Prasarana Logistik')->value('telegram_id');
+        $chat_ipsrs = OrgStruct::where('name', 'IPSRS')->value('telegram_id');
+
+        $send_chat = [];
+        if ($this->status == 'draft') {
+            $send_chat = array_filter([$chat_grup, $chat_ipsrs]);
+        } elseif ($this->status == 'waiting.approval') {
+            $send_chat = array_filter([$chat_grup, $chat_material, $chat_ipsrs]);
+        }else{
+            $send_chat = array_filter([$chat_grup,$chat_ipsrs]);
+        }
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
     }
 
 

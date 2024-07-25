@@ -152,20 +152,7 @@
                             <div class="form-group row">
                                 <label class="col-2 col-form-label">{{ __('Foto Kerusakan') }}</label>
                                 <div class="col-10 parent-group">
-                                    {{-- <div class="custom-file">
-                                        <input type="hidden"
-                                            name="uploads[uploaded]"
-                                            class="uploaded"
-                                            value="0">
-                                        <input type="file" multiple
-                                            class="custom-file-input base-form--save-temp-files"
-                                            data-name="uploads"
-                                            data-container="parent-group"
-                                            data-max-size="30024"
-                                            data-max-file="100"
-                                            accept="*">
-                                        <label class="custom-file-label" for="file">Choose File</label>
-                                    </div> --}}
+                        
 
                                     <div class="form-text text-muted">*Maksimal 20MB</div>
                                     @foreach ($record->files as $file)
@@ -242,7 +229,7 @@
         
                         <div class="col-sm-12">
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">{{ __('Status Pengajuan Disposisi') }}</label>
+                                <label class="col-sm-2 col-form-label">{{ __('Status Pengajuan Sparepat') }}</label>
                                 <div class="col-sm-10 col-form-label">
                                     <select name="is_disposisi" class="form-control" disabled>
                                         <option value="yes" {{ $record->is_disposisi == "yes" ? 'selected':'' }}>{{ __('Yes') }}</option>

@@ -7,8 +7,11 @@ use App\Http\Requests\Pengajuan\PerbaikanRequest;
 use App\Http\Requests\Pengajuan\PerbaikanVerifyRequest;
 use App\Http\Requests\Pengajuan\HasilPerbaikanRequest;
 use App\Models\Pengajuan\Perbaikan;
+use App\Models\Pengajuan\PerencanaanDetail;
 use App\Models\Globals\Approval;
 use App\Models\Master\Org\Position;
+use App\Models\Globals\Activity;
+use App\Models\inventaris\Aset;
 use App\Support\Base;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -146,11 +149,36 @@ class PerbaikanAsetController extends Controller
                     ];
                 }
 
+                if($record->status == 'draft' || $record->status =='rejected'){
+                    $actions[] = [
+                        'type' => 'edit',
+                        'page' => true,
+                        'label' => 'Detail',
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.detail', $record->id),
+                    ];
+                }
+
+                $approval1= $record->whereHas('approvals', function ($q) use ($record) {
+                    $q->where('target_id',$record->id)->where('status','!=','approved')->where('role_id',5);
+                })->count();
+
+                $approval2= $record->whereHas('approvals', function ($q) use ($record) {
+                    $q->where('target_id',$record->id)->where('status','!=','approved')->where('role_id',6);
+                })->count();
+
+
+                if($record->status != 'draft'){
+                    $actions[] = 'type:tracking';
+                }
+
+
                 if ($record->checkAction('history', $this->perms)) {
                     $actions[] = 'type:history';
                 }
 
-                if (auth()->user()->checkPerms('perbaikan-aset.edit') && $record->status =='waiting.verify' && $record->repair_date == null ) {
+                //hapus
+                if (auth()->user()->checkPerms('perbaikan-aset.edit') && $record->status =='draft' || $record->status =='rejected' && $record->repair_date == null ) {
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,
@@ -159,16 +187,29 @@ class PerbaikanAsetController extends Controller
                     ];
                 }
 
-                if(auth()->user()->hasRole('Sarpras') && $record->status=='waiting.verify'){
+                //approval tahap 1
+                if ($user->position->location->level == 'department' && $record->status=='waiting.verify' && $approval1 == 1 ) {
                     $actions[] = [
                         'type' => 'approval',
                         'label' => 'Verify',
                         'page' => true,
                         'id' => $record->id,
-                        'url' => route($this->routes . '.edit', $record->id)
+                        'url' => route($this->routes . '.approval', $record->id)
                     ];
                 }
 
+                //approval tahap 2
+                if ($approval1 == 0 && $approval2 == 1 && collect(auth()->user()->roles)->contains('name', 'Sarpras') && auth()->user()->position->location_id == 17 && $record->status=='waiting.verify'){
+                    $actions[] = [
+                        'type' => 'approval',
+                        'label' => 'Verify',
+                        'page' => true,
+                        'id' => $record->id,
+                        'url' => route($this->routes . '.approval', $record->id)
+                    ];
+                }
+
+                //pemeriksaan
                 if(auth()->user()->hasRole('Sarpras') && $record->status =='approved' && $record->check_up_result == null && auth()->user()->checkPerms('perbaikan-aset.edit')){
                     $actions[] = [
                         'type' => 'edit',
@@ -179,6 +220,7 @@ class PerbaikanAsetController extends Controller
                         'url' => route($this->routes . '.edit', $record->id)
                     ];
                 }
+
                 return $this->makeButtonDropdown($actions, $record->id);
             })
             ->rawColumns([
@@ -202,18 +244,59 @@ class PerbaikanAsetController extends Controller
     public function edit(Perbaikan $record)
     {
         $type ='edit';
-        return $this->render($this->views . '.edit', compact('record','type'));
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'perbaikan' => $perbaikan2,
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+        return $this->render($this->views . '.edit', compact('record','type','data'));
     }
 
     public function detail(Perbaikan $record)
     {
-        return $this->render($this->views . '.detail', compact('record'));
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'perbaikan' => $perbaikan2,
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+        return $this->render($this->views . '.edit', compact(['record','data']));
     }
 
-    public function updateSummary(PerbaikanVerifyRequest $request, Perbaikan $record)
+    public function updateSummary(Request $request, Perbaikan $record)
     {
-        
-        return $record->handleVerify($request);
+        if($record->status != 'approved'){
+            return $record->handleStoreOrUpdate($request);
+        }else{
+            return $record->handleCheckUp($request);
+        }
     }
 
     public function update(HasilPerbaikanRequest $request, Perbaikan $record)
@@ -240,13 +323,48 @@ class PerbaikanAsetController extends Controller
 
     public function approval(Perbaikan $record)
     {
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+
+        
+        $maut = $record->calculateUtilityScore($aset);
+        
+        $data = [
+            'perbaikan' => $perbaikan2,
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+        //dd($data['MAUT_score']['utility_score']);
+        return $this->render($this->views . '.show', compact(['record','data']));
+    }
+
+    public function approval1(Perbaikan $record)
+    {
         return $this->render($this->views . '.edit', compact('record'));
+    }
+
+    public function tracking(Perbaikan $record)
+    {
+        $module = $this->module;
+        if ($record->status === 'waiting.approval.revisi') {
+            $module = $module . '_upgrade';
+        }
+        return $this->render('globals.tracking', compact('record', 'module'));
     }
 
 
     public function approve(Perbaikan $record, Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         return $record->handleApprove($request);
         
     }
@@ -269,23 +387,36 @@ class PerbaikanAsetController extends Controller
 
     public function show(Perbaikan $record)
     {
-        return $this->render($this->views . '.show', compact('record'));
-        //ambil data dari show => detail
-    }
+        // {{-- perbaikan , nilai , umur, nilai_rekomen, nilai residu--}}
+        $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
 
-    public function tracking(Perbaikan $record)
-    {
-        $module = $this->module;
-        if ($record->status === 'waiting.approval.revisi') {
-            $module = $module . '_upgrade';
-        }
-        return $this->render('globals.tracking', compact('record', 'module'));
+        $umur = date_diff(date_create($aset->book_date), date_create(now()));
+
+        $maut = $record->getMautScore($aset);
+        
+        $data = [
+            'perbaikan' => $perbaikan2,
+            'nilai' => $aset->book_value,
+            'umur_tahun' => $umur->y,
+            'umur_bulan' => $umur->m,
+            // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+            'nilai_rekomen_50' => $aset->acq_value * 0.5,
+            'nilai_rekomen_30' => $aset->acq_value * 0.3,
+            'nilai_residu' => $aset->residual_value,
+            'MAUT_score' => $maut,
+        ];
+
+        return $this->render($this->views . '.show', compact('record', 'data'));
     }
 
     public function print(Perbaikan $record, $title = '')
     {
 
     }
+
+ 
 
 
     //usulan sperpat

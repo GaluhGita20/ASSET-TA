@@ -12,6 +12,7 @@ use App\Models\Master\Geografis\City;
 use App\Models\Master\Risk\LastAudit;
 // use App\Models\Master\Risk\RiskAssessment;
 use App\Models\Model;
+use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Models\Rkia\Summary;
 
 class OrgStruct extends Model
@@ -30,7 +31,7 @@ class OrgStruct extends Model
         'address',
         'province_id',
         'city_id',
-        'district_id'
+        'district_id',
     ];
 
     /** MUTATOR **/
@@ -201,6 +202,8 @@ class OrgStruct extends Model
             $this->updated_at = now();
             $this->level = $level;
             $this->code = $this->code ? : $this->getNewCode($level);
+            $this->telegram_id = $request->telegram_id;
+
             $this->save();
 
             // if ($level == 'group') {

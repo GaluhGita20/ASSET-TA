@@ -31,18 +31,28 @@
                             <option value="">{{ __('Pilih Struktur Organisasi') }}</option>
                         </select>   
                     @endif
-                    @if($departemen->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan')
-                        <select name="struct_id" class="form-control base-plugin--select2-ajax"
-                            data-url="{{ route('ajax.selectStruct', 'object_aset') }}"
+
+                    @if($departemen->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan' && $module == 'perencanaan-aset-pelayanan')
+                        <input type="hidden" id="departemen_idt" value="u">
+                        <select name="struct_id" id="umum" class="form-control base-plugin--select2-ajax struct_id"
+                            data-url="{{ rut('ajax.selectStruct', '[departemen_id]') }}"
+                            data-url-origin="{{ rut('ajax.selectStruct', ['departemen_id']) }}"
+                            data-placeholder="{{ __('Unit Kerja') }}">
+                            <option value="">{{ __('Pilih Struktur Organisasi') }}</option>
+                        </select>  
+
+                    @elseif($departemen->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan' && $module == 'perencanaan-aset')
+                        <input type="hidden" id="departemen_idt" value="p">
+                        <select name="struct_id" id="penunjang" class="form-control base-plugin--select2-ajax struct_id"
+                            data-url="{{ rut('ajax.selectStruct', '[departemen_id]') }}"
+                            data-url-origin="{{ rut('ajax.selectStruct', ['departemen_id']) }}"
                             data-placeholder="{{ __('Unit Kerja') }}">
                             <option value="">{{ __('Pilih Struktur Organisasi') }}</option>
                         </select>  
                     @endif
+
                     @if($departemen->location->level == 'subdepartmen' || $departemen->location->name != 'Sub Bagian Program Perencanaan dan Pelaporan' && $departemen->location->level != 'department')
                         <input type="text" class="form-control" value="{{ $departemen->location->name }}" readonly>
-                        {{-- <select class="form-control" name="struct_id" disabled>
-                            <option value="{{ $departemen->location->id}}" selected> {{ $departemen->location->name }} </option>
-                        </select> --}}
                         <input type="hidden" name="struct_id" value="{{ $departemen->location->id }}">
                     @endif
 
@@ -93,31 +103,8 @@
                             <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
                         @endfor
                     </select>
-                    {{-- <input class="form-control" type="number" min="{{ now()->format('Y') }}" max="2100" name="procurement_year" placeholder="{{ __('Periode Perencanaan') }}"> --}}
                 </div>
             </div>
-
-            {{-- <div class="form-group row">
-                <label class="col-2 col-form-label">{{ __('Lampiran') }}</label>
-                <div class="col-10 parent-group">
-                    <div class="custom-file">
-                        <input type="hidden"
-                            name="uploads[uploaded]"
-                            class="uploaded"
-                            value="0">
-                        <input type="file" multiple
-                            class="custom-file-input base-form--save-temp-files"
-                            data-name="uploads"
-                            data-container="parent-group"
-                            data-max-size="30024"
-                            data-max-file="100"
-                            accept="*">
-                        <label class="custom-file-label" for="file">Choose File</label>
-                    </div>
-                    <div class="form-text text-muted">*Maksimal 20MB</div>
-                </div>
-            </div> --}}
-
         </div>
     </div>
 @endsection
@@ -126,21 +113,33 @@
 
 <script>
     var nilai = document.getElementById('departemen_idt').value;
-    // console.log(nilai);
+    console.log(nilai);
     $(function () {
-      //  $('.content-page').on('change', 'select.departemen_id', function (e) {
             var me = nilai;
             if (me != null) {
                 console.log(me.val);
                 var objectId = $('select.struct_id');
                 var urlOrigin = objectId.data('url-origin');
-                var urlParam = $.param({departemen_id: me});
+                var urlParam;
+
+                if (me.val === 'p' || nilai=='p') {
+                    console.log('a');
+                    urlParam = $.param({ departemen_id: me });
+                } else if (me.val === 'u' || nilai == 'u') {
+                    console.log('b');
+                    urlParam = $.param({ departemen_id: me });
+                } else {
+                    console.log('c');
+                    urlParam = $.param({ departemen_id: me });
+                }
+
+                console.log(urlParam);
+
                 console.log(objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam))));
                 objectId.data('url', decodeURIComponent(decodeURIComponent(urlOrigin+'?'+urlParam)));
                 objectId.val(null).prop('disabled', false);
             }
             BasePlugin.initSelect2();
-       // });
     });
 </script>
 	

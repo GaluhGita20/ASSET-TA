@@ -9,6 +9,8 @@ use App\Http\Requests\Pengajuan\HasilPerbaikan2Request;
 use App\Models\Perbaikan\TransPerbaikanDisposisi;
 use App\Models\Perbaikan\UsulanSperpat;
 use App\Models\Pengajuan\Perbaikan;
+use App\Models\Pengajuan\PerencanaanDetail;
+use App\Models\Inventaris\Aset;
 use App\Models\Globals\Approval;
 use App\Models\Master\Org\Position;
 use App\Support\Base;
@@ -213,6 +215,10 @@ class PjPerbaikanAsetController extends Controller
     public function edit(Perbaikan $record)
     {
         $type ='edit';
+
+        $usulan = Aset::where('id',$record->kib_id)->where('type','KIB F')->value('usulan_id');
+        $usulan = PerencanaanDetail::where('id',$usulan)->first();
+        $perbaikan = TransPerbaikanDisposisi::where('perbaikan_id',$record->id)->first();
         $this->prepare([
             'tableStruct' => [
                 'datatable_1' => [
@@ -229,7 +235,8 @@ class PjPerbaikanAsetController extends Controller
                 'url' => route($this->routes . '.detailGrid', $record->id),
             ],
         ]);
-        return $this->render($this->views . '.edit', compact('record','type'));
+        // dd($usulan);
+        return $this->render($this->views . '.edit', compact('record','type','usulan','perbaikan'));
     }
 
     public function detailGrid(Perbaikan $record)

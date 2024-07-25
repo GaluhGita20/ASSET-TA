@@ -17,6 +17,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use PDF;
 
 class TransPerbaikanDisposisiController extends Controller
 {
@@ -123,7 +124,7 @@ class TransPerbaikanDisposisiController extends Controller
                 }
 
                 if($record->status === 'new' || $record->status === 'draft' || $record->status === 'rejected'){
-                    if($user->hasRole('Sarpras')){
+                    if($user->hasRole('PPK')){
                         $actions[] = [
                             'type' => 'edit',
                             'page' => true,
@@ -139,6 +140,13 @@ class TransPerbaikanDisposisiController extends Controller
                     if ($record->checkAction('history', $this->perms)) {
                         $actions[] = 'type:history';
                     }
+                }
+
+                if($record->status == 'completed'){
+                    $actions[] = [
+                        'type' => 'print',
+                        'url' => route($this->routes . '.print', $record->id),
+                    ];
                 }
 
                 
@@ -218,6 +226,8 @@ class TransPerbaikanDisposisiController extends Controller
     public function store(TransPerbaikanDisposisiRequest $request)
     {
         $record = new TransPerbaikanDisposisi;
+
+        // dd($request->all());
         return $record->handleStore($request);
     }
 
@@ -390,6 +400,33 @@ class TransPerbaikanDisposisiController extends Controller
         $type ='show';
         $baseContentReplace = 'base-modal--render';
         return $this->render($this->views . '.detail.show', compact('type','detail', 'baseContentReplace'));
+    }
+
+
+    public function print(TransPerbaikanDisposisi $record, $title = '')
+    {
+        
+        // dd($record);
+        if($record->sper_status =='vendor'){
+            $detailData1 = 0;
+            $total_sper = 0;
+        }elseif($record->sper_status =='sperpat'){
+            $detailData1 = UsulanSperpat::where('trans_perbaikan_id',$record->id)->get();
+            $total_sper = UsulanSperpat::where('trans_perbaikan_id',$record->id)->sum('total_cost');
+        }else{
+            $detailData1 = UsulanSperpat::where('trans_perbaikan_id',$record->id)->get();
+            $total_sper = UsulanSperpat::where('trans_perbaikan_id',$record->id)->sum('total_cost');
+        }
+        // dd($detailData1);
+        //$detailData = UsulanSperpat::where('trans_perbaikan_id',$record->trans_perbaikan_id)->get();
+        //$detailData = PerencanaanDetail::where('trans_id',$record->id)->get();
+        $gambar_logo_1 = public_path('assets/images/KLU_logo.png');
+        $gambar_logo_2 = public_path(config('base.logo.auth'));
+        $view1 = view($this->views.'.cetak',compact('total_sper','record','detailData1','title','gambar_logo_1','gambar_logo_2'))->render();
+        $html = $view1;
+        $pdf = PDF::loadHTML($html)->setPaper('a4', 'portrait');
+
+        return $pdf->stream('document.pdf');
     }
 
 

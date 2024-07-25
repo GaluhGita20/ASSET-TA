@@ -6,7 +6,9 @@ use App\Imports\Master\OrgStructImport;
 
 use App\Models\Globals\TempFiles;
 use App\Models\Pengajuan\PerencanaanDetail;
+use App\Models\Pengajuan\Perencanaan;
 use App\Models\Pengajuan\Penghapusan;
+// use App\Models\Master\Org\OrgStruct;
 use App\Models\Transaksi\PembelianTransaksi;
 use App\Models\Master\Org\OrgStruct;
 use App\Models\Master\BahanAset\BahanAset;
@@ -205,8 +207,7 @@ class Aset extends Model
                     });
                 });
         });
-    })->latest();
-    // })->latest();       
+    })->latest(); 
     }
 
     public function scopeLap($query)
@@ -332,7 +333,6 @@ class Aset extends Model
                 $usulan_id = $request['usulan_id'];
                 $usulan = PerencanaanDetail::where('id',$usulan_id)->get();
             }else{
-                // dd('tes');
                 if(count($request->usulan_id) > 1 ){
                     return $this->rollback(__('Pilih Satu Data Untuk Di Inventarisasikan'));
                 }
@@ -665,49 +665,92 @@ class Aset extends Model
 
 
     public function handleStoreOrUpdateKibC($request){
-        $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
-        $flagInv = $jumlah_item - $request->qty;
+        $flagt = Aset::where('usulan_id',$request->usulan_id)->where('type','KIB F')->value('book_value');
+        if($flagt){
 
-        $data = $request->all();
+            $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
+            $flagInv = $jumlah_item - $request->qty;
+    
+            $data = $request->all();
+    
+            $value6 = str_replace(['.', ','],'',$request->wide);
+            $wide = (int)$value6;
+    
+            if($request->type == 'KIB C'){
+                $value7 = str_replace(['.', ','],'',$request->wide_bld);
+                $wide_bld = (int)$value7;
+            }
+    
+            $sertif_date = Carbon::createFromFormat('d/m/Y', $request->sertificate_date);
+    
+            $value8 = str_replace(['.', ','],'',$request->residual_value);
+            $residu = (int)$value8;
+    
+            $value9 = str_replace(['.', ','],'',$request->unit_cost);
+            $cost = (int)$value9;
+     
+            // $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
+            $this->fill($data);
+            $this->land_status = strtolower($request->land_status);
+            // $this->land_use = strtolower($request->land_use);
+            $this->residual_value= $residu;
+            $this->sertificate_date = $sertif_date;
+            $this->wide= $wide;
+    
+            if($request->type == 'KIB C'){
+                $this->wide_bld= $wide_bld;
+            }
+    
+            $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
+            $this->no_register = $no_inventaris + 1;
+            $this->accumulated_depreciation = 0;
+            $this->book_value = $cost + $flagt;
+            $this->acq_value = $cost + $flagt;
+            $this->status = 'actives';
 
-        $value6 = str_replace(['.', ','],'',$request->wide);
-        $wide = (int)$value6;
-
-        if($request->type == 'KIB C'){
-            $value7 = str_replace(['.', ','],'',$request->wide_bld);
-            $wide_bld = (int)$value7;
+            Aset::where('usulan_id',$request->usulan_id)->where('type','KIB F')->update(['status' => 'notactive']);
+        }else{
+            $jumlah_item = $request->jumlah_semua; //jumlah semua - jumlah diimput
+            $flagInv = $jumlah_item - $request->qty;
+    
+            $data = $request->all();
+    
+            $value6 = str_replace(['.', ','],'',$request->wide);
+            $wide = (int)$value6;
+    
+            if($request->type == 'KIB C'){
+                $value7 = str_replace(['.', ','],'',$request->wide_bld);
+                $wide_bld = (int)$value7;
+            }
+    
+            $sertif_date = Carbon::createFromFormat('d/m/Y', $request->sertificate_date);
+    
+            $value8 = str_replace(['.', ','],'',$request->residual_value);
+            $residu = (int)$value8;
+    
+            $value9 = str_replace(['.', ','],'',$request->unit_cost);
+            $cost = (int)$value9;
+     
+            // $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
+            $this->fill($data);
+            $this->land_status = strtolower($request->land_status);
+            // $this->land_use = strtolower($request->land_use);
+            $this->residual_value= $residu;
+            $this->sertificate_date = $sertif_date;
+            $this->wide= $wide;
+    
+            if($request->type == 'KIB C'){
+                $this->wide_bld= $wide_bld;
+            }
+    
+            $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
+            $this->no_register = $no_inventaris + 1;
+            $this->accumulated_depreciation = 0;
+            $this->book_value = $cost;
+            $this->acq_value = $cost;
+            $this->status = 'actives';
         }
-
-        $sertif_date = Carbon::createFromFormat('d/m/Y', $request->sertificate_date);
-
-        $value8 = str_replace(['.', ','],'',$request->residual_value);
-        $residu = (int)$value8;
-
-        $value9 = str_replace(['.', ','],'',$request->unit_cost);
-        $cost = (int)$value9;
- 
-        // $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
-        $this->fill($data);
-        $this->land_status = strtolower($request->land_status);
-        // $this->land_use = strtolower($request->land_use);
-        $this->residual_value= $residu;
-        $this->sertificate_date = $sertif_date;
-        // $this->type='KIB C';
-        // if($type == 'F'){
-        //     $this
-        // }
-        $this->wide= $wide;
-
-        if($request->type == 'KIB C'){
-            $this->wide_bld= $wide_bld;
-        }
-
-        $no_inventaris = Aset::where('coa_id',$request->coa_id)->count();
-        $this->no_register = $no_inventaris + 1;
-        $this->accumulated_depreciation = 0;
-        $this->book_value = $cost;
-        $this->acq_value = $cost;
-        $this->status = 'actives';
+        
         $this->save();
         $this->saveLogNotify();
         if($flagInv == 0){
@@ -879,11 +922,26 @@ class Aset extends Model
 
     public function sendNotification($pesan)
     {
-        $chatId = '-4161016242'; // Ganti dengan chat ID penerima notifikasi
+        
+        $usulan_id = Aset::where('id',$this->id)->value('usulan_id');
+        $perencanaan_id = PerencanaanDetail::where('id',$usulan_id)->value('perencanaan_id');
 
-        Telegram::sendMessage([
-            'chat_id' => $chatId,
-            'text' => $pesan,
-        ]);
+        
+        $struct_id = Perencanaan::where('id', $perencanaan_id)->value('struct_id');
+        $chat_unit = OrgStruct::where('id', $struct_id)->value('telegram_id');
+
+        $chat_material = OrgStruct::where('name', 'Seksi Sarana dan Prasarana Logistik')->value('telegram_id');
+
+        $send_chat = [];
+        $send_chat = array_filter([$chat_unit, $chat_material]); 
+        
+        // Kirim pesan ke setiap chat ID
+        foreach ($send_chat as $chat_id) {
+            Telegram::sendMessage([
+                'chat_id' => $chat_id,
+                'text' => $pesan,
+            ]);
+        }
+
     }
 }

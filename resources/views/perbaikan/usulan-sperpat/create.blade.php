@@ -31,6 +31,7 @@
                                         <option disabed value="">Jenis Perbaikan</option>
                                         <option value="sperpat">Pembelian Sperpat</option>
                                         <option value="vendor">Sewa Vendor</option>
+                                        <option value="sperpat dan vendor">Pembelian Sperpat dan Sewa Vendor</option>
                                     </select>
                                 </div>
                             </div>

@@ -1,4 +1,14 @@
 @if (!empty($record))
+	@php 
+		$dep =  \App\Models\Pengajuan\Perbaikan::where('id',$record->perbaikan_id)->value('departemen_id');
+        $parent = \App\Models\Master\Org\OrgStruct::where('id',$dep)->value('parent_id');
+
+        if($parent == 3 || $dep == 3){
+            $module = 'usulan_pembelian-sperpat';
+        }else{
+            $module = 'usulan_pembelian-sperpat-umum';
+        }
+	@endphp
 	@if ($approval = $record->rejected($module))
 		<div class="alert alert-custom alert-light-warning fade show py-4" role="alert">
 			<div class="alert-icon"><i class="flaticon-warning"></i></div>
