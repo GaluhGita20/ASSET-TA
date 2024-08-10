@@ -121,7 +121,7 @@ class PerubahanPerencanaanAsetUmumController extends Controller
             })
 
             ->addColumn('pagu_total', function ($record) use ($user) {
-                return $record->detailUsulan->HPS_total_agree ? number_format($record->detailUsulan->HPS_total_agree, 0, ',', ',') : '-';
+                return $record->detailUsulan->HPS_total_cost ? number_format($record->detailUsulan->HPS_total_cost, 0, ',', ',') : '-';
             })
 
             ->addColumn('status', function ($record) use ($user) {
@@ -208,8 +208,23 @@ class PerubahanPerencanaanAsetUmumController extends Controller
                         ->where('target_id', $record->id)
                         ->where('status', '!=', 'approved')->where('order',2)
                         ->count();
+
+                    $approval3 = $record->approvals()
+                    ->where('target_id', $record->id)
+                    ->where('status', '!=', 'approved')->where('order',3)
+                    ->count();
     
                     if ($record->checkAction('approval', $this->perms) && $user->position->location->level == 'department' && $approval1 == 1 || $record->checkAction('approval', $this->perms) && $user->position->location->name == 'Sub Bagian Program Perencanaan dan Pelaporan') {
+                        $actions[] = [
+                            'type' => 'approval',
+                            'label' => 'Approval',
+                            'page' => true,
+                            'id' => $record->id,
+                            'url' => route($this->routes . '.approval', $record->id)
+                        ];
+                    }
+
+                    if ($record->checkAction('approval', $this->perms) && $user->position->location->name == 'Direksi RSUD' && $approval3 == 0 ) {
                         $actions[] = [
                             'type' => 'approval',
                             'label' => 'Approval',

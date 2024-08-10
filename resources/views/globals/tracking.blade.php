@@ -4,7 +4,7 @@
 @section('modal-title', __('Tracking Approval Revisi'))
 @elseif($record->status === 'waiting.approval.upgrade')
 @section('modal-title', __('Tracking Approval Upgrade'))
-@elseif($module =='transaksi_pengadaan-aset' || $module == 'pemeliharaan-aset' || $module == 'transaksi_non-pengadaan-aset' || $module == 'pemutihan-aset' || $module == 'trans-sperpat')
+@elseif($module =='transaksi_pengadaan-aset' || $module == 'pemeliharaan-aset' || $module == 'transaksi_non-pengadaan-aset' || $module == 'pemutihan-aset' || $module == 'trans-sperpat' || $module == 'perbaikan-aset')
 @section('modal-title', __('Tracking Verify'))
 @else
 @section('modal-title', __('Tracking Approval'))

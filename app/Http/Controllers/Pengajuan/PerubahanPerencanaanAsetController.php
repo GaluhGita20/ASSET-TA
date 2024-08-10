@@ -119,7 +119,9 @@ class PerubahanPerencanaanAsetController extends Controller
             })
 
             ->addColumn('pagu_total', function ($record) use ($user) {
-                return $record->detailUsulan->HPS_total_agree ? number_format($record->detailUsulan->HPS_total_agree, 0, ',', ',') : '-';
+
+                    return $record->detailUsulan->HPS_total_cost ? number_format($record->detailUsulan->HPS_total_cost, 0, ',', ',') : '-';
+                
             })
 
             ->addColumn('status', function ($record) use ($user) {
@@ -310,7 +312,7 @@ class PerubahanPerencanaanAsetController extends Controller
         return $record->handleStoreOrUpdate($request);
     }
 
-    public function updateHarga(PerubahanPerencanaanRequest $request, PerubahanPerencanaan $record)
+    public function updateHarga(Request $request, PerubahanPerencanaan $record)
     {
         return $record->handleStoreOrUpdateHarga($request);
     }

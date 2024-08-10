@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Pengajuan\PenghapusanRequest;
 use App\Models\Pengajuan\Penghapusan;
 use App\Models\Pengajuan\Pemutihans;
+use App\Models\Pengajuan\Perbaikan;
+use App\Models\Globals\Activity;
 use App\Models\Globals\Approval;
 use App\Models\Inventaris\Aset;
 use App\Models\Master\Org\Position;
@@ -180,11 +182,20 @@ class PenghapusanAsetController extends Controller
         $type ='edit';
 
         $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
+
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
-        
-        $maut = $record->calculateUtilityScore($aset);
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
         $data = [
+            'perbaikan' => $perbaikan2,
             'nilai' => $aset->book_value,
             'umur_tahun' => $umur->y,
             'umur_bulan' => $umur->m,
@@ -201,11 +212,20 @@ class PenghapusanAsetController extends Controller
     public function detail(Penghapusan $record)
     {
         $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
+
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
-        
-        $maut = $record->calculateUtilityScore($aset);
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
         $data = [
+            'perbaikan' => $perbaikan2,
             'nilai' => $aset->book_value,
             'umur_tahun' => $umur->y,
             'umur_bulan' => $umur->m,
@@ -215,6 +235,20 @@ class PenghapusanAsetController extends Controller
             'nilai_residu' => $aset->residual_value,
             'MAUT_score' => $maut,
         ];
+        // $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        
+        // $maut = $record->calculateUtilityScore($aset);
+        
+        // $data = [
+        //     'nilai' => $aset->book_value,
+        //     'umur_tahun' => $umur->y,
+        //     'umur_bulan' => $umur->m,
+        //     // 'umur' => date_diff(date_create($aset->book_date), date_create(now()))->y, // Ambil perbedaan tahun
+        //     'nilai_rekomen_50' => $aset->acq_value * 0.5,
+        //     'nilai_rekomen_30' => $aset->acq_value * 0.3,
+        //     'nilai_residu' => $aset->residual_value,
+        //     'MAUT_score' => $maut,
+        // ];
 
         return $this->render($this->views . '.detail', compact('record','data'));
     }
@@ -244,11 +278,20 @@ class PenghapusanAsetController extends Controller
     public function approval(Penghapusan $record)
     {
         $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
+
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
-        
-        $maut = $record->calculateUtilityScore($aset);
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
         $data = [
+            'perbaikan' => $perbaikan2,
             'nilai' => $aset->book_value,
             'umur_tahun' => $umur->y,
             'umur_bulan' => $umur->m,
@@ -288,11 +331,20 @@ class PenghapusanAsetController extends Controller
     public function show(Penghapusan $record)
     {
         $aset = Aset::where('id', $record->kib_id)->first();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
+
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
-        
-        $maut = $record->calculateUtilityScore($aset);
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
         $data = [
+            'perbaikan' => $perbaikan2,
             'nilai' => $aset->book_value,
             'umur_tahun' => $umur->y,
             'umur_bulan' => $umur->m,

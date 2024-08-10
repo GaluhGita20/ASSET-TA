@@ -106,7 +106,6 @@ class PerbaikanAsetController extends Controller
                 }else{
                     return $record->labelStatus($record->status ?? 'new');
                 }
-//                return $record->labelStatus($record->status ?? 'new');
             })
 
             ->addColumn('tanggal_pengajuan', function ($record) {
@@ -169,7 +168,11 @@ class PerbaikanAsetController extends Controller
 
 
                 if($record->status != 'draft'){
-                    $actions[] = 'type:tracking';
+                    $actions[] = 
+                    [
+                        'type'=>'tracking',
+                        'label'=>'Tracking Verify'
+                    ];
                 }
 
 
@@ -245,12 +248,17 @@ class PerbaikanAsetController extends Controller
     {
         $type ='edit';
         $aset = Aset::where('id', $record->kib_id)->first();
-        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
-        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
 
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
-        
-        $maut = $record->calculateUtilityScore($aset);
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
         $data = [
             'perbaikan' => $perbaikan2,
@@ -269,12 +277,18 @@ class PerbaikanAsetController extends Controller
     public function detail(Perbaikan $record)
     {
         $aset = Aset::where('id', $record->kib_id)->first();
-        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
-        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
 
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
-        $maut = $record->calculateUtilityScore($aset);
         
         $data = [
             'perbaikan' => $perbaikan2,
@@ -324,13 +338,18 @@ class PerbaikanAsetController extends Controller
     public function approval(Perbaikan $record)
     {
         $aset = Aset::where('id', $record->kib_id)->first();
-        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
-        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count();
 
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
 
-        
-        $maut = $record->calculateUtilityScore($aset);
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
+
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
         
         $data = [
             'perbaikan' => $perbaikan2,
@@ -343,7 +362,7 @@ class PerbaikanAsetController extends Controller
             'nilai_residu' => $aset->residual_value,
             'MAUT_score' => $maut,
         ];
-        //dd($data['MAUT_score']['utility_score']);
+
         return $this->render($this->views . '.show', compact(['record','data']));
     }
 
@@ -389,12 +408,18 @@ class PerbaikanAsetController extends Controller
     {
         // {{-- perbaikan , nilai , umur, nilai_rekomen, nilai residu--}}
         $aset = Aset::where('id', $record->kib_id)->first();
-        $perbaikan = Perbaikan::where('kib_id', $record->id)->where('status', 'approved')->pluck('id')->toArray();
-        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->get();
-
+        $perbaikan = Perbaikan::where('kib_id', $record->kib_id)->where('status', 'approved')->pluck('id')->toArray();
+        // dd($perbaikan);
+        $perbaikan2 = Activity::where('module', 'perbaikan-aset')->whereIn('target_id', $perbaikan)->where('message', 'LIKE', '%Update Hasil Perbaikan%')->count('id');
         $umur = date_diff(date_create($aset->book_date), date_create(now()));
+        if($perbaikan2 == null){
+            $perbaikan2 = 0;
+        }else{
+            $perbaikan2 = $perbaikan2;
+        }
 
-        $maut = $record->getMautScore($aset);
+        $maut = $record->calculateUtilityScore($aset,$perbaikan2);
+        
         
         $data = [
             'perbaikan' => $perbaikan2,
@@ -407,7 +432,6 @@ class PerbaikanAsetController extends Controller
             'nilai_residu' => $aset->residual_value,
             'MAUT_score' => $maut,
         ];
-
         return $this->render($this->views . '.show', compact('record', 'data'));
     }
 

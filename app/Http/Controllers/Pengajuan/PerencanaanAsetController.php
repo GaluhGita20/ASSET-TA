@@ -636,8 +636,7 @@ class PerencanaanAsetController extends Controller
 
     public function reject(Perencanaan $record, Request $request)
     {
-        // dd($request->all());
-        // dd($request->all());
+
         $request->validate(
             [
                 'note'  => 'required',

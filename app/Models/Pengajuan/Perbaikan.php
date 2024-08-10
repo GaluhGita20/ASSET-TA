@@ -324,6 +324,8 @@ class Perbaikan extends Model
                     $this->update(['status'=>'draft']);
                 }
             }
+
+            // dd($request->all());
             
             $this->fill($data);
             $this->save();
@@ -371,8 +373,8 @@ class Perbaikan extends Model
                 }
 
                 //$perbaikan = Perbaikan::where('repair_results','SELESAI')->where('action_repair','<>',null)->value('kib_id');
-                if($request->repair_results == 'SELESAI'){
-                    $aset = Aset::where('id',$this->kib_id)->where('type','KIB F')->value('usulan_id');
+                $aset = Aset::where('id',$this->kib_id)->where('type','KIB F')->value('usulan_id');
+                if($request->repair_results == 'SELESAI' && $aset != null){
                     // PerencanaanDetail::where('id',$aset)->update(['status'=>'waiting register']);
                     Aset::where('usulan_id',$aset)->where('type','KIB F')->update(['status' => 'notactive']);
                 }
@@ -704,22 +706,22 @@ class Perbaikan extends Model
 
         $send_chat = [];
         if ($this->status == 'draft') {
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         } elseif ($this->status == 'waiting.verify' && $approval1 > 0 ) { //verify tahap 1
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_departemen]);
+            $send_chat = array_filter([$chat_grup, $chat_departemen]);
             $pesan = $pesan.' '.' dan Kepada Departemen Unit Mohon Untuk Melakukan Approval';
         }elseif($this->status == 'rejected' && $approval1 > 0){ //rejected oleh departemen
-            $send_chat = array_filter([$chatId, $chat_grup]); //ditolak departemen
+            $send_chat = array_filter([$chat_grup]); //ditolak departemen
         } elseif ($this->status == 'waiting.verify' && $approval1 == 0) { //verify tahap 2
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_ipsrs]);
+            $send_chat = array_filter([$chat_grup, $chat_ipsrs]);
             $pesan = $pesan.' '.' dan Kepada Unit IPSRS Mohon Untuk Segera Melakukan Approval dan Melakukan Pemeriksaan Pada Aset';
         }elseif($this->status == 'rejected' && $approval1 == 0){ //rejected ipsrs
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         } else if($this->status == 'approved' && $this->repair_results != 'BELUM'){
-            $send_chat = array_filter([$chatId, $chat_grup,$chat_ipsrs]);
+            $send_chat = array_filter([$chat_grup,$chat_ipsrs]);
             $pesan = $pesan.' '.'dengan hasil perbaikan'.$this->repair_results;
         }else{
-            $send_chat = array_filter([$chatId, $chat_grup,$chat_ipsrs]);
+            $send_chat = array_filter([$chat_grup,$chat_ipsrs]);
         }
         
         // Kirim pesan ke setiap chat ID
@@ -773,43 +775,43 @@ class Perbaikan extends Model
     }
 
 
-    public function getBookValueUtility($aset)
-    {
-        $min = 100000;
-        $max = 10000000;
-        //$min = Aset::where('type',$aset->type)->min('book_value'); // nilai minimum yang bisa diatur sesuai kebutuhan
-        //$max = Aset::where('type',$aset->type)->max('book_value'); // nilai maksimum yang bisa diatur sesuai kebutuhan
-        return ($aset->book_value - $min) / ($max - $min);
-    }
+    // public function getBookValueUtility($aset)
+    // {
+    //     $min = 100000;
+    //     $max = 10000000;
+    //     //$min = Aset::where('type',$aset->type)->min('book_value'); // nilai minimum yang bisa diatur sesuai kebutuhan
+    //     //$max = Aset::where('type',$aset->type)->max('book_value'); // nilai maksimum yang bisa diatur sesuai kebutuhan
+    //     return ($aset->book_value - $min) / ($max - $min);
+    // }
 
-    public function getConditionUtility($aset)
-    {
-        $conditions = ['rusak berat' => 1, 'rusak sedang' => 0.8, 'baik' => 0];
-        return $conditions[$aset->condition] ?? 0;
-    }
+    // public function getConditionUtility($aset)
+    // {
+    //     $conditions = ['rusak berat' => 1, 'rusak sedang' => 0.8, 'baik' => 0];
+    //     return $conditions[$aset->condition] ?? 0;
+    // }
 
-    public function getAgeUtility($aset)
-    {
-        $min = 1; // usia minimum yang bisa diatur sesuai kebutuhan
-        $max = 7; // usia maksimum yang bisa diatur sesuai kebutuhan
-        $age = date_diff(date_create($aset->book_date), date_create(now()))->y;
-        return 1 - (1 - $min) / ($max - $min);
-    }
+    // public function getAgeUtility($aset)
+    // {
+    //     $min = 1; // usia minimum yang bisa diatur sesuai kebutuhan
+    //     $max = 7; // usia maksimum yang bisa diatur sesuai kebutuhan
+    //     $age = date_diff(date_create($aset->book_date), date_create(now()))->y;
+    //     return 1 - (1 - $min) / ($max - $min);
+    // }
 
-    public function getMautScore($aset)
-    {
-        $weightBookValue = 0.5;
-        $weightCondition = 0.2;
-        $weightAge = 0.3;
+    // public function getMautScore($aset)
+    // {
+    //     $weightBookValue = 0.5;
+    //     $weightCondition = 0.2;
+    //     $weightAge = 0.3;
 
-        $bookValueUtility = $this->getBookValueUtility($aset);
-        $conditionUtility = $this->getConditionUtility($aset);
-        $ageUtility = $this->getAgeUtility($aset);
+    //     $bookValueUtility = $this->getBookValueUtility($aset);
+    //     $conditionUtility = $this->getConditionUtility($aset);
+    //     $ageUtility = $this->getAgeUtility($aset);
 
-        return ($weightBookValue * $bookValueUtility) +
-            ($weightCondition * $conditionUtility) +
-            ($weightAge * $ageUtility);
-    }
+    //     return ($weightBookValue * $bookValueUtility) +
+    //         ($weightCondition * $conditionUtility) +
+    //         ($weightAge * $ageUtility);
+    // }
 
     ///================================
     
@@ -831,10 +833,12 @@ class Perbaikan extends Model
 
 
 
-     //kondisi aset
-     private $damageWeights = [
-        'rusak sedang' => 2,
-        'rusak berat' => 4
+     //jumlah perbaikan dilakukan
+    private $damageWeights = [
+        ['min' => 0, 'max' => 1, 'weight' => 4],
+        ['min' => 2, 'max' => 3, 'weight' => 3],
+        ['min' => 4, 'max' => 5, 'weight' => 2],
+        ['min' => 6, 'max' => 30, 'weight' => 1],
     ];
     
     //nilai aset
@@ -846,7 +850,8 @@ class Perbaikan extends Model
         ['min' => 7960000, 'max' => 9938999, 'weight' => 4],
         ['min' => 9939000, 'max' => 11917999, 'weight' => 3],
         ['min' => 11918000, 'max' => 13896999, 'weight' => 2],
-        ['min' => 13897000, 'max' => 15876000, 'weight' => 1]
+        ['min' => 13897000, 'max' => 1000000000, 'weight' => 1],
+        
     ];
     
     //umur aset
@@ -854,28 +859,34 @@ class Perbaikan extends Model
         ['max' => 2, 'weight' => 5],
         ['min' => 3, 'weight' => 2] // Assume anything greater than 2 years has the weight 2
     ];
+
     
-    public function calculateUtilityScore($aset) {
-        $damageWeight = $this->getDamageWeight($aset->condition);
-        $valueWeight = $this->getValueWeight($aset->book_value);
+    public function calculateUtilityScore($aset,$perbaikan2) {
+        //jumlah perbaikan
+        $damageWeight = $this->getDamageWeight($perbaikan2);
+        // dd($damageWeight['min']);
+
+        //harga aset 
+        $hargaAset = $aset->book_value;
+        $valueAset= $this->getValueWeight($hargaAset);
+
+        //umur
         $economicLifeWeight = $this->getEconomicLifeWeight(date_diff(date_create($aset->book_date), date_create(now()))->y);
-        
-        $min_book = Aset::where('type', $aset->type)->min('book_value');
-        $max_book = Aset::where('type', $aset->type)->max('book_value');
 
-        $min = $this->getValueWeight($min_book);
-        $max = $this->getValueWeight($max_book);
+        //////////////////////////////////////////////////////////////////////// NORMALISASI
 
-        $damageWeight = ($damageWeight - 2) / (5 - 2);
-        if ($max != $min) {
-            $valueWeight = ($valueWeight - $min) / ($max - $min);
-        } else {
-            $valueWeight = 0; // Contoh, bisa disesuaikan dengan logika aplikasi Anda
-        }
+        //kerusakan
+        $damageWeight = ($damageWeight['weight'] - 2) / (4 - 1);
+
+        //umur
         $economicLifeWeight = ($economicLifeWeight - 2) / (5 - 2);
 
-        $aset['utility_score'] = ($damageWeight * 0.2) + ($valueWeight * 0.5) + ($economicLifeWeight * 0.3);
-        return $aset;
+
+        $normalizedValue = $this->getNormalizeValue($hargaAset, $valueAset['min'], $valueAset['max']);
+        // dd($normalizedValue);
+
+        $aset['utility_score'] = ($damageWeight * 0.2) + ($normalizedValue * 0.5) + ($economicLifeWeight * 0.3);
+        return  $aset['utility_score'];
     }
 
     public function getDamageWeight($condition) {
@@ -885,11 +896,16 @@ class Perbaikan extends Model
     public function getValueWeight($value) {
         foreach ($this->valueWeights as $range) {
             if ($value >= $range['min'] && $value <= $range['max']) {
-                return $range['weight'];
+                return [
+                    'min' => $range['min'],
+                    'max' => $range['max'],
+                    'weight' => $range['weight'],
+                ];
             }
         }
-        return 0;
+        return null; // Return null jika tidak ada range yang cocok
     }
+
 
     public function getEconomicLifeWeight($economicLife) {
         foreach ($this->economicLifeWeights as $range) {
@@ -901,6 +917,10 @@ class Perbaikan extends Model
             }
         }
         return 0;
+    }
+
+    public function getNormalizeValue($value, $min, $max) {
+        return ($value - $min) / ($max - $min);
     }
     
     // // Contoh penggunaan

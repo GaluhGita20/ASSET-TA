@@ -1097,32 +1097,32 @@ class TransPerbaikanDisposisi extends Model
         $send_chat = [];
         if($this->sper_status != 'completed'){
             if ($this->sper_status == 'draft') {
-                $send_chat = array_filter([$chatId, $chat_ipsrs]);
+                $send_chat = array_filter([$chat_ipsrs]);
             }elseif ($this->sper_status == 'waiting.approval' && $approval1 > 0 && $module == 'usulan_pembelian-sperpat') { //verify tahap 1
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $penunjang]);
+                $send_chat = array_filter([$chat_ipsrs, $penunjang]);
                 $pesan = $pesan.' '.' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Selanjutnya';
             }elseif ($this->sper_status == 'waiting.approval' && $approval1_u > 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 1 umum
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $kepala_dep]);
+                $send_chat = array_filter([$chat_ipsrs, $kepala_dep]);
                 $pesan = $pesan.' '.' dan Kepada Departemen Unit Mohon Untuk Melakukan Approval';
             } elseif ($this->sper_status == 'waiting.approval' && $approval1_u == 0 && $approval2_u > 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 2 umum
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $penunjang]);
+                $send_chat = array_filter([$chat_ipsrs, $penunjang]);
                 $pesan = $pesan.' '.' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Selanjutnya';
             } elseif ($this->sper_status == 'waiting.approval' && $approval1 == 0 && $approval2 > 0 && $module == 'usulan_pembelian-sperpat') { //verify tahap 2
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_perencanaan]);
+                $send_chat = array_filter([$chat_ipsrs, $chat_perencanaan]);
                 $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Selanjutnya';
             } elseif ($this->sper_status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u > 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 2 umum
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_perencanaan]);
+                $send_chat = array_filter([$chat_ipsrs, $chat_perencanaan]);
                 $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Selanjutnya';
             } elseif ($this->sper_status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u == 0 && $module == 'usulan_pembelian-sperpat-umum') { //verify tahap 2 umum
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_direksi]);
+                $send_chat = array_filter([$chat_ipsrs, $chat_direksi]);
                 $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Approval Selanjutnya';
             } elseif ($this->sper_status == 'waiting.approval' && $approval1 == 0 && $approval2 == 0 && $module == 'usulan_pembelian-sperpat') { //verify tahap 2
-                $send_chat = array_filter([$chatId, $chat_ipsrs, $chat_direksi]);
+                $send_chat = array_filter([$chat_ipsrs, $chat_direksi]);
                 $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Approval Selanjutnya';
             }elseif($this->sper_status == 'rejected' && $module == 'usulan_pembelian-sperpat-umum' || $this->sper_status == 'rejected' && $module == 'usulan_pembelian-sperpat'){ //rejected ipsrs
-                $send_chat = array_filter([$chatId, $chat_ipsrs]);
+                $send_chat = array_filter([$chat_ipsrs]);
             } else {
-                $send_chat = array_filter([$chatId,$chat_ipsrs]);
+                $send_chat = array_filter([$chat_ipsrs]);
             }
         }else{
             $module = 'trans-sperpat';

@@ -550,7 +550,9 @@ class Perencanaan extends Model
                 ]);
             }
 
-            $this->rejectApproval($request->module, $request->note);
+            $module = request()->get('module');
+
+            $this->rejectApproval($module, $request->note);
             $this->update(['status' => 'rejected']);
             $this->saveLogNotify();
 
@@ -821,40 +823,40 @@ class Perencanaan extends Model
        // dd($pesan);
         // Penggunaan array untuk kondisi `elseif` yang kompleks
         if($this->status == 'draft') {
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         }elseif ($this->status == 'waiting.approval' && $approval1 > 0 && $module == 'perencanaan-aset') {
             // Verify tahap 1
-            $send_chat = array_filter([$chatId, $chat_grup, $penunjang]);
+            $send_chat = array_filter([$chat_grup, $penunjang]);
             $pesan .= ' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u > 0 && $module == 'perencanaan-aset-pelayanan') {
             // Verify tahap 1 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_departemen]);
+            $send_chat = array_filter([$chat_grup, $chat_departemen]);
             $pesan .= ' dan Kepada Departemen Unit Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u > 0 && $module == 'perencanaan-aset-pelayanan') {
             // Verify tahap 2 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $penunjang]);
+            $send_chat = array_filter([$chat_grup, $penunjang]);
             $pesan .= ' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1 == 0 && $approval2 > 0 && $module == 'perencanaan-aset') {
             // Verify tahap 2
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+            $send_chat = array_filter([$chat_grup, $chat_perencanaan]);
             $pesan .= ' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u > 0 && $module == 'perencanaan-aset-pelayanan') {
             // Verify tahap 3 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+            $send_chat = array_filter([$chat_grup, $chat_perencanaan]);
             $pesan .= ' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u == 0 && $module == 'perencanaan-aset-pelayanan') {
             // Verify tahap 4 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_direksi]);
+            $send_chat = array_filter([$chat_grup, $chat_direksi]);
             $pesan .= ' dan Kepada Direktur Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1 == 0 && $approval2 == 0 && $module == 'perencanaan-aset') {
             // Verify tahap 3
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_direksi]);
+            $send_chat = array_filter([$chat_grup, $chat_direksi]);
             $pesan .= ' dan Kepada Direktur Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif (($this->status == 'rejected' && $module == 'perencanaan-aset-pelayanan') || ($this->status == 'rejected' && $module == 'perencanaan-aset')) {
             // Rejected IPSRS
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         } else {
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         }
 
         // Jika ada penanganan tambahan untuk $send_chat atau $pesan, bisa diletakkan di sini

@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="long_JJR" placeholder="{{ __('Lebar') }}">
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="long_JJR" placeholder="{{ __('Panjang') }}">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 KM
@@ -107,7 +107,7 @@
                                 </div>
                                 <div class="col-8 parent-group">
                                     <div class="input-group">
-                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="width_JJR" placeholder="{{ __('Panjang') }}">
+                                        <input type="text" class="form-control base-plugin--inputmask_currency text-right" name="width_JJR" placeholder="{{ __('Lebar') }}">
                                         <div class="input-group-append">
                                             <span class="input-group-text">
                                                 M

@@ -193,7 +193,7 @@ class PerubahanPerencanaan extends Model
     public function handleStoreOrUpdateHarga($request){
         $this->beginTransaction();
         try {
-            //dd($request->all());
+        
             if($request->pagu_unit == null || $request->pagu_unit == 0){
                 return $this->rollback(
                     [
@@ -606,34 +606,32 @@ class PerubahanPerencanaan extends Model
 
         $send_chat = [];
         if ($this->status == 'draft') {
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         }elseif ($this->status == 'waiting.approval' && $approval1 > 0 && $module == 'perubahan-perencanaan') { //verify tahap 1
-            $send_chat = array_filter([$chatId, $chat_grup, $penunjang]);
+            $send_chat = array_filter([$chat_grup, $penunjang]);
             $pesan = $pesan.' '.' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Dokumen Usulan';
         }elseif ($this->status == 'waiting.approval' && $approval1_u > 0 && $module == 'perubahan-usulan-umum') { //verify tahap 1 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_departemen]);
+            $send_chat = array_filter([$chat_grup, $chat_departemen]);
             $pesan = $pesan.' '.' dan Kepada Departemen Unit Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u > 0 && $module == 'perubahan-usulan-umum') { //verify tahap 2 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $penunjang]);
+            $send_chat = array_filter([$chat_grup, $penunjang]);
             $pesan = $pesan.' '.' dan Kepada Departemen Penunjang Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1 == 0 && $approval2 > 0 && $module == 'perubahan-perencanaan') { //verify tahap 2
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+            $send_chat = array_filter([$chat_grup, $chat_perencanaan]);
             $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u > 0 && $module == 'perubahan-usulan-umum') { //verify tahap 2 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_perencanaan]);
+            $send_chat = array_filter([$chat_grup, $chat_perencanaan]);
             $pesan = $pesan.' '.' dan Kepada Unit Perencanaan Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1_u == 0 && $approval2_u == 0 && $approval3_u == 0 && $module == 'perubahan-usulan-umum') { //verify tahap 2 umum
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_direksi]);
+            $send_chat = array_filter([$chat_grup, $chat_direksi]);
             $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Approval Dokumen Usulan';
         } elseif ($this->status == 'waiting.approval' && $approval1 == 0 && $approval2 == 0 && $module == 'perubahan-perencanaan') { //verify tahap 2
-            $send_chat = array_filter([$chatId, $chat_grup, $chat_direksi]);
+            $send_chat = array_filter([$chat_grup, $chat_direksi]);
             $pesan = $pesan.' '.' dan Kepada Direktur Mohon Untuk Melakukan Approval Dokumen Usulan';
         }elseif($this->status == 'rejected' && $module == 'perubahan-usulan-umum' || $this->status == 'rejected' && $module == 'perubahan-perencanaan'){ //rejected ipsrs
-            // dd('te');
-            $send_chat = array_filter([$chatId, $chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         } else {
-            // dd('tes');
-            $send_chat = array_filter([$chatId,$chat_grup]);
+            $send_chat = array_filter([$chat_grup]);
         }
 
         foreach ($send_chat as $chat_id) {

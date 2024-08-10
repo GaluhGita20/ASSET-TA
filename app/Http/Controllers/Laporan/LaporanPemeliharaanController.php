@@ -21,8 +21,8 @@ class LaporanPemeliharaanController extends Controller
 {
     protected $module = 'laporan_pemeliharaan-aset';
     protected $routes = 'laporan.pemeliharaan-aset';
-    protected $views = 'laporan';
-    protected $perms = 'report-pemeliharaan';
+    protected $views =  'laporan';
+    protected $perms =  'report-pemeliharaan';
 
 
     public function __construct()
