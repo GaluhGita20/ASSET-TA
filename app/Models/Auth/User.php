@@ -90,6 +90,8 @@ class User extends Authenticatable
     /** RELATION **/
     public function notifications()
     {
+        // cara membuat pivot table yang berisi id dari user dan id dari email dan disertakan dengan reat_at
+        
         return $this->belongsToMany(
             Notification::class,
             'sys_notifications_users',
@@ -99,8 +101,15 @@ class User extends Authenticatable
             ->withPivot('readed_at');
     }
 
+    // satu user bisa memiliki banyak notif, dan 1 notif bisa dikaitkan ke banyak useer
+    // 'sys_notifications_users', foreign key di tabel pivot yang mengacu pada model saat ini (table notif)
+    // 'user_id', FOREIGN KEY TABEL, adalah foreign key di tabel pivot yang mengacu pada model terkait (table user)
+    // withPivot('readed_at') digunakan untuk memberi tahu Laravel bahwa kolom readed_at di tabel pivot harus disertakan ketika memuat data dari relasi ini.
+
     public function activities()
     {
+        // relasi table user dengan activity
+        // 1 user bisa memiliki banyak aktivity ;yang dihubungkan dengan user_id pada tabel activity
         return $this->hasMany(Activity::class, 'user_id');
     }
 
@@ -116,7 +125,11 @@ class User extends Authenticatable
 
     public function position()
     {
+        // relasi table user dengan position, dimana 1 user memiliki 1 posisi yang dihungungkan dengan position_id
         return $this->belongsTo(Position::class, 'position_id');
+
+        // bisa cek posisi kepala departemen dengan cara 
+        // $user->position->imKepalaDepartemen()
     }
 
     /** SCOPE **/

@@ -881,7 +881,6 @@ class Perbaikan extends Model
         //umur
         $economicLifeWeight = ($economicLifeWeight - 2) / (5 - 2);
 
-
         $normalizedValue = $this->getNormalizeValue($hargaAset, $valueAset['min'], $valueAset['max']);
         // dd($normalizedValue);
 

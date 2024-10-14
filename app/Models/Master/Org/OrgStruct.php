@@ -68,6 +68,7 @@ class OrgStruct extends Model
 
     public function child()
     {
+        // struct memiliki banyak child yang dihungkan oleh parrent_id di urutkan by level
         return $this->hasMany(OrgStruct::class, 'parent_id')->orderBy('level');
     }
 

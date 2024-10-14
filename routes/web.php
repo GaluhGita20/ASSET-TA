@@ -61,6 +61,14 @@ Route::middleware('auth')->group(function () {
             }
         );
 
+        // namespace ==> mengacu pada lokasi atau direktori kelas controller yang akan digunakan di dalam grup route ini. Pada contoh ini, Pengajuan berarti semua controller yang digunakan di dalam grup route ini berada di dalam namespace App\Http\Controllers\Pengajuan.
+
+        // prefix ==> menambahkan awalan pada setiap URL di dalam grup route ini. Pada contoh ini, semua route di dalam grup ini akan diawali dengan pengajuan pada URL-nya.
+
+        // name ==> memberikan nama dasar atau awalan untuk setiap nama route di dalam grup ini. Ini mempermudah penggunaan route dalam kode dengan memberikan nama yang konsisten.
+
+        // cnth
+        // pengajuan.perencanaan-aset.
     Route::namespace('Pengajuan')
     ->prefix('pengajuan')
     ->name('pengajuan.')
@@ -247,9 +255,6 @@ Route::middleware('auth')->group(function () {
                 Route::get('usulan-sperpat/{detail}/detailEditHarga', 'PerbaikanDisposisiController@detailEditHarga')->name('usulan-sperpat.detailEditHarga');
         });
 
-
-
-
         Route::namespace('Pemeliharaan')
         ->prefix('pemeliharaan')
         ->name('pemeliharaan.')
@@ -278,6 +283,7 @@ Route::middleware('auth')->group(function () {
         ->name('transaksi.')
         ->group(
             function () {
+
                 Route::name('waiting-purchase.')
                 ->prefix('waiting-purchase')
                 ->group(
@@ -448,78 +454,77 @@ Route::middleware('auth')->group(function () {
                 Route::get('perbaikan-aset/detailShow/{detail}', 'LaporanPerbaikanController@detailShow')->name('perbaikan-aset.detailShow');
                 Route::post('perbaikan-sperpat-aset/{record}/detailGrid', 'LaporanSperpatController@detailGrid')->name('perbaikan-sperpat-aset.detailGrid');
                 Route::get('perbaikan-sperpat-aset/detailShow/{detail}', 'LaporanSperpatController@detailShow')->name('perbaikan-sperpat-aset.detailShow');
-
-
-                //Route::get('hibah-aset/detailShow/{detail}', 'LaporanHibahAsetController@detailShow')->name('hibah-aset.detailShow');
                 Route::get('perencanaan-aset/detailShow/{detail}', 'LaporanPerencanaanController@detailShow')->name('perencanaan-aset.detailShow');
-
                 Route::get('penerimaan-aset/detailShow/{detail}', 'LaporanPenerimaanController@detailShow')->name('penerimaan-aset.detailShow');
                 Route::post('penerimaan-aset/{record}/detailGrid', 'LaporanPenerimaanController@detailGrid')->name('penerimaan-aset.detailGrid');
-
                 Route::get('penerimaan-hibah-aset/detailShow/{detail}', 'LaporanPenerimaanHibahController@detailShow')->name('penerimaan-hibah-aset.detailShow');
                 Route::post('penerimaan-hibah-aset/{record}/detailGrid', 'LaporanPenerimaanHibahController@detailGrid')->name('penerimaan-hibah-aset.detailGrid');
-
                 Route::get('pemeliharaan-aset/detailShow/{detail}', 'LaporanPemeliharaanController@detailShow')->name('pemeliharaan-aset.detailShow');
                 Route::post('pemeliharaan-aset/{record}/detailGrid', 'LaporanPemeliharaanController@detailGrid')->name('pemeliharaan-aset.detailGrid');
-                // Route::get('pemeliharaan-aset/detailShow/{detail}', 'LaporanPemeliharaanController@detailShow')->name('pemeliharaan-aset.detailShow');
                 Route::get('penghapusan-aset/detailShow/{detail}', 'LaporanPenghapusanController@detailShow')->name('penghapusan-aset.detailShow');
                 Route::get('pemutihan-aset/detailShow/{detail}', 'LaporanPemutihanController@detailShow')->name('pemutihan-aset.detailShow');
-                // Route::get('penerimaan-aset/detailShow/{detail}', 'LaporanPenerimaanController@detailShow')->name('penerimaan-aset.detailShow');
+
 
                 Route::namespace('Inventaris')
                 ->prefix('inventaris')
                 ->name('inventaris.')
                 ->group( function() {
+                    Route::name('kib-a.')
+                    ->prefix('kib-a')
+                    ->group(function() {  
+                        Route::post('{record}/detailsGrid','KIBAController@detailsGrid')->name('detailsGrid');
+                        Route::get('details/{record}', 'KIBAController@details')->name('details');
+                        Route::post('{record}/detailpGrid','KIBAController@detailpGrid')->name('detailpGrid');
+                        Route::get('detailp/{record}', 'KIBAController@detailp')->name('detailp');
+                    });
+                    Route::name('kib-b.')
+                    ->prefix('kib-b')
+                    ->group(function() { 
+                        Route::post('{record}/detailsGrid','KIBBController@detailsGrid')->name('detailsGrid');
+                        Route::get('details/{record}', 'KIBBController@details')->name('details');
+                        Route::post('{record}/detailpGrid','KIBBController@detailpGrid')->name('detailpGrid');
+                        Route::get('detailp/{record}', 'KIBBController@detailp')->name('detailp');
+                    });
+                    Route::name('kib-c.')
+                    ->prefix('kib-c')
+                    ->group(function() { 
+                        Route::post('{record}/detailsGrid','KIBCController@detailsGrid')->name('detailsGrid');
+                        Route::get('details/{record}', 'KIBCController@details')->name('details');
+                        Route::post('{record}/detailpGrid','KIBCController@detailpGrid')->name('detailpGrid');
+                        Route::get('detailp/{record}', 'KIBCController@detailp')->name('detailp');
+                    });
+                    Route::name('kib-d.')
+                    ->prefix('kib-d')
+                    ->group(function() { 
+                        Route::post('{record}/detailsGrid','KIBDController@detailsGrid')->name('detailsGrid');
+                        Route::get('details/{record}', 'KIBDController@details')->name('details');
+                        Route::post('{record}/detailpGrid','KIBDController@detailpGrid')->name('detailpGrid');
+                        Route::get('detailp/{record}', 'KIBDController@detailp')->name('detailp');
+                    });
+                    Route::name('kib-e.')
+                    ->prefix('kib-e')
+                    ->group(function() { 
+                        Route::post('{record}/detailsGrid','KIBEController@detailsGrid')->name('detailsGrid');
+                        Route::get('details/{record}', 'KIBEController@details')->name('details');
+                        Route::post('{record}/detailpGrid','KIBEController@detailpGrid')->name('detailpGrid');
+                        Route::get('detailp/{record}', 'KIBEController@detailp')->name('detailp');
+                    });
 
-                            Route::grid('kib-a','KIBAController');
-                            Route::post('kib-a/{record}/detailsGrid','KIBAController@detailsGrid')->name('kib-a.detailsGrid');
-                            Route::get('kib-a/details/{record}', 'KIBAController@details')->name('kib-a.details');
-
-                            Route::post('kib-a/{record}/detailpGrid','KIBAController@detailpGrid')->name('kib-a.detailpGrid');
-                            Route::get('kib-a/detailp/{record}', 'KIBAController@detailp')->name('kib-a.detailp');
-
-
-                            Route::grid('kib-b','KIBBController');
-                            Route::post('kib-b/{record}/detailsGrid','KIBBController@detailsGrid')->name('kib-b.detailsGrid');
-                            Route::get('kib-b/details/{record}', 'KIBBController@details')->name('kib-b.details');
-
-                            Route::post('kib-b/{record}/detailpGrid','KIBBController@detailpGrid')->name('kib-b.detailpGrid');
-                            Route::get('kib-b/detailp/{record}', 'KIBBController@detailp')->name('kib-b.detailp');
-                            
-
-                            Route::grid('kib-c','KIBCController');
-                            Route::post('kib-c/{record}/detailsGrid','KIBCController@detailsGrid')->name('kib-c.detailsGrid');
-                            Route::get('kib-c/details/{record}', 'KIBCController@details')->name('kib-c.details');
-
-                            Route::post('kib-c/{record}/detailpGrid','KIBCController@detailpGrid')->name('kib-c.detailpGrid');
-                            Route::get('kib-c/detailp/{record}', 'KIBCController@detailp')->name('kib-c.detailp');
-
-
-                            Route::grid('kib-d','KIBDController');
-                            Route::post('kib-d/{record}/detailsGrid','KIBDController@detailsGrid')->name('kib-d.detailsGrid');
-                            Route::get('kib-d/details/{record}', 'KIBDController@details')->name('kib-d.details');
-
-                            Route::post('kib-d/{record}/detailpGrid','KIBDController@detailpGrid')->name('kib-d.detailpGrid');
-                            Route::get('kib-d/detailp/{record}', 'KIBDController@detailp')->name('kib-d.detailp');
-
-                            Route::grid('kib-e','KIBEController');
-                            Route::post('kib-e/{record}/detailsGrid','KIBEController@detailsGrid')->name('kib-e.detailsGrid');
-                            Route::get('kib-e/details/{record}', 'KIBEController@details')->name('kib-e.details');
-
-                            Route::post('kib-e/{record}/detailpGrid','KIBEController@detailpGrid')->name('kib-e.detailpGrid');
-                            Route::get('kib-e/detailp/{record}', 'KIBEController@detailp')->name('kib-e.detailp');
-
-                            Route::grid('kib-f','KIBFController');
-                            Route::post('kib-f/{record}/detailsGrid','KIBFController@detailsGrid')->name('kib-f.detailsGrid');
-                            Route::get('kib-f/details/{record}', 'KIBFController@details')->name('kib-f.details');
-
-                            Route::post('kib-f/{record}/detailpGrid','KIBFController@detailpGrid')->name('kib-f.detailpGrid');
-                            Route::get('kib-f/detailp/{record}', 'KIBFController@detailp')->name('kib-f.detailp');
-                        }
-                    );
-
-                //inventaris 
-
+                    Route::name('kib-f.')
+                    ->prefix('kib-f')
+                    ->group(function() { 
+                        Route::post('{record}/detailsGrid','KIBFController@detailsGrid')->name('detailsGrid');
+                        Route::get('details/{record}', 'KIBFController@details')->name('details');
+                        Route::post('{record}/detailpGrid','KIBFController@detailpGrid')->name('detailpGrid');
+                        Route::get('detailp/{record}', 'KIBFController@detailp')->name('detailp'); 
+                    });
+                    Route::grid('kib-a','KIBAController');
+                    Route::grid('kib-b','KIBBController');
+                    Route::grid('kib-c','KIBCController');
+                    Route::grid('kib-d','KIBDController');
+                    Route::grid('kib-e','KIBEController');
+                    Route::grid('kib-f','KIBFController');
+                });
         });
 
     Route::namespace('Inventaris')
@@ -599,7 +604,8 @@ Route::middleware('auth')->group(function () {
                 // Route::get('kib-d/pemutihan/{record}', 'KIBDController@pemutihan')->name('kib-d.pemutihan');
                 // Route::get('kib-e/pemutihan/{record}', 'KIBEController@pemutihan')->name('kib-e.pemutihan');
                 // Route::get('kib-f/pemutihan/{record}', 'KIBFController@pemutihan')->name('kib-f.pemutihan');
-            });
+            }
+        );
 
     // Setting
     Route::namespace('Setting')

@@ -28,12 +28,15 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Models\Model;
 use Carbon\Carbon;
 
+// kelas aset mewarisi kelas model
 class Aset extends Model
 {
     use RaidModel, ResponseTrait;
 
+    // properti
     protected $table = 'ref_kib';
 
+    // properti
     protected $fillable = [
     'trans_id',
     'usulan_id',
@@ -95,13 +98,16 @@ class Aset extends Model
     //     return $this->belongsTo(User::class,'updated_by');
     // }
 
+    // method
     public function coad()
     {
+        // satu COA memiliki 1 coa_id
         return $this->belongsTo(Coa::class, 'coa_id'); // Sesuaikan dengan kunci asing yang sesuai
     }
 
     public function tanahs()
     {
+        // satu COA memiliki 1 tanah_id
         return $this->belongsTo(Coa::class, 'tanah_id'); // Sesuaikan dengan kunci asing yang sesuai
     }
 
@@ -132,6 +138,7 @@ class Aset extends Model
 
     public function asets()
     {
+        // satu tabel penghapusan memiliki banyak data kib_id 
         return $this->hasMany(Penghapusan::class, 'kib_id');
     }
 
@@ -174,6 +181,7 @@ class Aset extends Model
         function ($q) use ($user) { 
         $q->when($user->position->imKepalaDeparetemen(), 
             function ($qq) use ($user) {
+                
                 // Ambil semua id struktur yang terkait dengan departemen dan anaknya
                 $structIds = $user->position->location->getIdsWithChild();
                 
@@ -216,7 +224,15 @@ class Aset extends Model
 
         return $query->when(
             empty(array_intersect(['Keuangan', 'PPK', 'Direksi', 'Sarpras', 'BPKAD'], $user->roles->pluck('name')->toArray())),
+            // array_intersect untuk mengcek data / membandingkan 2 buah data jika terdapat nilai yang sama maka akan bernilai true jika tidak ada maka akan bernilai falase
+
+                //  $user->roles->pluck('name')->toArray())
                 function ($q) use ($user) {
+                    // $user->position->imKepalaDeparetemen()
+                    // $user = objek dari model user
+                    // position merupakn properti pada model user
+                    // imKepalaDeparetemen() merupakan method yng berada di dalam model Position
+
                 $q->when($user->position->imKepalaDeparetemen(),  // pastikan metode ini benar
                     function ($qq) use ($user) {
                         $structIds = $user->position->location->getIdsWithChild();

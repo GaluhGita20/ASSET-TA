@@ -10,7 +10,12 @@ use App\Models\Model;
 
 class Position extends Model
 {
+    // $table menentukan bahwa model ini berhubungan dengan tabel bernama ref_positions.
     protected $table = 'ref_positions';
+
+    // protected // Hanya bisa diakses dari dalam kelas atau subclass
+    // private, properti atau metode tersebut hanya bisa diakses dari dalam kelas itu sendiri, tidak bisa diakses dari luar kelas atau dari kelas turunan.
+    // public: Dapat diakses dari mana saja (dalam, luar, dan subclass).
 
     protected $fillable = [
         'location_id',
@@ -20,6 +25,10 @@ class Position extends Model
         'code',
         'telegram_user_id'
     ];
+
+    // $fillable adalah properti larangan mass assignment dalam Laravel. Properti ini menentukan kolom-kolom mana yang boleh diisi secara massal ketika menggunakan fungsi seperti create() atau update() untuk memasukkan data ke database.
+
+    // Ini bertujuan untuk melindungi data dari "mass assignment vulnerability", yaitu ketika ada data yang tidak diharapkan diisi oleh pengguna atau proses otomatis.
 
     /*******************************
      ** MUTATOR
@@ -44,11 +53,15 @@ class Position extends Model
 
     public function struct()
     {
+        // many-to-one (banyak ke satu) antara model posisi dengan model struct yang artinya 1 posisi hanya boleh punya 1 struct
+
+
         return $this->belongsTo(OrgStruct::class, 'location_id');
     }
     
     public function users()
     {
+         // hasmany (banyak ke banyak) antara model posisi dengan model user yang artinya 1 posisi memiliki banyak user
         return $this->hasMany(User::class,'position_id');
     }
     /*******************************
@@ -81,6 +94,7 @@ class Position extends Model
         $this->beginTransaction();
         try {
             $this->fill($request->all());
+            // $this = instance dari model saat ini, fill merupakan method untuk mengisi value pada model ini
             // dd($request->all());
             // if()
             $root = $request->root_id;
@@ -136,6 +150,9 @@ class Position extends Model
         $data = $this->name;
         $routes = request()->get('routes');
         switch (request()->route()->getName()) {
+            // fungsi global dalam Laravel yang mengembalikan instance dari request saat ini.
+            //  metode pada objek request yang mengembalikan informasi tentang rute yang sedang diproses
+            // getName() adalah metode pada objek rute yang mengembalikan nama dari rute saat ini.
             case $routes . '.store':
                 $this->addLog('Membuat Data ' . $data);
                 break;
@@ -159,11 +176,14 @@ class Position extends Model
 
     public function getNewCode($request)
     {
+        // request objek global dan mengambil properti root_id
         $instansi = OrgStruct::where('id',$request->root_id)->value('name');
+
 
         if($instansi == 'RSUD Kabupaten Lombok Utara'){
             $data =[1001,2000];
             $max = static::whereBetween('code',$data)->max('code');
+            // static = menyatakan bahwa kita akan beroperasi pada model saat ini.
             return $max ? $max + 1 : 1001;
         }else{
             $max = static::max('code');
@@ -173,6 +193,9 @@ class Position extends Model
 
     public function imAuditor()
     {
+        // isset() dalam PHP digunakan untuk memeriksa apakah sebuah variabel telah dideklarasikan dan memiliki nilai yang bukan null. Jika variabel tersebut ada dan tidak bernilai null, isset() akan mengembalikan true
+
+        // isset artinya memastikan bahwa sudah di setting / ada nilai, maka akan bernilai true
         return $this->location->code == 3001 || (isset($this->location->parent->code) && $this->location->parent->code == 3001);
     }
 
@@ -194,10 +217,14 @@ class Position extends Model
     public function imKepalaDeparetemen()
     {
         $temp = OrgStruct::department()->get();
+        // ambil semua data struct organisasi
+
         $user = auth()->user();
+        // ambil data user yang login
 
         $lists = [];
         foreach($temp as $dd){
+            // objek -> method relasi ->properti dari position
             if($user->position->level == 'kepala' && $user->position->location_id == $dd->id){
                 return true;
             }
@@ -213,6 +240,8 @@ class Position extends Model
         $lists = [];
         foreach($temp as $dd){
             if(in_array($location_id, $dd->getIdsWithChild())){
+                // $dd->getIdsWithChild()
+                // $dd objek dari struct dan memiliki method getIdsWWithchild
                 if($user->position->level == 'kepala' && $user->positon->location_id == $dd->id){
                     return true;
                 }

@@ -24,12 +24,16 @@ class LoginController extends Controller
 
     use AuthenticatesUsers, ThrottlesLogins;
 
+    // AuthenticatesUsers: Menyediakan berbagai metode untuk menangani autentikasi pengguna, seperti login() dan logout().
+    // ThrottlesLogins: Mengelola pembatasan percobaan login (rate limiting), misalnya jika pengguna mencoba login berkali-kali dalam waktu singkat.
+
     /**
      * Where to redirect users after login.
      *
      * @var string
      */
     protected $redirectTo = RouteServiceProvider::HOME;
+    // properti yang menentukan ke mana pengguna akan diarahkan setelah berhasil login. Dalam hal ini, diarahkan ke halaman home yang ditentukan di RouteServiceProvider.
 
     public function redirectTo()
     {
@@ -44,6 +48,7 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+        //  Pada saat kelas ini diinisialisasi, middleware guest akan memastikan bahwa hanya pengguna yang belum login (guest) yang bisa mengakses metode login, kecuali metode logout.
     }
 
     /**
@@ -67,10 +72,7 @@ class LoginController extends Controller
         //     $request->username,
         //     session('remember')
         // );
-        if (
-            method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)
-        ) {
+        if (method_exists($this, 'hasTooManyLoginAttempts') && $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
             return $this->sendLockoutResponse($request);
@@ -92,6 +94,12 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
+
+
+        // $this->validateLogin($request);: Memvalidasi input pengguna, seperti username dan password.
+        // Throttling: Jika terlalu banyak percobaan login gagal, fungsi hasTooManyLoginAttempts() akan mengunci pengguna untuk sementara waktu.
+        // attemptLogin(): Jika autentikasi berhasil, sesi login akan dimulai dan pengguna akan di-redirect. Juga mencatat log "Login berhasil".
+        // sendFailedLoginResponse(): Jika login gagal, metode ini akan memberikan respons bahwa autentikasi gagal.
     }
 
     /**
@@ -123,6 +131,11 @@ class LoginController extends Controller
             : redirect('/');
     }
 
+    // Pengguna dicatat dengan log "Logout berhasil".
+    // Metode guard()->logout() akan mengakhiri sesi login pengguna.
+    // Sesi dihapus dan token di-refresh untuk mencegah serangan CSRF.
+    // Pengguna di-redirect ke halaman utama atau JSON respons tergantung permintaan.
+
     /**
      * Show the application's login form.
      *
@@ -146,6 +159,7 @@ class LoginController extends Controller
     public function username($value = '')
     {
         $login = request()->input('username');
+        // check username apakah === email, jika iya maka nilai fieild === 'email'
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         request()->merge([$field => $login]);
         return $field;
@@ -159,6 +173,7 @@ class LoginController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+
     protected function validateLogin(Request $request)
     {
         $request->validate(

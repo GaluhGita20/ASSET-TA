@@ -157,6 +157,15 @@ class PerubahanPerencanaanAsetUmumController extends Controller
                         'url' => route($this->routes . '.updateSpesifikasi', $record->id),
                     ];
 
+                    if ($record->checkAction('delete', $this->perms)) {
+                        $actions[] = [
+                            'type' => 'delete',
+                            'id' => $record->id,
+                            'method'=>'post',
+                            'url' => route($this->routes . '.destroy', $record->id),
+                        ];
+                    }
+
                     if ($record->checkAction('history', $this->perms)) {
                         $actions[] = 'type:history';
                     }

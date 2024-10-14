@@ -11,6 +11,8 @@ use Illuminate\Queue\SerializesModels;
 class NotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
+    // Menggunakan trait Queueable memungkinkan email untuk dikirim dalam antrian (queue), yang berguna untuk pengiriman email secara asinkron.
+    // Trait SerializesModels digunakan untuk memastikan bahwa model yang ada dalam email diserialisasi dengan benar saat ditransmisikan melalui antrian.
 
     public $record;
     public $subject;
@@ -20,6 +22,7 @@ class NotificationMail extends Mailable
      *
      * @return void
      */
+    
     public function __construct(Notification $record)
     {
         $this->record  = $record;
@@ -39,4 +42,11 @@ class NotificationMail extends Mailable
                         'record' => $this->record
                     ]);
     }
+
+    //  Metode ini bertanggung jawab untuk membangun konten email.
+    // Di dalamnya, subject($this->subject) mengatur subjek email.
+    // view('mails.notification') menentukan tampilan (view) yang akan digunakan untuk konten email. Tampilan ini biasanya berisi HTML yang dirender sebagai isi email.
+
+    // with(['record' => $this->record]) menyampaikan data ke tampilan email. Dalam hal ini, objek $record yang telah disimpan sebelumnya akan tersedia dalam tampilan.
+
 }

@@ -34,6 +34,7 @@ class InventarisController extends Controller
 
     public function __construct()
     {
+        // emanggil metode prepare() dengan parameter array yang berisi data untuk disiapkan.
         $this->prepare([
             'module' => $this->module,
             'routes' => $this->routes,
@@ -49,7 +50,7 @@ class InventarisController extends Controller
         ]);
     }
 
-
+    // membuat method grid
     public function grid(Request $request)
     {
         $user = auth()->user();
@@ -126,10 +127,15 @@ class InventarisController extends Controller
     
     public function index()
     {
+        // Fungsi/Helper: auth() adalah sebuah helper function di Laravel yang memberikan akses ke sistem otentikasi.
+        // user() = objek yang dihasilkan dari fungsi auth
+        // hasRole() = method bawaan laravel
+        // position = relasi yang berada di dalam clas user
         if(auth()->user()->hasRole('Sarpras') && auth()->user()->position->location_id == 8){
             $this->prepare([
                 'tableStruct' => [
                     'url' => route($this->routes . ".grid"),
+                    // menuju $this->route.grid
                     'datatable_1' => [
                         $this->makeColumn('name:num|label:#'),
                         $this->makeColumn('name:ref_aset_id|label:Nama Aset|className:text-left|width:200px'),
@@ -194,11 +200,13 @@ class InventarisController extends Controller
             return $this->render($this->views . '.index');
         }else{
             $record = new Aset;
+            // membuat objek record agar dapat mengakses kelas aset
             // dd($request->all());
             if( count($request->usulan_id) > 1 ){
                 return $this->rollback(__('Pilih Satu Data Untuk Di Inventarisasikan'));
             }
 
+            // mengakses kelas handlesubmitKib dari kelas Aset
             return $record->handleSubmitKib($request); //handle pertama kali data diambil
         }
     }

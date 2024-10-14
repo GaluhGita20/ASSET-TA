@@ -100,6 +100,7 @@ class Base
                         'perms' => $menu['perms'],
                         'title' => __($menu['title']),
                     ];
+                    // __() adalah fungsi helper yang digunakan untuk menerjemahkan teks ke bahasa lain, sesuai dengan sistem lokalisasi (localization) yang disediakan oleh Laravel. Ini digunakan untuk memastikan aplikasi Anda mendukung multibahasa dengan mudah.
                 }
 
                 // Submenu 1

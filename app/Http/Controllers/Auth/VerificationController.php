@@ -38,5 +38,6 @@ class VerificationController extends Controller
         $this->middleware('auth');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
+        // Middleware signed digunakan untuk memverifikasi URL yang sudah ditandatangani (signed URL). Signed URL biasanya digunakan ketika Anda ingin mengirimkan link yang hanya valid untuk periode tertentu atau hanya bisa diakses oleh orang dengan URL tersebut.
     }
 }

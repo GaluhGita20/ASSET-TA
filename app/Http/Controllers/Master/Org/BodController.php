@@ -81,6 +81,7 @@ class BodController extends Controller
                         'type' => 'edit',
                         'id' => $record->id,
                     ];
+                    
                     $actions[] = [
                         'type' => 'delete',
                         'id' => $record->id,

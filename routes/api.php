@@ -37,7 +37,7 @@ Route::middleware(['throttle:60,1'])->group(function() {
         Route::get('/aset-kibe',[KIBEController::class,'index']);
         Route::get('/aset-kibf',[KIBFController::class,'index']);
 
-        Route::get('/aset-kiba-detail/{id}',[KIBAController::class,'detail']);
+        Route::get(' ',[KIBAController::class,'detail']);
         Route::get('/aset-kibb-detail/{id}',[KIBBController::class,'detail']);
         Route::get('/aset-kibc-detail/{id}',[KIBCController::class,'detail']);
         Route::get('/aset-kibd-detail/{id}',[KIBDController::class,'detail']);
